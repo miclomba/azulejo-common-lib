@@ -1,13 +1,14 @@
 #ifndef global_entity
 #define global_entity
 
+#include "config.h"
+
 namespace global {
 
-class Entity
+class X_DLL_EXPORT Entity
 {
 public:
     Entity();
-    void Foo() const;
     virtual ~Entity();
 };
 
