@@ -1,5 +1,5 @@
-#ifndef global_entity
-#define global_entity
+#ifndef global_resource
+#define global_resource
 
 #include "config.h"
 
@@ -7,10 +7,10 @@ namespace global
 {
 
 template<class T>
-class X_DLL_EXPORT Entity
+class X_DLL_EXPORT Resource
 {
 public:
-    virtual ~Entity() = default;
+    virtual ~Resource() = default;
 
 protected:
 	const T& Data() const;
@@ -20,7 +20,7 @@ private:
 	T data_;
 };
 
-#include "Entity.hpp"
+#include "Resource.hpp"
 
 }
 #endif

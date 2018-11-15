@@ -33,7 +33,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClCompile Include="test_entity.cpp" />
+    <ClCompile Include="test_resource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

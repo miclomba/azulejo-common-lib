@@ -1,12 +1,12 @@
 
 template<class T>
-const T& Entity<T>::Data() const
+const T& Resource<T>::Data() const
 {
 	return data_;
 }
 
 template <class T>
-T& Entity<T>::Data()
+T& Resource<T>::Data()
 {
 	return data_;
 }
