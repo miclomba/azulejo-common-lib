@@ -3,15 +3,25 @@
 
 #include "config.h"
 
-namespace global {
+namespace global
+{
 
+template<class T>
 class X_DLL_EXPORT Entity
 {
 public:
-    Entity();
-    virtual ~Entity();
+    virtual ~Entity() = default;
+
+protected:
+	const T& Data() const;
+	T& Data();
+
+private:
+	T data_;
 };
 
-} // end global
+#include "Entity.hpp"
+
+}
 #endif
 

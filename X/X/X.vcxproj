@@ -119,7 +119,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
+    <ClInclude Include="Entity.hpp">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
