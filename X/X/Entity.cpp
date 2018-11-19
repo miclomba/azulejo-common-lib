@@ -8,6 +8,26 @@ namespace global {
 using MemberKeys = Entity::MemberKeys;
 using Members = Entity::Members;
 
+Entity::Entity() = default;
+
+Entity::Entity(Entity&&) = default;
+Entity::Entity(const Entity& other)
+{
+	for (auto& e : other.GetMembers())
+		GetMembers()[e.first] = std::make_shared<Entity>(*e.second);
+}
+
+Entity& Entity::operator=(Entity&&) = default;
+Entity& Entity::operator=(const Entity& other)
+{
+	if (this == &other)
+		return *this;
+
+	GetMembers().clear();
+	for (auto& e : other.GetMembers())
+		GetMembers()[e.first] = std::make_shared<Entity>(*e.second);
+}
+
 Entity::~Entity() = default;
 
 const Members& Entity::GetMembers() const

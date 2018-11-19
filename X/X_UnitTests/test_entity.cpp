@@ -17,24 +17,20 @@ const int INT_VALUE = 7;
 class TypeB : public global::Entity 
 {
 public:
-	TypeB() : resource_(DEFAULT_INT_VALUE) {}
-	int& GetResource() { return resource_; }
+	TypeB() {}
 	std::string Serialize() const { return typeid(TypeB).name();  };
-private:
-	int resource_;
 };
 
 class TypeA : public global::Entity
 {
 public:
-	TypeA() { GetMembers().insert(std::make_pair(KEY, std::make_unique<TypeB>())); }
-	TypeA(int d) : TypeA() { GetTypeB().GetResource() = d; }
-	int GetValue() { return GetTypeB().GetResource(); }
+	TypeA(const std::string& key) { GetMembers().insert(std::make_pair(key, std::make_unique<TypeB>())); }
+	TypeA() {}
 	const Members& GetProtectedMembers() const { return GetMembers(); }
 	Members& GetProtectedMembers() { return GetMembers(); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
-	std::string Serialize() const { return typeid(TypeA).name();  };
+	std::string Serialize() const { return typeid(TypeA).name(); };
 private:
 	TypeB& GetTypeB() { return *std::static_pointer_cast<TypeB>(GetMembers()[KEY]); }
 };
@@ -42,46 +38,43 @@ private:
 
 TEST(Entity, MoveConstruct)
 {
-	TypeA ea(INT_VALUE);
-
+	TypeA ea(KEY);
+	auto memberAddress = ea.GetProtectedMembers()[KEY].get();
 	// move
 	TypeA eaMoved(std::move(ea));
 
-	EXPECT_EQ(eaMoved.GetValue(), INT_VALUE);
+	EXPECT_EQ(memberAddress, eaMoved.GetProtectedMembers()[KEY].get());
 }
 
 TEST(Entity, MoveAssign)
 {
-	TypeA ea(INT_VALUE);
+	TypeA ea(KEY);
+	auto memberAddress = ea.GetProtectedMembers()[KEY].get();
 
 	TypeA eaMoved;
-	EXPECT_EQ(eaMoved.GetValue(), DEFAULT_INT_VALUE);
 
 	// move assign
 	EXPECT_NO_THROW(eaMoved = std::move(ea));
-
-	EXPECT_EQ(eaMoved.GetValue(), INT_VALUE);
+	EXPECT_EQ(memberAddress, eaMoved.GetProtectedMembers()[KEY].get());
 }
 
 TEST(Entity, CopyConstruct)
 {
-	TypeA ea(INT_VALUE);
+	TypeA ea(KEY);
 
 	// copy
 	TypeA eaCopied(ea);
-	EXPECT_EQ(eaCopied.GetValue(), INT_VALUE);
+	EXPECT_NE(ea.GetProtectedMembers()[KEY].get(), eaCopied.GetProtectedMembers()[KEY].get());
 }
 
 TEST(Entity, CopyAssign)
 {
-	TypeA ea(INT_VALUE);
+	TypeA ea(KEY);
 	TypeA eaCopied;
-	EXPECT_EQ(eaCopied.GetValue(), DEFAULT_INT_VALUE);
 
 	// copy assign
 	EXPECT_NO_THROW(eaCopied = ea);
-
-	EXPECT_EQ(eaCopied.GetValue(), INT_VALUE);
+	EXPECT_NE(ea.GetProtectedMembers()[KEY].get(), eaCopied.GetProtectedMembers()[KEY].get());
 }
 
 TEST(Entity, GetMembers)
@@ -101,7 +94,7 @@ TEST(Entity, GetMembersConst)
 
 TEST(Entity, GetMembersKeys)
 {
-	TypeA ea;
+	TypeA ea(KEY);
 	EXPECT_NO_THROW(ea.GetProtectedMemberKeys());
 	auto keys = ea.GetProtectedMemberKeys();
 	EXPECT_EQ(keys.size(), ea.GetExpectedMemberCount());
@@ -111,7 +104,7 @@ TEST(Entity, GetMembersKeys)
 TEST(Entity, SerializeNestedEntities)
 {
 	std::stringstream serialization;
-	serialization << TypeA();
+	serialization << TypeA(KEY);
 	std::string expected = std::string(typeid(TypeA).name()) + typeid(TypeB).name();
 	EXPECT_EQ(serialization.str(), expected);
 }
