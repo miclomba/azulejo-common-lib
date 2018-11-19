@@ -1,6 +1,7 @@
 #ifndef global_entity
 #define global_entity
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -20,6 +21,10 @@ public:
 public:
 	virtual ~Entity();
 
+	virtual std::string Serialize() const = 0;
+
+	friend X_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const Entity& from);
+
 protected:
 	const Members& GetMembers() const;
 	Members& GetMembers();
@@ -31,5 +36,6 @@ private:
 };
 
 } // namespace global
+
 #endif // global_entity
 

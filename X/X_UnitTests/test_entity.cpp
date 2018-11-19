@@ -1,72 +1,60 @@
 #include "gtest/gtest.h"
 
 #include <memory>
+#include <sstream>
+#include <string>
 
 #include "X/Entity.h"
 #include "X/Resource.h"
 
-using Members = global::Entity::Members;
-using MemberKeys = global::Entity::MemberKeys;
-
 namespace
 {
-const std::string KEY = "keyB";
+const std::string KEY = "key";
 const std::string NEW_KEY = "newKeyB";
 const int DEFAULT_INT_VALUE = 0;
 const int INT_VALUE = 7;
 
-class IntResource : public global::Resource<int>
+class TypeB : public global::Entity 
 {
 public:
-	IntResource() {}
-	IntResource(const int value)
-	{
-		EXPECT_NO_THROW(SetData(value));
-		EXPECT_EQ(GetData(), value);
-	}
-	int GetData() const { return Data(); }
-	void SetData(int value) { Data() = value; }
-};
-
-class EntityTypeB : public global::Entity 
-{
-public:
-	EntityTypeB() { resource_.SetData(DEFAULT_INT_VALUE); }
-	IntResource& GetResource() { return resource_; }
+	TypeB() : resource_(DEFAULT_INT_VALUE) {}
+	int& GetResource() { return resource_; }
+	std::string Serialize() const { return typeid(TypeB).name();  };
 private:
-	IntResource resource_;
+	int resource_;
 };
 
-class EntityTypeA : public global::Entity
+class TypeA : public global::Entity
 {
 public:
-	EntityTypeA() { GetMembers().insert(std::make_pair(KEY, std::make_unique<EntityTypeB>())); }
-	EntityTypeA(int d) : EntityTypeA() { GetEntityTypeB().GetResource().SetData(d); }
-	int GetValue() { return GetEntityTypeB().GetResource().GetData(); }
+	TypeA() { GetMembers().insert(std::make_pair(KEY, std::make_unique<TypeB>())); }
+	TypeA(int d) : TypeA() { GetTypeB().GetResource() = d; }
+	int GetValue() { return GetTypeB().GetResource(); }
 	const Members& GetProtectedMembers() const { return GetMembers(); }
 	Members& GetProtectedMembers() { return GetMembers(); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
+	std::string Serialize() const { return typeid(TypeA).name();  };
 private:
-	EntityTypeB& GetEntityTypeB() { return *std::static_pointer_cast<EntityTypeB>(GetMembers()[KEY]); }
+	TypeB& GetTypeB() { return *std::static_pointer_cast<TypeB>(GetMembers()[KEY]); }
 };
 }
 
 TEST(Entity, MoveConstruct)
 {
-	EntityTypeA ea(INT_VALUE);
+	TypeA ea(INT_VALUE);
 
 	// move
-	EntityTypeA eaMoved(std::move(ea));
+	TypeA eaMoved(std::move(ea));
 
 	EXPECT_EQ(eaMoved.GetValue(), INT_VALUE);
 }
 
 TEST(Entity, MoveAssign)
 {
-	EntityTypeA ea(INT_VALUE);
+	TypeA ea(INT_VALUE);
 
-	EntityTypeA eaMoved;
+	TypeA eaMoved;
 	EXPECT_EQ(eaMoved.GetValue(), DEFAULT_INT_VALUE);
 
 	// move assign
@@ -77,17 +65,17 @@ TEST(Entity, MoveAssign)
 
 TEST(Entity, CopyConstruct)
 {
-	EntityTypeA ea(INT_VALUE);
+	TypeA ea(INT_VALUE);
 
 	// copy
-	EntityTypeA eaCopied(ea);
+	TypeA eaCopied(ea);
 	EXPECT_EQ(eaCopied.GetValue(), INT_VALUE);
 }
 
 TEST(Entity, CopyAssign)
 {
-	EntityTypeA ea(INT_VALUE);
-	EntityTypeA eaCopied;
+	TypeA ea(INT_VALUE);
+	TypeA eaCopied;
 	EXPECT_EQ(eaCopied.GetValue(), DEFAULT_INT_VALUE);
 
 	// copy assign
@@ -98,24 +86,40 @@ TEST(Entity, CopyAssign)
 
 TEST(Entity, GetMembers)
 {
-	EntityTypeA ea;
+	TypeA ea;
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
-	int count = ea.GetProtectedMembers().size();
-	ea.GetProtectedMembers().insert(std::make_pair(NEW_KEY, std::make_unique<EntityTypeB>()));
+	size_t count = ea.GetProtectedMembers().size();
+	ea.GetProtectedMembers().insert(std::make_pair(NEW_KEY, std::make_unique<TypeB>()));
 	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
 }
 
 TEST(Entity, GetMembersConst)
 {
-	const EntityTypeA ea;
+	const TypeA ea;
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
 }
 
 TEST(Entity, GetMembersKeys)
 {
-	EntityTypeA ea;
+	TypeA ea;
 	EXPECT_NO_THROW(ea.GetProtectedMemberKeys());
 	auto keys = ea.GetProtectedMemberKeys();
 	EXPECT_EQ(keys.size(), ea.GetExpectedMemberCount());
 	EXPECT_EQ(keys[0], KEY);
+}
+
+TEST(Entity, SerializeNestedEntities)
+{
+	std::stringstream serialization;
+	serialization << TypeA();
+	std::string expected = std::string(typeid(TypeA).name()) + typeid(TypeB).name();
+	EXPECT_EQ(serialization.str(), expected);
+}
+
+TEST(Entity, SerializeEntity)
+{
+	std::stringstream serialization;
+	serialization << TypeB();
+	std::string expected = typeid(TypeB).name();
+	EXPECT_EQ(serialization.str(), expected);
 }

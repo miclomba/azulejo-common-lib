@@ -1,5 +1,8 @@
 #include "Entity.h"
 
+#include <iostream>
+#include <queue>
+
 namespace global {
 
 using MemberKeys = Entity::MemberKeys;
@@ -25,5 +28,20 @@ const MemberKeys Entity::GetMemberKeys() const
 	return keys;
 }
 
+std::ostream& operator<<(std::ostream& to, const Entity& from)
+{
+	std::queue<const Entity*> que;
+	que.push(&from);
+	
+	while (!que.empty())
+	{
+		auto front = que.front();
+		que.pop();
+		for (auto& e : front->GetMembers())
+			que.push(e.second.get());
+		to << front->Serialize();
+	}
+	return to;
+}
 
 }

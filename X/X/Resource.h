@@ -7,7 +7,7 @@ namespace global
 {
 
 template<class T>
-class X_DLL_EXPORT Resource
+class X_DLL_EXPORT Resource 
 {
 public:
     virtual ~Resource() = default;
