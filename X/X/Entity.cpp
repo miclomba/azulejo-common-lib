@@ -48,20 +48,15 @@ const MemberKeys Entity::GetMemberKeys() const
 	return keys;
 }
 
-std::ostream& operator<<(std::ostream& to, const Entity& from)
+/*
+void Entity::InsertMember(const std::string& key, const Entity& copyEntity)
 {
-	std::queue<const Entity*> que;
-	que.push(&from);
-	
-	while (!que.empty())
-	{
-		auto front = que.front();
-		que.pop();
-		for (auto& e : front->GetMembers())
-			que.push(e.second.get());
-		to << front->Serialize();
-	}
-	return to;
+	members_[key] = std::make_shared<Entity>(copyEntity);
 }
 
+void Entity::InsertMember(const std::string& key, Entity&& moveEntity)
+{
+	members_[key] = std::move(moveEntity);
+}
+*/
 }

@@ -1,18 +1,14 @@
 #include "gtest/gtest.h"
 
 #include <memory>
-#include <sstream>
 #include <string>
 
 #include "X/Entity.h"
-#include "X/Resource.h"
 
 namespace
 {
 const std::string KEY = "key";
 const std::string NEW_KEY = "newKeyB";
-const int DEFAULT_INT_VALUE = 0;
-const int INT_VALUE = 7;
 
 class TypeB : public global::Entity 
 {
@@ -99,20 +95,4 @@ TEST(Entity, GetMembersKeys)
 	auto keys = ea.GetProtectedMemberKeys();
 	EXPECT_EQ(keys.size(), ea.GetExpectedMemberCount());
 	EXPECT_EQ(keys[0], KEY);
-}
-
-TEST(Entity, SerializeNestedEntities)
-{
-	std::stringstream serialization;
-	serialization << TypeA(KEY);
-	std::string expected = std::string(typeid(TypeA).name()) + typeid(TypeB).name();
-	EXPECT_EQ(serialization.str(), expected);
-}
-
-TEST(Entity, SerializeEntity)
-{
-	std::stringstream serialization;
-	serialization << TypeB();
-	std::string expected = typeid(TypeB).name();
-	EXPECT_EQ(serialization.str(), expected);
 }

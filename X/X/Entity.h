@@ -26,13 +26,12 @@ public:
 	Entity& operator=(Entity&& other);
 	virtual ~Entity();
 
-	virtual std::string Serialize() const { return "";  };
-
-	friend X_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const Entity& from);
-
 protected:
 	const Members& GetMembers() const;
 	Members& GetMembers();
+
+	//virtual void InsertMember(const std::string& key, const Entity& copied);
+	//virtual void InsertMember(const std::string& key, Entity&& moved);
 
 	const MemberKeys GetMemberKeys() const;
 

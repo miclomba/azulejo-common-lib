@@ -119,12 +119,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ISerializableEntity.cpp" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Resource.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClInclude Include="ISerializableEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
