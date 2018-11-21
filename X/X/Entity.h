@@ -28,10 +28,9 @@ public:
 
 protected:
 	const Members& GetMembers() const;
-	Members& GetMembers();
 
-	//virtual void InsertMember(const std::string& key, const Entity& copied);
-	//virtual void InsertMember(const std::string& key, Entity&& moved);
+	Entity& GetMember(const std::string& key);
+	virtual void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
 
 	const MemberKeys GetMemberKeys() const;
 

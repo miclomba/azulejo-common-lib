@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 
+#include "X/Entity.h"
 #include "X/ISerializableEntity.h"
 
 namespace
@@ -20,16 +21,17 @@ public:
 class TypeA : public global::ISerializableEntity
 {
 public:
-	TypeA(const std::string& key) { GetMembers().insert(std::make_pair(key, std::make_unique<TypeB>())); }
+	TypeA(const std::string& key) { AggregateMember(key, std::make_unique<TypeB>()); }
 	TypeA() {}
-	const Members& GetProtectedMembers() const { return GetMembers(); }
-	Members& GetProtectedMembers() { return GetMembers(); }
+	void AddProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
+	const Members& GetProtectedMembers() { return GetMembers(); };
+	Entity& GetProtectedMember(const std::string& key) { return GetMember(key); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 
 	std::string Serialize() const { return typeid(TypeA).name(); };
 private:
-	TypeB& GetTypeB() { return *std::static_pointer_cast<TypeB>(GetMembers()[KEY]); }
+	TypeB& GetTypeB() { return static_cast<TypeB&>(GetMember(KEY)); }
 };
 }
 
@@ -47,6 +49,21 @@ TEST(ISerializableEntity, SerializeEntity)
 	serialization << TypeB();
 	std::string expected = typeid(TypeB).name();
 	EXPECT_EQ(serialization.str(), expected);
+}
+
+TEST(ISerializableEntity, AddMember)
+{
+	TypeA ea;
+	EXPECT_NO_THROW(ea.GetProtectedMembers());
+	size_t count = ea.GetProtectedMembers().size();
+	ea.AddProtectedMember(KEY, std::make_unique<TypeA>());
+	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
+}
+
+TEST(ISerializableEntity, ThrowOnAddMember)
+{
+	TypeA ea;
+	EXPECT_THROW(ea.AddProtectedMember(KEY, std::make_unique<global::Entity>()), std::runtime_error);
 }
 
 // TODO

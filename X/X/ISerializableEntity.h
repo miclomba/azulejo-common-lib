@@ -1,6 +1,7 @@
 #ifndef global_iserializable_entity
 #define global_iserializable_entity
 
+#include <memory>
 #include <string>
 
 #include "config.h"
@@ -17,6 +18,11 @@ public:
 	virtual std::string Serialize() const = 0;
 
 	friend X_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const ISerializableEntity& from);
+
+protected:
+
+	void AggregateMember(const std::string& key, std::shared_ptr<Entity> entity) override;
+
 };
 
 } // namespace global

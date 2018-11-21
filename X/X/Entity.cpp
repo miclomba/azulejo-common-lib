@@ -13,8 +13,8 @@ Entity::Entity() = default;
 Entity::Entity(Entity&&) = default;
 Entity::Entity(const Entity& other)
 {
-	for (auto& e : other.GetMembers())
-		GetMembers()[e.first] = std::make_shared<Entity>(*e.second);
+	for (auto& e : other.members_)
+		members_[e.first] = std::make_shared<Entity>(*e.second);
 }
 
 Entity& Entity::operator=(Entity&&) = default;
@@ -23,40 +23,42 @@ Entity& Entity::operator=(const Entity& other)
 	if (this == &other)
 		return *this;
 
-	GetMembers().clear();
-	for (auto& e : other.GetMembers())
-		GetMembers()[e.first] = std::make_shared<Entity>(*e.second);
+	members_.clear();
+	for (auto& e : other.members_)
+		members_[e.first] = std::make_shared<Entity>(*e.second);
 }
 
 Entity::~Entity() = default;
+
+const MemberKeys Entity::GetMemberKeys() const
+{
+	MemberKeys keys;
+	for (auto& e : members_)
+		keys.push_back(e.first);
+	return keys;
+}
 
 const Members& Entity::GetMembers() const
 {
 	return members_;
 }
 
-Members& Entity::GetMembers()
+Entity& Entity::GetMember(const std::string& key)
 {
-	return members_;
+	auto found = members_.find(key);
+	if (found != members_.cend())
+		return *members_[key];
+
+	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 }
 
-const MemberKeys Entity::GetMemberKeys() const
+void Entity::AggregateMember(const std::string& key, std::shared_ptr<Entity> entity)
 {
-	MemberKeys keys;
-	for (auto& e : GetMembers())
-		keys.push_back(e.first);
-	return keys;
+	auto found = members_.find(key);
+	if (found != members_.cend())
+		throw std::runtime_error("Cannot aggregate entity using key=" + key + " because this key is already in use.");
+
+	members_[key] = std::move(entity);
 }
 
-/*
-void Entity::InsertMember(const std::string& key, const Entity& copyEntity)
-{
-	members_[key] = std::make_shared<Entity>(copyEntity);
-}
-
-void Entity::InsertMember(const std::string& key, Entity&& moveEntity)
-{
-	members_[key] = std::move(moveEntity);
-}
-*/
 }

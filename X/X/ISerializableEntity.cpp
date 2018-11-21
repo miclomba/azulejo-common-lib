@@ -28,4 +28,11 @@ std::ostream& operator<<(std::ostream& to, const ISerializableEntity& from)
 	return to;
 }
 
+void ISerializableEntity::AggregateMember(const std::string& key, std::shared_ptr<Entity> entity)
+{
+	if (! std::dynamic_pointer_cast<ISerializableEntity>(entity))
+		throw std::runtime_error("Cannot aggregate non-ISerializableEntity in a ISerializableEntity");
+	Entity::AggregateMember(key, std::move(entity));
+}
+
 }
