@@ -1,6 +1,7 @@
 #ifndef global_iserializable_entity
 #define global_iserializable_entity
 
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -16,13 +17,12 @@ public:
 	virtual ~ISerializableEntity();
 
 	virtual std::string Serialize() const = 0;
+	virtual void Deserialize(const std::string& serialization) = 0;
+
+	static std::string GetDelimeter();
 
 	friend X_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const ISerializableEntity& from);
-
-protected:
-
-	void AggregateMember(const std::string& key, std::shared_ptr<Entity> entity) override;
-
+	friend X_DLL_EXPORT std::istream& operator>>(std::istream& from, ISerializableEntity& to);
 };
 
 } // namespace global

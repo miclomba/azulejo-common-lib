@@ -2,10 +2,20 @@
 
 #include <queue>
 
+namespace
+{
+const char DELIM = ':';
+}
+
 namespace global
 {
 
 ISerializableEntity::~ISerializableEntity() = default;
+
+std::string ISerializableEntity::GetDelimeter()
+{
+	return std::string(1,DELIM);
+}
 
 std::ostream& operator<<(std::ostream& to, const ISerializableEntity& from)
 {
@@ -23,16 +33,19 @@ std::ostream& operator<<(std::ostream& to, const ISerializableEntity& from)
 				throw std::runtime_error("Attempted to serialize a non-serializable entity: " + e.first);
 			que.push(se.get());
 		}
-		to << front->Serialize();
+		to << front->Serialize() << DELIM;
 	}
 	return to;
 }
 
-void ISerializableEntity::AggregateMember(const std::string& key, std::shared_ptr<Entity> entity)
+std::istream& operator>>(std::istream& from, ISerializableEntity& to)
 {
-	if (! std::dynamic_pointer_cast<ISerializableEntity>(entity))
-		throw std::runtime_error("Cannot aggregate non-ISerializableEntity in a ISerializableEntity");
-	Entity::AggregateMember(key, std::move(entity));
+	std::string line;
+	std::getline(from, line);
+
+	to.Deserialize(line);
+
+	return from;
 }
 
 }

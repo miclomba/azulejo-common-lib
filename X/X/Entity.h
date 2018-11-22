@@ -1,7 +1,6 @@
 #ifndef global_entity
 #define global_entity
 
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
