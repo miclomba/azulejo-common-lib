@@ -14,6 +14,7 @@ namespace
 const std::string KEY = "key";
 const std::string TYPEA = "TypeA";
 const std::string TYPEB = "TypeB";
+const char DELIM = ':';
 
 class TypeB : public global::ISerializableEntity 
 {
@@ -82,4 +83,9 @@ TEST(ISerializableEntity, DeserializeEntity)
 	EXPECT_TRUE(b.deserializedTypeString.empty());
 	serialization >> b;
 	EXPECT_EQ(b.deserializedTypeString, TYPEB);
+}
+
+TEST(ISerializableEntity, Delimiter)
+{
+	EXPECT_EQ(ISerializableEntity::GetDelimeter(), std::string(1,DELIM));
 }
