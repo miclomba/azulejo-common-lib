@@ -8,8 +8,7 @@
 
 #include "config.h"
 
-namespace global
-{
+namespace global {
 
 class X_DLL_EXPORT Entity
 {

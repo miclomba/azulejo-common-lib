@@ -8,8 +8,7 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global
-{
+namespace global {
 
 class X_DLL_EXPORT ISerializableEntity : public Entity
 {

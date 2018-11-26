@@ -119,8 +119,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IRunnableEntity.cpp" />
     <ClCompile Include="ISerializableEntity.cpp" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="IRunnableEntity.h" />
     <ClInclude Include="Resource.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
