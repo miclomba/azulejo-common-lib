@@ -123,10 +123,12 @@
     <ClCompile Include="ISerializableEntity.cpp" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="IRunnableEntity.h" />
+    <ClInclude Include="IShareableEntity.h" />
     <ClInclude Include="Resource.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="IShareableEntity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClInclude Include="ISerializableEntity.h" />
   </ItemGroup>

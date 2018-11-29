@@ -6,7 +6,11 @@
 
 namespace global {
 
-IRunnableEntity::~IRunnableEntity() = default;
+IRunnableEntity::~IRunnableEntity()
+{
+	if (thread_)
+		thread_->join();
+}
 
 void IRunnableEntity::Start()
 {

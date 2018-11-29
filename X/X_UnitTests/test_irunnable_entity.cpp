@@ -51,7 +51,6 @@ TEST(IRunnableEntity, ThrowOnStart)
 
 	EXPECT_NO_THROW(runn.Start());
 	EXPECT_THROW(runn.Start(), std::runtime_error);
-	runn.Join();
 }
 
 TEST(IRunnableEntity, Join)
