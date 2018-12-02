@@ -17,16 +17,19 @@ public:
 	virtual ~IShareableEntity();
 
 	virtual void Share(const std::string& name) = 0;
+	virtual void Access(const std::string& name) = 0;
 	
 	std::string GetSharedName() const;
 	size_t GetSharedSize() const;
 	void* GetSharedAddress() const;
 
 protected:
-	void OpenOrCreate(const std::string& name, const size_t size);
+	void Create(const std::string& name, const size_t size);
+	void Open(const std::string& name);
 
 private:
 	std::shared_ptr<boost::interprocess::shared_memory_object> shmem_;
+	bool isShmemOwner_{ false };
 };
 
 } // namespace global

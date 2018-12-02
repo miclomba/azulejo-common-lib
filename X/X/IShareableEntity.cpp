@@ -10,7 +10,7 @@ namespace global {
 
 IShareableEntity::~IShareableEntity()
 {
-	if (shmem_)
+	if (shmem_ && isShmemOwner_)
 	{
 		auto name = shmem_->get_name();
 		bool removed = boost::interprocess::shared_memory_object::remove(name);
@@ -19,20 +19,32 @@ IShareableEntity::~IShareableEntity()
 	}
 }
 
-void IShareableEntity::OpenOrCreate(const std::string& name, const size_t size)
+void IShareableEntity::Create(const std::string& name, const size_t size)
 {
 	using namespace boost::interprocess;
 
 	if (shmem_)
 		throw std::runtime_error("Shared memory already allocated using name=" + std::string(shmem_->get_name()));
 
-	shmem_ = std::make_shared<shared_memory_object>(open_or_create, name.c_str(), read_write);
+	shmem_ = std::make_shared<shared_memory_object>(create_only, name.c_str(), read_write);
 
 	auto currentSize = GetSharedSize();
 	auto desiredSize = static_cast<offset_t>(size);
 
 	if (desiredSize > currentSize)
 		shmem_->truncate(desiredSize);
+
+	isShmemOwner_ = true;
+}
+
+void IShareableEntity::Open(const std::string& name)
+{
+	using namespace boost::interprocess;
+
+	if (shmem_)
+		throw std::runtime_error("Shared memory already allocated using name=" + std::string(shmem_->get_name()));
+
+	shmem_ = std::make_shared<shared_memory_object>(open_only, name.c_str(), read_write);
 }
 
 std::string IShareableEntity::GetSharedName() const
