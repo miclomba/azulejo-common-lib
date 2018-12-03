@@ -17,7 +17,6 @@ public:
 	virtual ~IShareableEntity();
 
 	virtual void Share(const std::string& name) = 0;
-	virtual void Access(const std::string& name) = 0;
 	
 	std::string GetSharedName() const;
 	size_t GetSharedSize() const;
@@ -29,6 +28,8 @@ protected:
 
 private:
 	std::shared_ptr<boost::interprocess::shared_memory_object> shmem_;
+	
+	// TODO : find a way to remove this	
 	bool isShmemOwner_{ false };
 };
 
