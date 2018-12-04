@@ -6,11 +6,12 @@
 
 #include <boost/asio.hpp>
 
+#include "config.h"
 #include "Entity.h"
 
 namespace global {
 
-class INetworkableEntity : public Entity
+class X_DLL_EXPORT INetworkableEntity : public Entity
 {
 public:
 	virtual ~INetworkableEntity();

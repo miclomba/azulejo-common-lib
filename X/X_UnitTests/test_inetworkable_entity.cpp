@@ -11,6 +11,8 @@ namespace
 class Client : public global::INetworkableEntity
 {
 public:
+	Client() {};
+
 	void Network(const std::string& url) override
 	{
 		auto socket = Connect(url);
@@ -29,12 +31,14 @@ public:
 
 			std::cout.write(buf.data(), len);
 		}
-	}
+	};
 };
 
 class Server : public global::INetworkableEntity
 {
 public:
+	Server() {};
+
 	void Network(const std::string& url) override
 	{
 		using namespace boost::asio::ip;
@@ -46,12 +50,11 @@ public:
 			boost::system::error_code ignored_error;
 			boost::asio::write(*socket, boost::asio::buffer("received"), ignored_error);
 		}
-	}
+	};
 };
-}
+} // end namespace
 
-TEST(INetworkableEntity, DoSomething)
+TEST(INetworkableEntity, ServerNetwork)
 {
 	Server server;
-	server.Network("localhost");
 }
