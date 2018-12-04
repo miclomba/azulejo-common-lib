@@ -13,17 +13,13 @@ namespace global {
 class INetworkableEntity : public Entity
 {
 public:
-	INetworkableEntity();
 	virtual ~INetworkableEntity();
 
-	virtual void Network() = 0;
+	virtual void Network(const std::string& url) = 0;
 
 protected:
-	void Connect(const std::string& url);
-
-private:
-	std::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor_;
-	std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
+	std::shared_ptr<boost::asio::ip::tcp::socket> Accept(const boost::asio::ip::tcp::endpoint& endPoint);
+	std::shared_ptr<boost::asio::ip::tcp::socket> Connect(const std::string& url);
 };
 
 } // namespace global
