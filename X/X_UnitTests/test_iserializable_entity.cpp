@@ -19,7 +19,6 @@ const char DELIM = ':';
 class TypeB : public global::ISerializableEntity 
 {
 public:
-	TypeB() {}
 	std::string Serialize() const override { return TYPEB; };
 
 	std::string deserializedTypeString;

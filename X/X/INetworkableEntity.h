@@ -16,11 +16,11 @@ class X_DLL_EXPORT INetworkableEntity : public Entity
 public:
 	virtual ~INetworkableEntity();
 
-	virtual void Network(const std::string& url) = 0;
+	virtual void Network() = 0;
 
 protected:
-	std::shared_ptr<boost::asio::ip::tcp::socket> Accept(const boost::asio::ip::tcp::endpoint& endPoint);
-	std::shared_ptr<boost::asio::ip::tcp::socket> Connect(const std::string& url);
+	std::shared_ptr<boost::asio::ip::tcp::socket> Accept(const int portNumber);
+	std::shared_ptr<boost::asio::ip::tcp::socket> Connect(const std::string& host);
 };
 
 } // namespace global
