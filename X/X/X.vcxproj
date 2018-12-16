@@ -119,11 +119,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="INetworkableEntity.cpp" />
+    <ClCompile Include="IClientEntity.cpp" />
+    <ClCompile Include="IServerEntity.cpp" />
     <ClCompile Include="IRunnableEntity.cpp" />
     <ClCompile Include="ISerializableEntity.cpp" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="INetworkableEntity.h" />
+    <ClInclude Include="IClientEntity.h" />
+    <ClInclude Include="IServerEntity.h" />
     <ClInclude Include="IRunnableEntity.h" />
     <ClInclude Include="IShareableEntity.h" />
     <ClInclude Include="Resource.hpp">

@@ -33,7 +33,10 @@
     <ClCompile Include="IShareableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="INetworkableEntity.cpp">
+    <ClCompile Include="IServerEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IClientEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +62,10 @@
     <ClInclude Include="IShareableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="INetworkableEntity.h">
+    <ClInclude Include="IServerEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IClientEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

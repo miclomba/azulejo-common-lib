@@ -1,69 +1,71 @@
+#include "gtest/gtest.h"
 
-#include <array>
-#include <iostream>
+#include <ctime>
 #include <exception>
+#include <iostream>
+#include <memory>
+#include <string>
 
 #include <boost/array.hpp>
-#include <boost/chrono.hpp>
-#include <boost/thread/thread.hpp> 
 
-#include "X/INetworkableEntity.h"
+#include "X/IClientEntity.h"
+#include "X/IServerEntity.h"
 
 namespace
 {
-const std::string HOST = "localhost";
+const int SLEEP_TIME_MS = 15000;
 const int PORT = 13;
 const int BUFF_LEN = 128;
-const int SLEEP_TIME_MS = 15000;
+const std::string HOST = "localhost";
 
-std::string MakeString()
+std::string MakeDaytimeString()
 {
-	return std::string("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	using namespace std; // For time_t, time and ctime;
+	time_t now = time(0);
+	char str[26];
+	ctime_s(str, sizeof(str), &now);
+	return str;
 }
 
-class Client : public global::INetworkableEntity
+class Client : public global::IClientEntity
 {
-public:
-	void Network() override
+protected:
+	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
 	{
-		auto socket = Connect(HOST);
+		boost::array<char, BUFF_LEN> buf;
+		boost::system::error_code error;
 
-		for (;;)
-		{
-			boost::array<char, BUFF_LEN> buf;
-			boost::system::error_code error;
+		size_t len = mySocket->read_some(boost::asio::buffer(buf), error);
+		if (error == boost::asio::error::eof)
+			return false; // Connection closed cleanly by peer.
+		else if (error)
+			throw boost::system::system_error(error); // Some other error.
 
-			size_t len = socket->read_some(boost::asio::buffer(buf), error);
+		std::cout.write(buf.data(), len);
 
-			if (error == boost::asio::error::eof)
-				break; // Connection closed cleanly by peer.
-			else if (error)
-				throw boost::system::system_error(error); // Some other error.
-
-			std::cout.write(buf.data(), len);
-		}
-	};
+		return true;
+	}
 };
 
-class Server : public global::INetworkableEntity
+class Server : public global::IServerEntity
 {
 public:
-	void Network() override
+	Server(const int port) : IServerEntity(port) {}
+protected:
+	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
 	{
-		using namespace boost::asio::ip;
+		std::string message = MakeDaytimeString();
 
-		for (;;)
-		{
-			auto socket = Accept(PORT);
+		boost::system::error_code ec;
+		boost::asio::write(*mySocket, boost::asio::buffer(message), boost::asio::transfer_all(), ec);
 
-			auto message = MakeString();
-
-			boost::system::error_code ignored_error;
-			boost::asio::write(*socket, boost::asio::buffer(message), ignored_error);
-		}
-	};
+		if (!ec)
+			return true;
+		return false;
+	}
 };
 } // end namespace
+
 /*
 int main(const int argc, const char** argv)
 {
@@ -71,10 +73,10 @@ int main(const int argc, const char** argv)
 	if (argc == 1)
 	{
 		std::cout << "Running server..." << std::endl;
-		Server server;
+		Server server(PORT);
 		try
 		{
-			server.Network();
+			server.Run();
 		}
 		catch (std::exception&)
 		{
@@ -85,13 +87,10 @@ int main(const int argc, const char** argv)
 	{
 		std::cout << "Running client..." << std::endl;
 
-		// sleep some
-		//boost::this_thread::sleep_for(boost::chrono::milliseconds(SLEEP_TIME_MS));
-
 		Client client;
 		try
 		{
-			client.Network();
+			client.Run(HOST, PORT);
 		}
 		catch (std::exception&)
 		{
