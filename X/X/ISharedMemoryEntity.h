@@ -1,5 +1,5 @@
-#ifndef global_ishareable_entity
-#define global_ishareable_entity
+#ifndef global_ishared_memory_entity
+#define global_ishared_memory_entity
 
 #include <memory>
 #include <string>
@@ -11,18 +11,15 @@
 
 namespace global {
 
-class X_DLL_EXPORT IShareableEntity : public Entity
+class X_DLL_EXPORT ISharedMemoryEntity : public Entity
 {
 public:
-	virtual ~IShareableEntity();
+	virtual ~ISharedMemoryEntity();
 
-	virtual void Share(const std::string& name) = 0;
-	
 	std::string GetSharedName() const;
 	size_t GetSharedSize() const;
 	void* GetSharedAddress() const;
 
-protected:
 	void Create(const std::string& name, const size_t size);
 	void Open(const std::string& name);
 
@@ -35,4 +32,4 @@ private:
 
 } // namespace global
 
-#endif // global_ishareable_entity
+#endif // global_ishared_memory_entity

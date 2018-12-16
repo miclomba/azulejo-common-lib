@@ -37,7 +37,7 @@
     <ClCompile Include="test_inetworkable_entity.cpp" />
     <ClCompile Include="test_irunnable_entity.cpp" />
     <ClCompile Include="test_iserializable_entity.cpp" />
-    <ClCompile Include="test_ishareable_entity.cpp" />
+    <ClCompile Include="test_ishared_memory_entity.cpp" />
     <ClCompile Include="test_resource.cpp" />
   </ItemGroup>
   <ItemGroup>

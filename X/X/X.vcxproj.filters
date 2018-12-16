@@ -30,13 +30,13 @@
     <ClCompile Include="IRunnableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IShareableEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IServerEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IClientEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ISharedMemoryEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,13 +59,13 @@
     <ClInclude Include="IRunnableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IShareableEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IServerEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IClientEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISharedMemoryEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

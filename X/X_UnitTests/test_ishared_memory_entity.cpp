@@ -3,84 +3,76 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/thread.hpp> 
 
-#include "X/IShareableEntity.h"
+#include "X/ISharedMemoryEntity.h"
 
 namespace
 {
 const std::string NAME = "shmem";
 const size_t SIZE = 1024;
 
-class ShareableCreator : public global::IShareableEntity
+class ShareableCreator : public global::ISharedMemoryEntity
 {
-public:
-	ShareableCreator() {};
-
-	void Share(const std::string& name) override { Create(name,SIZE); };
 };
 
-class ShareableAccessor : public global::IShareableEntity
+class ShareableAccessor : public global::ISharedMemoryEntity
 {
-public:
-	ShareableAccessor() {};
-
-	void Share(const std::string& name) override { Open(name); };
 };
 }
 /*
-TEST(IShareableEntity, OpenOrCreate)
+TEST(ISharedMemoryEntity, OpenOrCreate)
 {
 	ShareableCreator shareable;
 
-	EXPECT_NO_THROW(shareable.Share(NAME));
+	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
 }
 
-TEST(IShareableEntity, ThrowOnOpenOrCreate)
+TEST(ISharedMemoryEntity, ThrowOnOpenOrCreate)
 {
 	ShareableCreator shareable;
 
-	EXPECT_NO_THROW(shareable.Share(NAME));
-	EXPECT_THROW(shareable.Share(NAME), std::runtime_error);
+	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
+	EXPECT_THROW(shareable.Create(NAME, SIZE), std::runtime_error);
 }
 
-TEST(IShareableEntity, GetSharedName)
+TEST(ISharedMemoryEntity, GetSharedName)
 {
 	ShareableCreator shareable;
 
-	shareable.Share(NAME);
+	shareable.Create(NAME,SIZE);
 	EXPECT_EQ(NAME,shareable.GetSharedName());
 }
 */
-TEST(IShareableEntity, ThrowOnGetSharedName)
+TEST(ISharedMemoryEntity, ThrowOnGetSharedName)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedName(), std::runtime_error);
 }
 /*
-TEST(IShareableEntity, GetSharedSize)
+TEST(ISharedMemoryEntity, GetSharedSize)
 {
 	ShareableCreator shareable;
 
-	shareable.Share(NAME);
+	shareable.Create(NAME,SIZE);
 	EXPECT_EQ(SIZE, shareable.GetSharedSize());
 }
 */
-TEST(IShareableEntity, ThrowOnGetSharedSize)
+TEST(ISharedMemoryEntity, ThrowOnGetSharedSize)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedSize(), std::runtime_error);
 }
 /*
-TEST(IShareableEntity, GetSharedAddress)
+TEST(ISharedMemoryEntity, GetSharedAddress)
 {
 	ShareableCreator shareable;
 
-	shareable.Share(NAME);
+	shareable.Create(NAME,SIZE);
 	EXPECT_NO_THROW(shareable.GetSharedAddress());
 }
 */
-TEST(IShareableEntity, ThrowOnGetSharedAddress)
+TEST(ISharedMemoryEntity, ThrowOnGetSharedAddress)
 {
 	ShareableCreator shareable;
 
@@ -92,15 +84,19 @@ int main(int argc, const char** argv)
 	// sleep some
 	boost::this_thread::sleep_for(boost::chrono::milliseconds(15000));
 
-	std::shared_ptr<global::IShareableEntity> sable;
+	std::shared_ptr<global::ISharedMemoryEntity> sable;
 
 	// if parent
 	if (argc == 1)
+	{
 		sable = std::make_shared<ShareableCreator>();
+		sable->Create(NAME,SIZE);
+	}
 	else
+	{
 		sable = std::make_shared<ShareableAccessor>();
-		
-	sable->Share(NAME);
+		sable->Open(NAME);
+	}
 
 	if (NAME != sable->GetSharedName())
 		throw std::runtime_error("Shared memory segment's name is not equal to " + NAME);
