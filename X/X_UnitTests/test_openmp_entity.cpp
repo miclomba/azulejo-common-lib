@@ -24,7 +24,9 @@ public:
 	void Run() override 
 	{
 		omp_set_num_threads(numThreads_);
+		// can the implementation vary the number of threads dynamically (some impl don't support this)
 		omp_set_dynamic(setDynamic_);
+		// are nested parallel regions supported (some impl don't support this)
 		omp_set_nested(setNested_);
 
 		// Create an atomic
