@@ -18,7 +18,7 @@ public:
 
 protected:
 	int numThreads_;
-	bool setDynamic_;
+	bool setDynamic_; 
 	bool setNested_;
 };
 
