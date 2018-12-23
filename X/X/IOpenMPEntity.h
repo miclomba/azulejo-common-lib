@@ -17,8 +17,8 @@ public:
 	virtual void Run() = 0;
 
 protected:
-	int numThreads_; 
-	bool setDynamic_;
+	int numThreads_;
+	bool setDynamic_; 
 	bool setNested_;
 };
 

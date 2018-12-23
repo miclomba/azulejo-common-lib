@@ -18,7 +18,7 @@ public:
 
 	int GetSharedTotal() 
 	{ 
-		return sharedTotal_; 
+		return sharedTotal_;
 	}
 
 	void Run() override 
