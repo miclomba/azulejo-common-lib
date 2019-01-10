@@ -6,15 +6,27 @@
 #include <string>
 #include <vector>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include "config.h"
 
 namespace global {
+
+class EntityAggregationSerializer;
 
 class X_DLL_EXPORT Entity
 {
 public:
 	using MemberKeys = std::vector<std::string>;
 	using Members = std::map<std::string, std::shared_ptr<Entity>>;
+
+	friend class EntityAggregationSerializer;
+
+	const std::string GetKey() const;
+	void SetKey(const std::string& key);
+
+	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const;
+	virtual void Load(boost::property_tree::ptree& tree, const std::string& path);
 
 public:
 	Entity();
@@ -25,14 +37,13 @@ public:
 	virtual ~Entity();
 
 protected:
-	const Members& GetMembers() const;
-
-	Entity& GetMember(const std::string& key);
+	const Members& GetAggregatedMembers() const;
+	Entity& GetAggregatedMember(const std::string& key);
 	virtual void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
-
-	const MemberKeys GetMemberKeys() const;
+	const MemberKeys GetAggregatedMemberKeys() const;
 
 private:
+	std::string key_;
 	Members members_;
 };
 

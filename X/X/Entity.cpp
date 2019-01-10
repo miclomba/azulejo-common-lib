@@ -1,7 +1,12 @@
 #include "Entity.h"
+#include "EntityAggregationSerializer.h"
 
 #include <iostream>
 #include <queue>
+
+#include <boost/property_tree/ptree.hpp>
+
+using boost::property_tree::ptree;
 
 namespace global {
 
@@ -30,7 +35,27 @@ Entity& Entity::operator=(const Entity& other)
 
 Entity::~Entity() = default;
 
-const MemberKeys Entity::GetMemberKeys() const
+const std::string Entity::GetKey() const
+{
+	if (key_.empty())
+		throw std::runtime_error("Entity key has not been set when getting key");
+	return key_;
+}
+
+void Entity::SetKey(const std::string& key)
+{
+	key_ = key;
+}
+
+void Entity::Save(ptree& tree, const std::string& path) const
+{
+}
+
+void Entity::Load(ptree& tree, const std::string& path)
+{
+}
+
+const MemberKeys Entity::GetAggregatedMemberKeys() const
 {
 	MemberKeys keys;
 	for (auto& e : members_)
@@ -38,16 +63,20 @@ const MemberKeys Entity::GetMemberKeys() const
 	return keys;
 }
 
-const Members& Entity::GetMembers() const
+const Members& Entity::GetAggregatedMembers() const
 {
 	return members_;
 }
 
-Entity& Entity::GetMember(const std::string& key)
+Entity& Entity::GetAggregatedMember(const std::string& key)
 {
 	auto found = members_.find(key);
 	if (found != members_.cend())
+	{
+		if (!members_[key])
+			members_[key] = EntityAggregationSerializer::GetInstance()->Deserialize(key);
 		return *members_[key];
+	}
 
 	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 }

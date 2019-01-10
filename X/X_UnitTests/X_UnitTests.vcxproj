@@ -34,9 +34,10 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClCompile Include="test_entity.cpp" />
+    <ClCompile Include="test_entity_aggregation_serializer.cpp" />
     <ClCompile Include="test_inetworkable_entity.cpp" />
     <ClCompile Include="test_irunnable_entity.cpp" />
-    <ClCompile Include="test_iserializable_entity.cpp" />
+    <ClCompile Include="test_istreamable_entity.cpp" />
     <ClCompile Include="test_ishared_memory_entity.cpp" />
     <ClCompile Include="test_openmp_entity.cpp" />
     <ClCompile Include="test_resource.cpp" />
