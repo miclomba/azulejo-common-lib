@@ -24,9 +24,6 @@
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ISerializableEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IRunnableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +37,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IOpenMPEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAggregationSerializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IStreamableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,9 +59,6 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ISerializableEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IRunnableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,6 +72,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IOpenMPEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityAggregationSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IStreamableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,13 +23,13 @@ public:
 	TypeA(const std::string& key) { AggregateMember(key, std::make_unique<TypeB>()); }
 	TypeA() {}
 	void AddProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
-	const Members& GetProtectedMembers() { return GetMembers(); };
-	Entity& GetProtectedMember(const std::string& key) { return GetMember(key); }
-	const MemberKeys GetProtectedMemberKeys() const { return GetMemberKeys(); }
+	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
+	Entity& GetProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
+	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 	std::string Serialize() const { return typeid(TypeA).name(); };
 private:
-	TypeB& GetTypeB() { return static_cast<TypeB&>(GetMember(KEY)); }
+	TypeB& GetTypeB() { return static_cast<TypeB&>(GetAggregatedMember(KEY)); }
 };
 }
 
