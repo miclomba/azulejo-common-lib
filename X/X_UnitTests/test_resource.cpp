@@ -1,4 +1,7 @@
-#include "gtest/gtest.h"
+
+#include "config.h"
+
+#include <gtest/gtest.h>
 
 #include "X/Resource.h"
 

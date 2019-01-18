@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include "config.h"
 
 #include <ctime>
 #include <exception>
@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include <gtest/gtest.h>
 #include <boost/array.hpp>
 
 #include "X/IClientEntity.h"

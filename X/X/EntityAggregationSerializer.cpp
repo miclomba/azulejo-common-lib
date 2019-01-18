@@ -1,19 +1,17 @@
 #include "EntityAggregationSerializer.h"
 
+#include <filesystem>
 #include <fstream>
 #include <memory>
 
-#include <boost/filesystem.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "Entity.h"
 
-namespace fs = boost::filesystem;
-
+namespace fs = std::filesystem;
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
-
 using path_type = boost::property_tree::ptree::path_type;
 
 namespace
@@ -56,10 +54,10 @@ std::string FindRelativePath(const ptree& root, const ptree& node) {
 
 namespace global {
 
-EntityAggregationSerializer* EntityAggregationSerializer::instance_{ nullptr };
+EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
 
-EntityAggregationSerializer::EntityAggregationSerializer() {};
-EntityAggregationSerializer::~EntityAggregationSerializer() {};
+EntityAggregationSerializer::EntityAggregationSerializer() = default;
+EntityAggregationSerializer::~EntityAggregationSerializer() = default;
 
 EntityAggregationSerializer* EntityAggregationSerializer::GetInstance()
 {
@@ -83,18 +81,29 @@ void EntityAggregationSerializer::LoadSerializationStructure(const std::string& 
 	if (file)
 		read_json(file, serializationStructure_);
 	else
+	{
+		serializationPath_.clear();
 		throw std::runtime_error("Could not open " + pathToJSON + " when loading serialization structure");
+	}
+}
+
+bool EntityAggregationSerializer::HasSerializationStructure() const
+{
+	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
 void EntityAggregationSerializer::Serialize(const Entity& entity)
 {
+	if (!HasSerializationStructure())
+		throw std::runtime_error("Cannot serialize entity because no serialization structure has been loaded");
+
 	auto tree = serializationStructure_.get_child_optional(entity.GetKey());
 	if (!tree)
 		throw std::runtime_error("Cannot locate entity identifier in the serialization json structure");
 	else
 	{
 		std::string relativePath = FindRelativePath(serializationStructure_, *tree);
-		std::string absolutePath = (fs::path(serializationPath_) / relativePath).string();
+		std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
 
 		entity.Save(*tree, absolutePath);
 	}
@@ -106,6 +115,9 @@ void EntityAggregationSerializer::Serialize(const Entity& entity)
 
 std::shared_ptr<Entity> EntityAggregationSerializer::Deserialize(const std::string& key)
 {
+	if (!HasSerializationStructure())
+		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
+
 	auto entity = std::make_shared<Entity>(); // = FactoryCreateEntityFromKey(key)
 
 	auto tree = serializationStructure_.get_child_optional(key);
@@ -121,7 +133,7 @@ std::shared_ptr<Entity> EntityAggregationSerializer::Deserialize(const std::stri
 
 	auto& memberKeys = entity->GetAggregatedMemberKeys();
 	for (auto& k : memberKeys)
-		entity->AggregateMember(k,Deserialize(k));
+		entity->AggregateMember(Deserialize(k));
 
 	return entity;
 }

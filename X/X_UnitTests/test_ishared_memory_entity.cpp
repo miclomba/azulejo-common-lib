@@ -1,4 +1,7 @@
-#include "gtest/gtest.h"
+
+#include "config.h"
+
+#include <gtest/gtest.h>
 
 #include <boost/chrono.hpp>
 #include <boost/thread/thread.hpp> 

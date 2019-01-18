@@ -1,8 +1,11 @@
-#include "gtest/gtest.h"
+
+#include "config.h"
 
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include <gtest/gtest.h>
 
 #include "X/Entity.h"
 #include "X/IStreamableEntity.h"
@@ -32,9 +35,9 @@ public:
 class TypeA : public global::IStreamableEntity
 {
 public:
-	TypeA(const std::string& key) { AggregateMember(key, std::make_unique<TypeB>()); }
+	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
 	TypeA() {}
-	void AddProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
+	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
@@ -60,7 +63,9 @@ TEST(IStreamableEntity, StreamNestedEntities)
 TEST(IStreamableEntity, ThrowOnStreamNestedEntities)
 {
 	TypeA ea;
-	EXPECT_NO_THROW(ea.AddProtectedMember(KEY, std::make_unique<global::Entity>()));
+	auto e = std::make_shared<global::Entity>();
+	e->SetKey(KEY);
+	EXPECT_NO_THROW(ea.AddProtectedMember(e));
 
 	std::stringstream sstream;
 	EXPECT_THROW(sstream << ea, std::runtime_error);
