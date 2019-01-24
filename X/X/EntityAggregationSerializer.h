@@ -25,7 +25,7 @@ public:
 
 	void LoadSerializationStructure(const std::string& pathToJSON);
 
-	void Serialize(const Entity& entity);
+	void Serialize(const Entity& entity, const std::string& parentPath = "");
 	std::shared_ptr<Entity> Deserialize(const std::string& key);
 
 	bool HasSerializationStructure() const;

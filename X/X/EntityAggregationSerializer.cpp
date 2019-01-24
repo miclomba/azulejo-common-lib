@@ -1,5 +1,6 @@
 #include "EntityAggregationSerializer.h"
 
+#include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -11,46 +12,6 @@
 
 namespace fs = std::filesystem;
 using boost::property_tree::ptree;
-using boost::property_tree::read_json;
-using path_type = boost::property_tree::ptree::path_type;
-
-namespace
-{
-bool FindKeyPath(const ptree& root, const ptree& node, path_type& path) {
-    if (std::addressof(root) == std::addressof(node))
-        return true;
-
-    for (auto& child : root) {
-        auto next = path;
-        next /= child.first;
-
-        if ( std::addressof(child.second) == std::addressof(node) || FindKeyPath(child.second, node, next))
-        {
-            path = next;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-std::string KeyPathToFilePath(const std::string& keyPath)
-{
-	auto pos = keyPath.find_first_of('.');
-	if (pos = std::string::npos)
-		return keyPath;
-	return (fs::path(keyPath.substr(0, pos)) / KeyPathToFilePath(keyPath.substr(pos + 1))).string();
-}
-
-std::string FindRelativePath(const ptree& root, const ptree& node) {
-    path_type path;
-
-    if (!FindKeyPath(root, node, path))
-        throw std::range_error("Subtree path could not be found.");
-
-    return KeyPathToFilePath(path.dump());
-}
-}
 
 namespace global {
 
@@ -79,7 +40,7 @@ void EntityAggregationSerializer::LoadSerializationStructure(const std::string& 
 
 	std::ifstream file(pathToJSON);
 	if (file)
-		read_json(file, serializationStructure_);
+		boost::property_tree::read_json(file, serializationStructure_);
 	else
 	{
 		serializationPath_.clear();
@@ -92,17 +53,23 @@ bool EntityAggregationSerializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
-void EntityAggregationSerializer::Serialize(const Entity& entity)
+void EntityAggregationSerializer::Serialize(const Entity& entity, const std::string& parentPath)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot serialize entity because no serialization structure has been loaded");
-
-	auto tree = serializationStructure_.get_child_optional(entity.GetKey());
+	
+	std::string searchPath = parentPath.empty() ? entity.GetKey() : parentPath + "." + entity.GetKey();
+	
+	auto tree = serializationStructure_.get_child_optional(searchPath);
 	if (!tree)
+	{
 		throw std::runtime_error("Cannot locate entity identifier in the serialization json structure");
+	}
 	else
 	{
-		std::string relativePath = FindRelativePath(serializationStructure_, *tree);
+		std::string relativePath = searchPath;
+		std::replace(relativePath.begin(), relativePath.end(), '.', '/');
+
 		std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
 
 		entity.Save(*tree, absolutePath);
@@ -110,22 +77,24 @@ void EntityAggregationSerializer::Serialize(const Entity& entity)
 
 	auto& members = entity.GetAggregatedMembers();
 	for (auto& m : members)
-		Serialize(*m.second);
+		Serialize(*m.second,searchPath);
 }
 
 std::shared_ptr<Entity> EntityAggregationSerializer::Deserialize(const std::string& key)
 {
+	/*
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
 
 	auto entity = std::make_shared<Entity>(); // = FactoryCreateEntityFromKey(key)
+	std::string searchPath = key.empty() ? entity->GetKey() : key + "." + entity->GetKey();
 
 	auto tree = serializationStructure_.get_child_optional(key);
 	if (!tree)
 		throw std::runtime_error("Cannot locate entity identifier in the deserialization json structure");
 	else
 	{
-		std::string relativePath = FindRelativePath(serializationStructure_, *tree);
+		std::string relativePath = "";// FindRelativePath(serializationStructure_, *tree);
 		std::string absolutePath = (fs::path(serializationPath_) / relativePath).string();
 
 		entity->Load(*tree, absolutePath);
@@ -136,6 +105,8 @@ std::shared_ptr<Entity> EntityAggregationSerializer::Deserialize(const std::stri
 		entity->AggregateMember(Deserialize(k));
 
 	return entity;
+	*/
+	throw std::runtime_error("not implemented");
 }
 
 } // end namespace global
