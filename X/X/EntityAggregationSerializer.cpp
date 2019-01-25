@@ -53,12 +53,12 @@ bool EntityAggregationSerializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
-void EntityAggregationSerializer::Serialize(const Entity& entity, const std::string& parentPath)
+void EntityAggregationSerializer::Serialize(const Entity& entity, const std::string& parentKey)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot serialize entity because no serialization structure has been loaded");
 	
-	std::string searchPath = parentPath.empty() ? entity.GetKey() : parentPath + "." + entity.GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
 	auto tree = serializationStructure_.get_child_optional(searchPath);
 	if (!tree)
@@ -80,33 +80,31 @@ void EntityAggregationSerializer::Serialize(const Entity& entity, const std::str
 		Serialize(*m.second,searchPath);
 }
 
-std::shared_ptr<Entity> EntityAggregationSerializer::Deserialize(const std::string& key)
+void EntityAggregationSerializer::Deserialize(Entity& entity, const std::string& parentKey)
 {
-	/*
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
 
-	auto entity = std::make_shared<Entity>(); // = FactoryCreateEntityFromKey(key)
-	std::string searchPath = key.empty() ? entity->GetKey() : key + "." + entity->GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
-	auto tree = serializationStructure_.get_child_optional(key);
+	auto tree = serializationStructure_.get_child_optional(searchPath);
 	if (!tree)
+	{
 		throw std::runtime_error("Cannot locate entity identifier in the deserialization json structure");
+	}
 	else
 	{
-		std::string relativePath = "";// FindRelativePath(serializationStructure_, *tree);
-		std::string absolutePath = (fs::path(serializationPath_) / relativePath).string();
+		std::string relativePath = searchPath;
+		std::replace(relativePath.begin(), relativePath.end(), '.', '/');
 
-		entity->Load(*tree, absolutePath);
+		std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
+
+		entity.Load(*tree, absolutePath);
 	}
 
-	auto& memberKeys = entity->GetAggregatedMemberKeys();
-	for (auto& k : memberKeys)
-		entity->AggregateMember(Deserialize(k));
-
-	return entity;
-	*/
-	throw std::runtime_error("not implemented");
+	auto& members = entity.GetAggregatedMembers();
+	for (auto& m : members)
+		Deserialize(*m.second, searchPath);
 }
 
 } // end namespace global

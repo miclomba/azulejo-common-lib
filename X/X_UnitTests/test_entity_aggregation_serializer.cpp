@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include <boost/property_tree/json_parser.hpp>
@@ -44,6 +46,11 @@ public:
 		std::filesystem::create_directories(path);
 	}
 
+	void Load(boost::property_tree::ptree& tree, const std::string& path) override
+	{
+		EXPECT_TRUE(fs::exists(path));
+	}
+
 private:
 	mutable std::string path_;
 };
@@ -63,16 +70,25 @@ std::shared_ptr<TypeA> CreateEntity()
 	return entity_1a;
 }
 
-void CreateEntityFile(const std::string& filePath)
+std::vector<std::string> CreateEntityFile(const std::string& filePath)
 {
+	std::vector<std::string> directories;
+
 	ptree root;
 	root.add_child(ENTITY_1A, ptree());
+	directories.push_back(ENTITY_1A);
+
 	auto& child = root.get_child(ENTITY_1A);
 	child.add_child(ENTITY_2A, ptree());
+	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A).string());
+
 	auto& child2 = child.get_child(ENTITY_2A);
 	child2.add_child(ENTITY_1B, ptree(VALUE));
+	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A / ENTITY_1B).string());
 
 	boost::property_tree::json_parser::write_json(filePath, root);
+
+	return directories;
 }
 }
 
@@ -132,25 +148,30 @@ TEST(EntityAggregationSerializer, Serialize)
 {
 	auto serializer = global::EntityAggregationSerializer::GetInstance();
 
-	auto entity_1a = CreateEntity();
+	// create an entity to serialize
+	std::shared_ptr<TypeA> entity = CreateEntity();
 
-	EXPECT_THROW(serializer->Serialize(*entity_1a), std::runtime_error);
+	// try to serialize without a serialization structure
+	EXPECT_THROW(serializer->Serialize(*entity), std::runtime_error);
 
+	// create and load a serialization structure
 	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
 	EXPECT_FALSE(fs::exists(jsonFile));
-	CreateEntityFile(jsonFile);
+	std::vector<std::string> directoryList = CreateEntityFile(jsonFile);
 	EXPECT_TRUE(fs::exists(jsonFile));
-
 	EXPECT_NO_THROW(serializer->LoadSerializationStructure(jsonFile));
 
-	EXPECT_NO_THROW(serializer->Serialize(*entity_1a));
+	// serialize
+	EXPECT_NO_THROW(serializer->Serialize(*entity));
 
-	// validate all directories were created
+	// check serialization
+	for (auto& dir : directoryList)
+		EXPECT_TRUE(fs::exists(fs::path(JSON_ROOT) / dir));
 
+	// cleanup serialization
 	fs::remove(jsonFile);
 	EXPECT_FALSE(fs::exists(jsonFile));
-
-	auto directories = fs::path(JSON_ROOT) / entity_1a->GetKey();
+	auto directories = fs::path(JSON_ROOT) / entity->GetKey();
 	fs::remove_all(directories);
 	EXPECT_FALSE(fs::exists(directories));
 
@@ -159,6 +180,34 @@ TEST(EntityAggregationSerializer, Serialize)
 
 TEST(EntityAggregationSerializer, Deserialize)
 {
+	auto serializer = global::EntityAggregationSerializer::GetInstance();
+
+	// try to deserialize without a serialization structure
+	EXPECT_THROW(serializer->Deserialize(global::Entity()), std::runtime_error);
+
+	// create and load a serialization structure
+	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
+	EXPECT_FALSE(fs::exists(jsonFile));
+	std::vector<std::string> directoryList = CreateEntityFile(jsonFile);
+	EXPECT_TRUE(fs::exists(jsonFile));
+	EXPECT_NO_THROW(serializer->LoadSerializationStructure(jsonFile));
+
+	// create a serialization
+	for (auto& dir : directoryList)
+		fs::create_directories(fs::path(JSON_ROOT) / dir);
+
+	// deserialize an entity
+	std::shared_ptr<TypeA> entity = CreateEntity();
+	EXPECT_NO_THROW(serializer->Deserialize(*entity));
+
+	// cleanup serialization
+	fs::remove(jsonFile);
+	EXPECT_FALSE(fs::exists(jsonFile));
+	auto directories = fs::path(JSON_ROOT) / entity->GetKey();
+	fs::remove_all(directories);
+	EXPECT_FALSE(fs::exists(directories));
+
+	global::EntityAggregationSerializer::ResetInstance();
 }
 
 TEST(EntityAggregationSerializer, LazyLoadEntity)

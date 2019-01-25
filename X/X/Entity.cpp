@@ -73,8 +73,8 @@ Entity& Entity::GetAggregatedMember(const std::string& key)
 	auto found = members_.find(key);
 	if (found != members_.cend())
 	{
-		if (!members_[key])
-			members_[key] = EntityAggregationSerializer::GetInstance()->Deserialize(key);
+		//if (!members_[key])
+		//	members_[key] = EntityAggregationSerializer::GetInstance()->Deserialize(key);
 		return *members_[key];
 	}
 
