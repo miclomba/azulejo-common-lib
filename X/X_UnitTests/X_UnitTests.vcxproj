@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_entity.cpp" />
+    <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
     <ClCompile Include="test_entity_aggregation_serializer.cpp" />
     <ClCompile Include="test_inetworkable_entity.cpp" />
     <ClCompile Include="test_irunnable_entity.cpp" />

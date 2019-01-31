@@ -11,7 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "X/Entity.h"
-#include "X/EntityAggregationSerializer.h"
+#include "X/EntityAggregationDeserializer.h"
 
 namespace fs = std::filesystem;
 using boost::property_tree::ptree;
@@ -107,48 +107,95 @@ std::vector<std::string> CreateEntityFile(const std::string& filePath)
 }
 }
 
-TEST(EntityAggregationSerializer, GetInstance)
+TEST(EntityAggregationDeserializer, GetInstance)
 {
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::GetInstance());
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
-	EXPECT_TRUE(serializer);
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(global::EntityAggregationDeserializer::GetInstance());
+	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
+	EXPECT_TRUE(deserializer);
+	EXPECT_NO_THROW(global::EntityAggregationDeserializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, ResetInstance)
+TEST(EntityAggregationDeserializer, ResetInstance)
 {
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(global::EntityAggregationDeserializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, Serialize)
+TEST(EntityAggregationDeserializer, LoadSerializationStructure)
 {
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
 
-	// get serialization paths
 	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
-	std::vector<std::string> directoryList = LocalSerializationPaths();
-
-	// validate serialization
 	EXPECT_FALSE(fs::exists(jsonFile));
-	for (auto& dir : directoryList)
-		EXPECT_FALSE(fs::exists(fs::path(JSON_ROOT) / dir));
 
-	// serialize
-	EXPECT_NO_THROW(serializer->SetSerializationPath(jsonFile));
-	std::shared_ptr<TypeA> entity = CreateEntity();
-	EXPECT_NO_THROW(serializer->Serialize(*entity));
+	EXPECT_THROW(deserializer->LoadSerializationStructure(jsonFile), std::runtime_error);
 
-	// validate serialization
+	CreateEntityFile(jsonFile);
 	EXPECT_TRUE(fs::exists(jsonFile));
+
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
+
+	fs::remove(jsonFile);
+	EXPECT_FALSE(fs::exists(jsonFile));
+
+	global::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST(EntityAggregationDeserializer, HasSerializationStructure)
+{
+	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
+
+	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
+	EXPECT_FALSE(fs::exists(jsonFile));
+	CreateEntityFile(jsonFile);
+	EXPECT_TRUE(fs::exists(jsonFile));
+
+	EXPECT_FALSE(deserializer->HasSerializationStructure());
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
+	EXPECT_TRUE(deserializer->HasSerializationStructure());
+
+	fs::remove(jsonFile);
+	EXPECT_FALSE(fs::exists(jsonFile));
+
+	global::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST(EntityAggregationDeserializer, Deserialize)
+{
+	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
+
+	// register deserialization types
+	deserializer->RegisterEntity<TypeA>();
+
+	// try to deserialize without a serialization structure
+	EXPECT_THROW(deserializer->Deserialize(global::Entity()), std::runtime_error);
+
+	// create serialization structure
+	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
+	EXPECT_FALSE(fs::exists(jsonFile));
+	std::vector<std::string> directoryList = CreateEntityFile(jsonFile);
+	EXPECT_TRUE(fs::exists(jsonFile));
+
+	// load serialization structure
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
+
+	// create a serialization
 	for (auto& dir : directoryList)
-		EXPECT_TRUE(fs::exists(fs::path(JSON_ROOT) / dir));
+		fs::create_directories(fs::path(JSON_ROOT) / dir);
+
+	// deserialize an entity
+	TypeA entity;
+	EXPECT_NO_THROW(deserializer->Deserialize(entity));
 
 	// cleanup serialization
 	fs::remove(jsonFile);
 	EXPECT_FALSE(fs::exists(jsonFile));
-	auto directories = fs::path(JSON_ROOT) / entity->GetKey();
+	auto directories = fs::path(JSON_ROOT) / entity.GetKey();
 	fs::remove_all(directories);
 	EXPECT_FALSE(fs::exists(directories));
 
-	global::EntityAggregationSerializer::ResetInstance();
+	global::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST(EntityAggregationDeserializer, LazyLoadEntity)
+{
 }

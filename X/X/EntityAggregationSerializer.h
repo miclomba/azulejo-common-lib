@@ -2,13 +2,9 @@
 #define global_entity_aggregation_serializer_h
 
 #include <filesystem>
-#include <memory>
 #include <string>
 
 #include <boost/property_tree/ptree.hpp>
-
-#include <memory>
-#include <string>
 
 #include "config.h"
 #include "Entity.h"
@@ -23,12 +19,10 @@ public:
 	static EntityAggregationSerializer* GetInstance();
 	static void ResetInstance();
 
-	void LoadSerializationStructure(const std::string& pathToJSON);
-
 	void Serialize(const Entity& entity, const std::string& parentKey = "");
-	void Deserialize(Entity& entity, const std::string& parentKey = "");
 
-	bool HasSerializationStructure() const;
+	void SetSerializationPath(const std::string& pathToJSON);
+	std::string GetSerializationPath() const;
 
 private:
 	static EntityAggregationSerializer* instance_;

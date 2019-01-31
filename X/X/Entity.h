@@ -12,6 +12,7 @@
 
 namespace global {
 
+class EntityAggregationDeserializer;
 class EntityAggregationSerializer;
 
 class X_DLL_EXPORT Entity
@@ -21,6 +22,7 @@ public:
 	using Members = std::map<std::string, std::shared_ptr<Entity>>;
 
 	friend class EntityAggregationSerializer;
+	friend class EntityAggregationDeserializer;
 
 	const std::string GetKey() const;
 	void SetKey(const std::string& key);

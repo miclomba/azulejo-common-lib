@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EntityAggregationDeserializer.cpp" />
     <ClCompile Include="EntityAggregationSerializer.cpp" />
     <ClCompile Include="IClientEntity.cpp" />
     <ClCompile Include="IOpenMPEntity.cpp" />
@@ -130,6 +131,8 @@
     <ClCompile Include="IRunnableEntity.cpp" />
     <ClCompile Include="IStreamableEntity.cpp" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityAggregationDeserializer.h" />
+    <ClInclude Include="EntityAggregationDeserializer.hpp" />
     <ClInclude Include="EntityAggregationSerializer.h" />
     <ClInclude Include="IClientEntity.h" />
     <ClInclude Include="IOpenMPEntity.h" />
