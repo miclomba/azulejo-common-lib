@@ -41,6 +41,7 @@ private:
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
 
+	std::string GetKeyPath(const std::string& key, const boost::property_tree::ptree& tree) const;
 	void DeserializeWithParentKey(Entity& entity, const std::string& parentKey = "");
 
 	static EntityAggregationDeserializer* instance_;

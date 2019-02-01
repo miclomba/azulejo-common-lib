@@ -166,14 +166,20 @@ TEST(EntityAggregationDeserializer, Deserialize)
 		fs::create_directories(fs::path(JSON_ROOT) / dir);
 
 	// deserialize an entity
-	TypeA entity;
-	entity.SetKey(ENTITY_1A);
-	EXPECT_NO_THROW(deserializer->Deserialize(entity));
+	TypeA entity1a;
+	entity1a.SetKey(ENTITY_1A);
+	EXPECT_NO_THROW(deserializer->Deserialize(entity1a));
+	TypeA entity2a;
+	entity2a.SetKey(ENTITY_2A);
+	EXPECT_NO_THROW(deserializer->Deserialize(entity2a));
+	TypeA entity1b;
+	entity1b.SetKey(ENTITY_1B);
+	EXPECT_NO_THROW(deserializer->Deserialize(entity1b));
 
 	// cleanup serialization
 	fs::remove(jsonFile);
 	EXPECT_FALSE(fs::exists(jsonFile));
-	auto directories = fs::path(JSON_ROOT) / entity.GetKey();
+	auto directories = fs::path(JSON_ROOT) / entity1a.GetKey();
 	fs::remove_all(directories);
 	EXPECT_FALSE(fs::exists(directories));
 

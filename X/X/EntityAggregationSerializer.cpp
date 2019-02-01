@@ -32,6 +32,7 @@ void EntityAggregationSerializer::ResetInstance()
 
 void EntityAggregationSerializer::Serialize(const Entity& entity)
 {
+	// find parent key path here and pass to this functions
 	SerializeWithParentKey(entity);
 }
 
@@ -39,7 +40,7 @@ void EntityAggregationSerializer::SerializeWithParentKey(const Entity& entity, c
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
-	auto tree = serializationStructure_.add_child(searchPath, ptree());
+	auto tree = serializationStructure_.put_child(searchPath, ptree());
 
 	std::string relativePath = searchPath;
 	std::replace(relativePath.begin(), relativePath.end(), '.', '/');

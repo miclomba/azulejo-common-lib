@@ -24,12 +24,6 @@ public:
 	friend class EntityAggregationSerializer;
 	friend class EntityAggregationDeserializer;
 
-	const std::string GetKey() const;
-	void SetKey(const std::string& key);
-
-	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const;
-	virtual void Load(boost::property_tree::ptree& tree, const std::string& path);
-
 public:
 	Entity();
 	Entity(const Entity& other);
@@ -37,6 +31,12 @@ public:
 	Entity(Entity&& other);
 	Entity& operator=(Entity&& other);
 	virtual ~Entity();
+
+	const std::string GetKey() const;
+	void SetKey(const std::string& key);
+
+	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const;
+	virtual void Load(boost::property_tree::ptree& tree, const std::string& path);
 
 protected:
 	const Members& GetAggregatedMembers() const;

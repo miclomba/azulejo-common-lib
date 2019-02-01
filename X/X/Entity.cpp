@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "EntityAggregationSerializer.h"
+#include "EntityAggregationDeserializer.h"
 
 #include <iostream>
 #include <queue>
@@ -73,8 +73,14 @@ Entity& Entity::GetAggregatedMember(const std::string& key)
 	auto found = members_.find(key);
 	if (found != members_.cend())
 	{
-		//if (!members_[key])
-		//	members_[key] = EntityAggregationSerializer::GetInstance()->Deserialize(key);
+		if (!members_[key]) 
+		{
+			auto deserializer = EntityAggregationDeserializer::GetInstance();
+
+			std::unique_ptr<Entity> entity = deserializer->GenerateEntity(key);
+			deserializer->Deserialize(*entity);
+			members_[key] = std::move(entity);
+		}
 		return *members_[key];
 	}
 

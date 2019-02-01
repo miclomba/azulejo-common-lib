@@ -9,6 +9,8 @@
 
 #include "Entity.h"
 
+using boost::property_tree::ptree;
+
 namespace global {
 
 EntityAggregationDeserializer* EntityAggregationDeserializer::instance_ = nullptr;
@@ -49,9 +51,50 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
+void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
+{
+	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
+		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDeserializer");
+
+	keyToEntityMap_.erase(key);
+}
+
+std::string EntityAggregationDeserializer::GetKeyPath(const std::string& key, const ptree& tree) const
+{
+	for (auto& keyValue : tree)
+	{
+		std::string nodeKey = keyValue.first;
+		ptree node = keyValue.second;
+
+		if (nodeKey == key)
+			return nodeKey;
+		else
+		{
+			std::string returnedKey = GetKeyPath(key, node);
+			size_t pos = returnedKey.find_last_of('.');
+			if ((pos == std::string::npos && returnedKey == key) || (pos != std::string::npos && returnedKey.substr(pos+1) == key))
+				return nodeKey + "." + returnedKey;
+		}
+	}
+	return "";
+}
+
 void EntityAggregationDeserializer::Deserialize(Entity& entity)
 {
-	DeserializeWithParentKey(entity);
+	if (!HasSerializationStructure())
+		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
+
+	std::string keyPath = GetKeyPath(entity.GetKey(), serializationStructure_);
+	if (keyPath.empty())
+		throw std::runtime_error("Cannot deserialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
+
+	std::string parentKey;
+
+	size_t pos = keyPath.find_last_of('.');
+	if (pos != std::string::npos)
+		parentKey = keyPath.substr(0,pos);
+
+	DeserializeWithParentKey(entity, parentKey);
 }
 
 void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, const std::string& parentKey)

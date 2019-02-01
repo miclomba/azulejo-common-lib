@@ -9,11 +9,3 @@ void EntityAggregationDeserializer::RegisterEntity(const std::string& key)
 
 	keyToEntityMap_.insert(std::make_pair(key, TFunction));
 }
-
-void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
-		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDeserializer");
-
-	keyToEntityMap_.erase(key);
-}
