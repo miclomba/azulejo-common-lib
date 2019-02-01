@@ -19,22 +19,24 @@ public:
 	static EntityAggregationSerializer* GetInstance();
 	static void ResetInstance();
 
-	void Serialize(const Entity& entity, const std::string& parentKey = "");
+	void Serialize(const Entity& entity);
 
 	void SetSerializationPath(const std::string& pathToJSON);
 	std::string GetSerializationPath() const;
 
 private:
-	static EntityAggregationSerializer* instance_;
-
-	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
-
 	EntityAggregationSerializer();
 	EntityAggregationSerializer(const EntityAggregationSerializer&) = delete;
 	EntityAggregationSerializer& operator=(const EntityAggregationSerializer&) = delete;
 	EntityAggregationSerializer(EntityAggregationSerializer&&) = delete;
 	EntityAggregationSerializer& operator=(EntityAggregationSerializer&&) = delete;
+
+	void SerializeWithParentKey(const Entity& entity, const std::string& parentKey = "");
+
+	static EntityAggregationSerializer* instance_;
+
+	std::filesystem::path serializationPath_;
+	boost::property_tree::ptree serializationStructure_;
 };
 
 } // end namespace global

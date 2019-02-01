@@ -30,7 +30,12 @@ void EntityAggregationSerializer::ResetInstance()
 	instance_ = nullptr;
 }
 
-void EntityAggregationSerializer::Serialize(const Entity& entity, const std::string& parentKey)
+void EntityAggregationSerializer::Serialize(const Entity& entity)
+{
+	SerializeWithParentKey(entity);
+}
+
+void EntityAggregationSerializer::SerializeWithParentKey(const Entity& entity, const std::string& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
@@ -45,7 +50,7 @@ void EntityAggregationSerializer::Serialize(const Entity& entity, const std::str
 
 	auto& members = entity.GetAggregatedMembers();
 	for (auto& m : members)
-		Serialize(*m.second,searchPath);
+		SerializeWithParentKey(*m.second,searchPath);
 
 	if (parentKey.empty())
 		boost::property_tree::json_parser::write_json(serializationPath_.string(), serializationStructure_);

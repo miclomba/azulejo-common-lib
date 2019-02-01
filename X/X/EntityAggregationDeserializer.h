@@ -26,27 +26,28 @@ public:
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
 
-	void Deserialize(Entity& entity, const std::string& parentKey = "");
+	void Deserialize(Entity& entity);
 
 	template<typename T>
-	void RegisterEntity();
-	template<typename T>
-	void UnregisterEntity();
+	void RegisterEntity(const std::string& key);
+	void UnregisterEntity(const std::string& key);
 
 	std::unique_ptr<Entity> GenerateEntity(const std::string& key);
 
 private:
-	static EntityAggregationDeserializer* instance_;
-
-	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
-	std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
-
 	EntityAggregationDeserializer();
 	EntityAggregationDeserializer(const EntityAggregationDeserializer&) = delete;
 	EntityAggregationDeserializer& operator=(const EntityAggregationDeserializer&) = delete;
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
+
+	void DeserializeWithParentKey(Entity& entity, const std::string& parentKey = "");
+
+	static EntityAggregationDeserializer* instance_;
+
+	std::filesystem::path serializationPath_;
+	boost::property_tree::ptree serializationStructure_;
+	std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
 };
 
 #include "EntityAggregationDeserializer.hpp"

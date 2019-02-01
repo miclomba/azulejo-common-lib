@@ -28,10 +28,7 @@ const std::string VALUE = "value";
 class TypeA : public global::Entity
 {
 public:
-	TypeA()
-	{
-		SetKey(ENTITY_1A);
-	}
+	TypeA() = default;
 
 	~TypeA()
 	{

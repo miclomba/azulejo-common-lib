@@ -28,11 +28,7 @@ const std::string VALUE = "value";
 class TypeA : public global::Entity
 {
 public:
-	TypeA()
-	{
-		SetKey(ENTITY_1A);
-	}
-
+	TypeA() = default;
 	~TypeA()
 	{
 		if (!path_.empty())
@@ -59,21 +55,6 @@ private:
 	mutable std::string path_;
 };
 
-std::shared_ptr<TypeA> CreateEntity()
-{
-	auto entity_1a = std::make_shared<TypeA>();
-	auto entity_1b = std::make_shared<TypeA>();
-	auto entity_2a = std::make_shared<TypeA>();
-	entity_1a->SetKey(ENTITY_1A);
-	entity_1b->SetKey(ENTITY_1B);
-	entity_2a->SetKey(ENTITY_2A);
-
-	entity_2a->AggregateProtectedMember(entity_1b);
-	entity_1a->AggregateProtectedMember(entity_2a);
-
-	return entity_1a;
-}
-
 std::vector<std::string> LocalSerializationPaths()
 {
 	std::vector<std::string> directories;
@@ -94,12 +75,12 @@ std::vector<std::string> CreateEntityFile(const std::string& filePath)
 	directories.push_back(ENTITY_1A);
 
 	auto& child = root.get_child(ENTITY_1A);
-	child.add_child(ENTITY_1A, ptree());
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_1A).string());
+	child.add_child(ENTITY_2A, ptree());
+	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A).string());
 
-	auto& child2 = child.get_child(ENTITY_1A);
-	child2.add_child(ENTITY_1A, ptree(VALUE));
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_1A / ENTITY_1A).string());
+	auto& child2 = child.get_child(ENTITY_2A);
+	child2.add_child(ENTITY_1B, ptree(VALUE));
+	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A / ENTITY_1B).string());
 
 	boost::property_tree::json_parser::write_json(filePath, root);
 
@@ -164,7 +145,9 @@ TEST(EntityAggregationDeserializer, Deserialize)
 	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
 
 	// register deserialization types
-	deserializer->RegisterEntity<TypeA>();
+	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
+	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
+	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
 	EXPECT_THROW(deserializer->Deserialize(global::Entity()), std::runtime_error);
@@ -184,6 +167,7 @@ TEST(EntityAggregationDeserializer, Deserialize)
 
 	// deserialize an entity
 	TypeA entity;
+	entity.SetKey(ENTITY_1A);
 	EXPECT_NO_THROW(deserializer->Deserialize(entity));
 
 	// cleanup serialization
