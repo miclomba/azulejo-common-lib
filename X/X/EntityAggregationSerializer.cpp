@@ -30,10 +30,41 @@ void EntityAggregationSerializer::ResetInstance()
 	instance_ = nullptr;
 }
 
+std::string EntityAggregationSerializer::GetKeyPath(const std::string& key, const Entity& entity) const
+{
+	Entity::Members members = entity.GetAggregatedMembers();
+
+	if (entity.GetKey() == key)
+		return entity.GetKey();
+	else
+	{
+		for (auto& member : members)
+		{
+			std::string memKey = member.first;
+			std::shared_ptr<Entity> memObj = member.second;
+
+			std::string returnedKey = GetKeyPath(key, *memObj.get());
+			size_t pos = returnedKey.find_last_of('.');
+			if ((pos == std::string::npos && returnedKey == key) || (pos != std::string::npos && returnedKey.substr(pos + 1) == key))
+				return memKey + "." + returnedKey;
+		}
+	}
+	return "";
+}
+
 void EntityAggregationSerializer::Serialize(const Entity& entity)
 {
-	// find parent key path here and pass to this functions
-	SerializeWithParentKey(entity);
+	std::string keyPath = GetKeyPath(entity.GetKey(), entity);
+	if (keyPath.empty())
+		throw std::runtime_error("Cannot serialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
+
+	std::string parentKey;
+
+	size_t pos = keyPath.find_last_of('.');
+	if (pos != std::string::npos)
+		parentKey = keyPath.substr(0, pos);
+
+	SerializeWithParentKey(entity, parentKey);
 }
 
 void EntityAggregationSerializer::SerializeWithParentKey(const Entity& entity, const std::string& parentKey)

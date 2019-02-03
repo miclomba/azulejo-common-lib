@@ -33,6 +33,8 @@ private:
 
 	void SerializeWithParentKey(const Entity& entity, const std::string& parentKey = "");
 
+	std::string GetKeyPath(const std::string& key, const Entity& entity) const;
+
 	static EntityAggregationSerializer* instance_;
 
 	std::filesystem::path serializationPath_;

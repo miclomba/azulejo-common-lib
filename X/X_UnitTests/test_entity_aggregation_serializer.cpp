@@ -56,52 +56,91 @@ private:
 	mutable std::string path_;
 };
 
-std::shared_ptr<TypeA> CreateEntity()
+std::shared_ptr<TypeA> CreateEntity(const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
 {
-	auto entity_1a = std::make_shared<TypeA>();
-	auto entity_1b = std::make_shared<TypeA>();
-	auto entity_2a = std::make_shared<TypeA>();
-	entity_1a->SetKey(ENTITY_1A);
-	entity_1b->SetKey(ENTITY_1B);
-	entity_2a->SetKey(ENTITY_2A);
+	auto rootEntity = std::make_shared<TypeA>();
+	auto leafEntity = std::make_shared<TypeA>();
+	auto intermediateEntity = std::make_shared<TypeA>();
 
-	entity_2a->AggregateProtectedMember(entity_1b);
-	entity_1a->AggregateProtectedMember(entity_2a);
+	rootEntity->SetKey(root);
+	intermediateEntity->SetKey(intermediate);
+	leafEntity->SetKey(leaf);
 
-	return entity_1a;
+	if (!leaf.empty())
+		intermediateEntity->AggregateProtectedMember(leafEntity);
+	if (!intermediate.empty())
+		rootEntity->AggregateProtectedMember(intermediateEntity);
+
+	return rootEntity;
 }
 
-std::vector<std::string> LocalSerializationPaths()
+std::vector<std::string> LocalSerializationPaths(const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
 {
 	std::vector<std::string> directories;
 
-	directories.push_back(ENTITY_1A);
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A).string());
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A / ENTITY_1B).string());
+	directories.push_back(root);
+	if (!intermediate.empty())
+		directories.push_back((fs::path(root) / intermediate).string());
+	if (!leaf.empty())
+		directories.push_back((fs::path(root) / intermediate / leaf).string());
 
 	return directories;
 }
 
-std::vector<std::string> CreateEntityFile(const std::string& filePath)
+class Fixture
 {
-	std::vector<std::string> directories;
+public:
+	Fixture(bool expectSerialization, const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
+	{
+		expectSerialization_ = expectSerialization;
 
-	ptree root;
-	root.add_child(ENTITY_1A, ptree());
-	directories.push_back(ENTITY_1A);
+		// get serialization paths
+		jsonFile_ = (fs::path(JSON_ROOT) / JSON_FILE).string();
+		directoryList_ = LocalSerializationPaths(root, intermediate, leaf);
 
-	auto& child = root.get_child(ENTITY_1A);
-	child.add_child(ENTITY_1A, ptree());
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_1A).string());
+		// validate serialization
+		EXPECT_FALSE(fs::exists(jsonFile_));
+		for (auto& dir : directoryList_)
+			EXPECT_FALSE(fs::exists(fs::path(JSON_ROOT) / dir));
 
-	auto& child2 = child.get_child(ENTITY_1A);
-	child2.add_child(ENTITY_1A, ptree(VALUE));
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_1A / ENTITY_1A).string());
+		entity_ = CreateEntity(root, intermediate, leaf);
+	}
 
-	boost::property_tree::json_parser::write_json(filePath, root);
+	~Fixture()
+	{
+		if (expectSerialization_)
+		{
+			// validate serialization
+			EXPECT_TRUE(fs::exists(jsonFile_));
+			for (auto& dir : directoryList_)
+				EXPECT_TRUE(fs::exists(fs::path(JSON_ROOT) / dir));
 
-	return directories;
-}
+			// cleanup serialization
+			fs::remove(jsonFile_);
+			EXPECT_FALSE(fs::exists(jsonFile_));
+			auto directories = fs::path(JSON_ROOT) / entity_->GetKey();
+			fs::remove_all(directories);
+			EXPECT_FALSE(fs::exists(directories));
+		}
+	}
+
+	std::string GetJSONFilePath() const
+	{
+		return jsonFile_;
+	}
+
+	std::shared_ptr<TypeA> GetEntity()
+	{
+		return entity_;
+	}
+
+private:
+	std::string jsonFile_;
+	std::vector<std::string> directoryList_;
+	bool expectSerialization_;
+
+	std::shared_ptr<TypeA> entity_;
+};
 }
 
 TEST(EntityAggregationSerializer, GetInstance)
@@ -117,35 +156,56 @@ TEST(EntityAggregationSerializer, ResetInstance)
 	EXPECT_NO_THROW(global::EntityAggregationSerializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, Serialize)
+TEST(EntityAggregationSerializer, SerializeFromRoot)
 {
+	Fixture fixture(true, ENTITY_1A, ENTITY_2A, ENTITY_1B);
+
 	auto serializer = global::EntityAggregationSerializer::GetInstance();
 
-	// get serialization paths
-	auto jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
-	std::vector<std::string> directoryList = LocalSerializationPaths();
+	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
-	// validate serialization
-	EXPECT_FALSE(fs::exists(jsonFile));
-	for (auto& dir : directoryList)
-		EXPECT_FALSE(fs::exists(fs::path(JSON_ROOT) / dir));
+	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
-	// serialize
-	EXPECT_NO_THROW(serializer->SetSerializationPath(jsonFile));
-	std::shared_ptr<TypeA> entity = CreateEntity();
-	EXPECT_NO_THROW(serializer->Serialize(*entity));
+	global::EntityAggregationSerializer::ResetInstance();
+}
 
-	// validate serialization
-	EXPECT_TRUE(fs::exists(jsonFile));
-	for (auto& dir : directoryList)
-		EXPECT_TRUE(fs::exists(fs::path(JSON_ROOT) / dir));
+TEST(EntityAggregationSerializer, SerializeFromIntermediate)
+{
+	Fixture fixture(true, ENTITY_2A, ENTITY_1B);
 
-	// cleanup serialization
-	fs::remove(jsonFile);
-	EXPECT_FALSE(fs::exists(jsonFile));
-	auto directories = fs::path(JSON_ROOT) / entity->GetKey();
-	fs::remove_all(directories);
-	EXPECT_FALSE(fs::exists(directories));
+	auto serializer = global::EntityAggregationSerializer::GetInstance();
+
+	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+
+	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
+
+	global::EntityAggregationSerializer::ResetInstance();
+}
+
+TEST(EntityAggregationSerializer, SerializeFromLeaf)
+{
+	Fixture fixture(true, ENTITY_1B);
+
+	auto serializer = global::EntityAggregationSerializer::GetInstance();
+
+	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+
+	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
+
+	global::EntityAggregationSerializer::ResetInstance();
+}
+
+TEST(EntityAggregationSerializer, SerializeFromNoKeyEntity)
+{
+	Fixture fixture(false, ENTITY_1B);
+
+	auto serializer = global::EntityAggregationSerializer::GetInstance();
+
+	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+
+	TypeA entity;
+	entity.SetKey("");
+	EXPECT_THROW(serializer->Serialize(entity), std::runtime_error);
 
 	global::EntityAggregationSerializer::ResetInstance();
 }

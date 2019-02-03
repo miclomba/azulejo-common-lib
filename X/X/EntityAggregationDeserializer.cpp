@@ -11,6 +11,29 @@
 
 using boost::property_tree::ptree;
 
+namespace
+{
+std::string GetKeyPath(const std::string& key, const ptree& tree)
+{
+	for (auto& keyValue : tree)
+	{
+		std::string nodeKey = keyValue.first;
+		ptree node = keyValue.second;
+
+		if (nodeKey == key)
+			return nodeKey;
+		else
+		{
+			std::string returnedKey = GetKeyPath(key, node);
+			size_t pos = returnedKey.find_last_of('.');
+			if ((pos == std::string::npos && returnedKey == key) || (pos != std::string::npos && returnedKey.substr(pos+1) == key))
+				return nodeKey + "." + returnedKey;
+		}
+	}
+	return "";
+}
+}
+
 namespace global {
 
 EntityAggregationDeserializer* EntityAggregationDeserializer::instance_ = nullptr;
@@ -59,26 +82,6 @@ void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
 	keyToEntityMap_.erase(key);
 }
 
-std::string EntityAggregationDeserializer::GetKeyPath(const std::string& key, const ptree& tree) const
-{
-	for (auto& keyValue : tree)
-	{
-		std::string nodeKey = keyValue.first;
-		ptree node = keyValue.second;
-
-		if (nodeKey == key)
-			return nodeKey;
-		else
-		{
-			std::string returnedKey = GetKeyPath(key, node);
-			size_t pos = returnedKey.find_last_of('.');
-			if ((pos == std::string::npos && returnedKey == key) || (pos != std::string::npos && returnedKey.substr(pos+1) == key))
-				return nodeKey + "." + returnedKey;
-		}
-	}
-	return "";
-}
-
 void EntityAggregationDeserializer::Deserialize(Entity& entity)
 {
 	if (!HasSerializationStructure())
@@ -107,7 +110,7 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, con
 	auto tree = serializationStructure_.get_child_optional(searchPath);
 	if (!tree)
 	{
-		throw std::runtime_error("Cannot locate entity identifier in the deserialization json structure");
+		throw std::runtime_error("Cannot locate entity key in the deserialization json structure");
 	}
 	else
 	{
