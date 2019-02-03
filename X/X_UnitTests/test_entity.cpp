@@ -25,6 +25,7 @@ public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
 	TypeA() {}
 	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
+	void AddProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
 	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
@@ -87,6 +88,16 @@ TEST(Entity, AddMember)
 	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
 }
 
+TEST(Entity, AddMemberWithKey)
+{
+	TypeA ea;
+	EXPECT_NO_THROW(ea.GetProtectedMembers());
+	size_t count = ea.GetProtectedMembers().size();
+	auto e = std::make_shared<TypeB>();
+	ea.AddProtectedMember(NEW_KEY, e);
+	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
+}
+
 TEST(Entity, ThrowOnAddMember)
 {
 	TypeA ea;
@@ -97,6 +108,12 @@ TEST(Entity, ThrowOnAddMember)
 	auto e2 = std::make_shared<TypeB>();
 	e2->SetKey(NEW_KEY);
 	EXPECT_THROW(ea.AddProtectedMember(e2), std::runtime_error);
+}
+
+TEST(Entity, ThrowOnAddNullptrMember)
+{
+	TypeA ea;
+	EXPECT_THROW(ea.AddProtectedMember(nullptr), std::runtime_error);
 }
 
 TEST(Entity, GetMember)

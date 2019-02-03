@@ -41,8 +41,10 @@ public:
 protected:
 	const Members& GetAggregatedMembers() const;
 	Entity& GetAggregatedMember(const std::string& key);
-	virtual void AggregateMember(std::shared_ptr<Entity> copied);
 	const MemberKeys GetAggregatedMemberKeys() const;
+
+	virtual void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
+	virtual void AggregateMember(std::shared_ptr<Entity> copied);
 
 private:
 	std::string key_;

@@ -87,14 +87,25 @@ Entity& Entity::GetAggregatedMember(const std::string& key)
 	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 }
 
-void Entity::AggregateMember(std::shared_ptr<Entity> entity)
+void Entity::AggregateMember(const std::string& key, std::shared_ptr<Entity> entity)
 {
-	std::string key = entity->GetKey();
 	auto found = members_.find(key);
 	if (found != members_.cend())
 		throw std::runtime_error("Cannot aggregate entity using key=" + key + " because this key is already in use.");
 
+	if (entity)
+		entity->SetKey(key);
+
 	members_[key] = std::move(entity);
+}
+
+void Entity::AggregateMember(std::shared_ptr<Entity> entity)
+{
+	if (!entity)
+		throw std::runtime_error("Entity is nullptr when aggregating entity");
+
+	std::string key = entity->GetKey();
+	AggregateMember(key, std::move(entity));
 }
 
 }
