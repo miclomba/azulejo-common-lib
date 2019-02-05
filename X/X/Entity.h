@@ -32,7 +32,7 @@ public:
 	Entity& operator=(Entity&& other);
 	virtual ~Entity();
 
-	const std::string GetKey() const;
+	std::string GetKey() const;
 	void SetKey(const std::string& key);
 
 	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const;
@@ -40,8 +40,8 @@ public:
 
 protected:
 	const Members& GetAggregatedMembers() const;
-	Entity& GetAggregatedMember(const std::string& key);
-	const MemberKeys GetAggregatedMemberKeys() const;
+	std::shared_ptr<Entity> GetAggregatedMember(const std::string& key);
+	MemberKeys GetAggregatedMemberKeys() const;
 
 	virtual void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
 	virtual void AggregateMember(std::shared_ptr<Entity> copied);

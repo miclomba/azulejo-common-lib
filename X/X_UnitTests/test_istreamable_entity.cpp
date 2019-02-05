@@ -39,7 +39,7 @@ public:
 	TypeA() {}
 	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
+	Entity& GetProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 
@@ -48,7 +48,7 @@ public:
 
 	std::string data_ = TYPEA;
 private:
-	TypeB& GetTypeB() { return static_cast<TypeB&>(GetAggregatedMember(KEY)); }
+	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
 };
 }
 

@@ -74,6 +74,11 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
+bool EntityAggregationDeserializer::HasSerializationKey(const std::string& key) const
+{
+	return !GetKeyPath(key, serializationStructure_).empty() ? true : false;
+}
+
 void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
@@ -128,11 +133,11 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, con
 		auto memberEntity = GenerateEntity(key);
 		entity.AggregateMember(std::move(memberEntity));
 
-		DeserializeWithParentKey(entity.GetAggregatedMember(key), searchPath);
+		DeserializeWithParentKey(*entity.GetAggregatedMember(key), searchPath);
 	}
 }
 
-std::unique_ptr<Entity> EntityAggregationDeserializer::GenerateEntity(const std::string& key)
+std::unique_ptr<Entity> EntityAggregationDeserializer::GenerateEntity(const std::string& key) const
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");

@@ -40,7 +40,8 @@ public:
 	void AggregateProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
 
 	const Members& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetAggregatedProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
+	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
+	std::shared_ptr<Entity> GetAggregatedProtectedMemberPtr(const std::string& key) { return GetAggregatedMember(key); }
 	const MemberKeys GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
 	void Save(boost::property_tree::ptree& tree, const std::string& path) const override
@@ -307,9 +308,33 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntity)
 	global::Entity::Members members = entity->GetAggregatedProtectedMembers();
 	EXPECT_TRUE(members[ENTITY_2A] == nullptr);
 
+	// try to lazy load the entity
 	global::Entity& lazyLoaded = entity->GetAggregatedProtectedMember(ENTITY_2A);
 	members = entity->GetAggregatedProtectedMembers();
 	EXPECT_TRUE(&(*members[ENTITY_2A]) == &lazyLoaded);
+
+	global::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, LazyLoadEntityWithoutSerialization)
+{
+	auto deserializer = global::EntityAggregationDeserializer::GetInstance();
+
+	// register deserialization types
+	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
+	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
+	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
+
+	// load serialization structure
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
+
+	// Create entity with unloaded member
+	TypeA entity;
+	entity.AggregateProtectedMember(BAD_KEY, nullptr);
+
+	// try to lazy load the entity
+	std::shared_ptr<global::Entity> lazyLoaded = entity.GetAggregatedProtectedMemberPtr(BAD_KEY);
+	EXPECT_TRUE(lazyLoaded == nullptr);
 
 	global::EntityAggregationDeserializer::ResetInstance();
 }

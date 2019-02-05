@@ -35,7 +35,7 @@ Entity& Entity::operator=(const Entity& other)
 
 Entity::~Entity() = default;
 
-const std::string Entity::GetKey() const
+std::string Entity::GetKey() const
 {
 	if (key_.empty())
 		throw std::runtime_error("Entity key has not been set when getting key");
@@ -55,7 +55,7 @@ void Entity::Load(ptree& tree, const std::string& path)
 {
 }
 
-const MemberKeys Entity::GetAggregatedMemberKeys() const
+MemberKeys Entity::GetAggregatedMemberKeys() const
 {
 	MemberKeys keys;
 	for (auto& e : members_)
@@ -68,20 +68,22 @@ const Members& Entity::GetAggregatedMembers() const
 	return members_;
 }
 
-Entity& Entity::GetAggregatedMember(const std::string& key)
+std::shared_ptr<Entity> Entity::GetAggregatedMember(const std::string& key)
 {
 	auto found = members_.find(key);
 	if (found != members_.cend())
 	{
-		if (!members_[key]) 
+		if (!members_[key])
 		{
 			auto deserializer = EntityAggregationDeserializer::GetInstance();
-
-			std::unique_ptr<Entity> entity = deserializer->GenerateEntity(key);
-			deserializer->Deserialize(*entity);
-			members_[key] = std::move(entity);
+			if (deserializer->HasSerializationKey(key))
+			{
+				std::unique_ptr<Entity> entity = deserializer->GenerateEntity(key);
+				deserializer->Deserialize(*entity);
+				members_[key] = std::move(entity);
+			}
 		}
-		return *members_[key];
+		return members_[key];
 	}
 
 	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");

@@ -25,6 +25,7 @@ public:
 
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
+	bool HasSerializationKey(const std::string& key) const;
 
 	void Deserialize(Entity& entity);
 
@@ -32,7 +33,7 @@ public:
 	void RegisterEntity(const std::string& key);
 	void UnregisterEntity(const std::string& key);
 
-	std::unique_ptr<Entity> GenerateEntity(const std::string& key);
+	std::unique_ptr<Entity> GenerateEntity(const std::string& key) const;
 
 private:
 	EntityAggregationDeserializer();
@@ -47,7 +48,7 @@ private:
 
 	std::filesystem::path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
-	std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
+	mutable std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
 };
 
 #include "EntityAggregationDeserializer.hpp"
