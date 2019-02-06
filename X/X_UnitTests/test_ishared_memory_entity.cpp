@@ -13,14 +13,14 @@ namespace
 const std::string NAME = "shmem";
 const size_t SIZE = 1024;
 
-class ShareableCreator : public global::ISharedMemoryEntity
+class ShareableCreator : public entity::ISharedMemoryEntity
 {
 };
 
-class ShareableAccessor : public global::ISharedMemoryEntity
+class ShareableAccessor : public entity::ISharedMemoryEntity
 {
 };
-}
+} // end namespace anonymous
 /*
 TEST(ISharedMemoryEntity, OpenOrCreate)
 {
@@ -87,7 +87,7 @@ int main(int argc, const char** argv)
 	// sleep some
 	boost::this_thread::sleep_for(boost::chrono::milliseconds(15000));
 
-	std::shared_ptr<global::ISharedMemoryEntity> sable;
+	std::shared_ptr<entity::ISharedMemoryEntity> sable;
 
 	// if parent
 	if (argc == 1)

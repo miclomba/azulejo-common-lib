@@ -12,14 +12,14 @@ namespace
 const std::string KEY = "key";
 const std::string NEW_KEY = "newKeyB";
 
-class TypeB : public global::Entity 
+class TypeB : public entity::Entity 
 {
 public:
 	TypeB() {}
 	std::string Serialize() const { return typeid(TypeB).name();  };
 };
 
-class TypeA : public global::Entity
+class TypeA : public entity::Entity
 {
 public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
@@ -34,7 +34,7 @@ public:
 private:
 	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
 };
-}
+} // end namespace anonymous
 
 TEST(Entity, MoveConstruct)
 {

@@ -1,5 +1,5 @@
-#ifndef global_entity_aggregation_serializer_h
-#define global_entity_aggregation_serializer_h
+#ifndef entity_entityaggregationserializer_h
+#define entity_entityaggregationserializer_h
 
 #include <filesystem>
 #include <string>
@@ -9,9 +9,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT EntityAggregationSerializer
+class ENTITY_DLL_EXPORT EntityAggregationSerializer
 {
 public:
 	virtual ~EntityAggregationSerializer();
@@ -39,6 +39,6 @@ private:
 	boost::property_tree::ptree serializationStructure_;
 };
 
-} // end namespace global
-#endif // global_entity_aggregation_serializer_h
+} // end namespace entity
+#endif // entity_entityaggregationserializer_h
 

@@ -7,8 +7,7 @@ namespace
 const char DELIM = ':';
 }
 
-namespace global
-{
+namespace entity {
 
 IStreamableEntity::~IStreamableEntity() = default;
 
@@ -48,4 +47,4 @@ std::istream& operator>>(std::istream& from, IStreamableEntity& to)
 	return from;
 }
 
-}
+} // end namespace entity

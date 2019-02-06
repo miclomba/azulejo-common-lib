@@ -9,7 +9,7 @@
 
 using boost::property_tree::ptree;
 
-namespace global {
+namespace entity {
 
 EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
 
@@ -68,4 +68,4 @@ std::string EntityAggregationSerializer::GetSerializationPath() const
 	return serializationPath_.string();
 }
 
-} // end namespace global
+} // end namespace entity

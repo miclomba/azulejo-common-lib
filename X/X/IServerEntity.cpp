@@ -5,7 +5,7 @@
 
 #include <boost/asio.hpp>
 
-namespace global {
+namespace entity {
 
 IServerEntity::IServerEntity(const int port)
 {
@@ -51,4 +51,4 @@ void IServerEntity::Run()
 	}
 }
 
-} // namespace global
+} // namespace entity

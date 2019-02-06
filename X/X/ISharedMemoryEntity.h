@@ -1,5 +1,5 @@
-#ifndef global_ishared_memory_entity
-#define global_ishared_memory_entity
+#ifndef entity_isharedmemoryentity_h
+#define entity_isharedmemoryentity_h
 
 #include <memory>
 #include <string>
@@ -9,9 +9,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT ISharedMemoryEntity : public Entity
+class ENTITY_DLL_EXPORT ISharedMemoryEntity : public Entity
 {
 public:
 	virtual ~ISharedMemoryEntity();
@@ -30,6 +30,6 @@ private:
 	bool isShmemOwner_{ false };
 };
 
-} // namespace global
+} // end namespace entity
 
-#endif // global_ishared_memory_entity
+#endif // entity_isharedmemoryentity_h

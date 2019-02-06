@@ -1,5 +1,5 @@
-#ifndef global_entity_aggregation_deserializer_h
-#define global_entity_aggregation_deserializer_h
+#ifndef entity_entityaggregationdeserializer_h
+#define entity_entityaggregationdeserializer_h
 
 #include <filesystem>
 #include <functional>
@@ -13,9 +13,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT EntityAggregationDeserializer
+class ENTITY_DLL_EXPORT EntityAggregationDeserializer
 {
 public:
 	virtual ~EntityAggregationDeserializer();
@@ -53,6 +53,6 @@ private:
 
 #include "EntityAggregationDeserializer.hpp"
 
-} // end namespace global
-#endif // global_entity_aggregation_deserializer_h
+} // end namespace entity
+#endif // entity_entityaggregationdeserializer_h
 

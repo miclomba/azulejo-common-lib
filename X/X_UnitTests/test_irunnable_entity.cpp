@@ -20,7 +20,7 @@ int SumSquares(const int x)
 	return accum;
 }
 
-class Runnable : public global::IRunnableEntity
+class Runnable : public entity::IRunnableEntity
 {
 public:
 	Runnable(const int x) : x_(x) { accum_ = 0; };
@@ -35,7 +35,7 @@ private:
 };
 
 int Runnable::accum_ = 0;
-}
+} // end namespace anonymous
 
 TEST(IRunnableEntity, Start)
 {

@@ -8,7 +8,7 @@
 
 using boost::property_tree::ptree;
 
-namespace global {
+namespace entity {
 
 using MemberKeys = Entity::MemberKeys;
 using Members = Entity::Members;
@@ -110,4 +110,4 @@ void Entity::AggregateMember(std::shared_ptr<Entity> entity)
 	AggregateMember(key, std::move(entity));
 }
 
-}
+} // end namespace entity

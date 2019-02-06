@@ -1,5 +1,5 @@
-#ifndef global_entity
-#define global_entity
+#ifndef entity_h
+#define entity_h
 
 #include <map>
 #include <memory>
@@ -10,12 +10,12 @@
 
 #include "config.h"
 
-namespace global {
+namespace entity {
 
 class EntityAggregationDeserializer;
 class EntityAggregationSerializer;
 
-class X_DLL_EXPORT Entity
+class ENTITY_DLL_EXPORT Entity
 {
 public:
 	using MemberKeys = std::vector<std::string>;
@@ -51,7 +51,7 @@ private:
 	Members members_;
 };
 
-} // namespace global
+} // end namespace entity
 
-#endif // global_entity
+#endif // entity_h
 

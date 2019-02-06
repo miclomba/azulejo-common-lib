@@ -10,7 +10,7 @@
 #include "X/Entity.h"
 #include "X/IStreamableEntity.h"
 
-using global::IStreamableEntity;
+using entity::IStreamableEntity;
 
 namespace
 {
@@ -19,7 +19,7 @@ const std::string TYPEA = "TypeA";
 const std::string TYPEB = "TypeB";
 const char DELIM = ':';
 
-class TypeB : public global::IStreamableEntity 
+class TypeB : public entity::IStreamableEntity 
 {
 public:
 	std::string ToString() const override { return TYPEB; };
@@ -32,7 +32,7 @@ public:
 	};
 };
 
-class TypeA : public global::IStreamableEntity
+class TypeA : public entity::IStreamableEntity
 {
 public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
@@ -50,7 +50,7 @@ public:
 private:
 	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
 };
-}
+} // end namespace anonymous
 
 TEST(IStreamableEntity, StreamNestedEntities)
 {
@@ -63,7 +63,7 @@ TEST(IStreamableEntity, StreamNestedEntities)
 TEST(IStreamableEntity, ThrowOnStreamNestedEntities)
 {
 	TypeA ea;
-	auto e = std::make_shared<global::Entity>();
+	auto e = std::make_shared<entity::Entity>();
 	e->SetKey(KEY);
 	EXPECT_NO_THROW(ea.AddProtectedMember(e));
 

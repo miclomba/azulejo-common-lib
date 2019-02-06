@@ -32,9 +32,9 @@ std::string GetKeyPath(const std::string& key, const ptree& tree)
 	}
 	return "";
 }
-}
+} // end namespace anonymous
 
-namespace global {
+namespace entity {
 
 EntityAggregationDeserializer* EntityAggregationDeserializer::instance_ = nullptr;
 
@@ -148,4 +148,4 @@ std::unique_ptr<Entity> EntityAggregationDeserializer::GenerateEntity(const std:
 	return std::move(entity);
 }
 
-} // end namespace global
+} // end namespace entity
