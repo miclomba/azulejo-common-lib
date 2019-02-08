@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "X/Resource.h"
+#include "X/IResource.h"
 
 namespace
 {
