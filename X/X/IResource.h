@@ -35,7 +35,7 @@ private:
 	mutable int checkSum_{ -1 };
 };
 
-#include "Resource.hpp"
+#include "IResource.hpp"
 
 }
 #endif // end dataresource_iresource_h
