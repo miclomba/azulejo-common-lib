@@ -139,7 +139,7 @@
     <ClInclude Include="IServerEntity.h" />
     <ClInclude Include="IRunnableEntity.h" />
     <ClInclude Include="ISharedMemoryEntity.h" />
-    <ClInclude Include="Resource.hpp">
+    <ClInclude Include="IResource.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClCompile Include="Entity.cpp" />
@@ -149,7 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="IResource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
