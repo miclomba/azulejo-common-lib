@@ -11,23 +11,25 @@
 namespace
 {
 const std::vector<int> INT_VALUES(1,1);
+const std::vector<int> EMPTY_INT_VALUES;
 
-class IntResource : public dataresource::Resource<std::vector<int>>
+class IntResource : public dataresource::IResource<std::vector<int>>
 {
 public:
-	IntResource() {}
-	IntResource(const std::vector<int>& values) 
-	{
-		EXPECT_NO_THROW(SetData(values));
-		EXPECT_EQ(GetData(), values);
-	}
+	IntResource(std::vector<int>&& values) : IResource(std::move(values)) {}
+	IntResource(const std::vector<int>& values) : IResource(values) {}
 	std::vector<int> GetData() const { return Data(); }
 	void SetData(const std::vector<int>& values) { Data() = values; }
+	bool IsDirtyProtected() { return IsDirty(); }
 	int ChecksumProtected() { return Checksum(); }
+
+protected:
+	void SaveImpl(const std::string& path) const {}
+	void LoadImpl(const std::string& path) {};
 };
 }
 
-TEST(Resource, MoveConstruct)
+TEST(IResource, MoveConstruct)
 {
 	IntResource ir(INT_VALUES);
 
@@ -37,10 +39,10 @@ TEST(Resource, MoveConstruct)
 	EXPECT_EQ(irMoved.GetData(), INT_VALUES);
 }
 
-TEST(Resource, MoveAssign)
+TEST(IResource, MoveAssign)
 {
 	IntResource ir(INT_VALUES);
-	IntResource irMoved;
+	IntResource irMoved(EMPTY_INT_VALUES);
 
 	// move assign
 	EXPECT_NO_THROW(irMoved = std::move(ir));
@@ -48,7 +50,7 @@ TEST(Resource, MoveAssign)
 	EXPECT_EQ(irMoved.GetData(), INT_VALUES);
 }
 
-TEST(Resource, CopyConstruct)
+TEST(IResource, CopyConstruct)
 {
 	IntResource ir(INT_VALUES);
 
@@ -57,10 +59,10 @@ TEST(Resource, CopyConstruct)
 	EXPECT_EQ(irCopied.GetData(), INT_VALUES);
 }
 
-TEST(Resource, CopyAssign)
+TEST(IResource, CopyAssign)
 {
 	IntResource ir(INT_VALUES);
-	IntResource irCopied;
+	IntResource irCopied(EMPTY_INT_VALUES);
 
 	// copy assign
 	EXPECT_NO_THROW(irCopied = ir);
@@ -68,33 +70,33 @@ TEST(Resource, CopyAssign)
 	EXPECT_EQ(irCopied.GetData(), INT_VALUES);
 }
 
-TEST(Resource, SetData)
+TEST(IResource, SetData)
 {
-	IntResource ir;
+	IntResource ir(EMPTY_INT_VALUES);
 	EXPECT_NO_THROW(ir.SetData(INT_VALUES));
 	EXPECT_EQ(ir.GetData(), INT_VALUES);
 }
 
-TEST(Resource, GetData)
+TEST(IResource, GetData)
 {
-	IntResource ir;
+	IntResource ir(EMPTY_INT_VALUES);
 	EXPECT_NO_THROW(ir.SetData(INT_VALUES));
 	EXPECT_EQ(ir.GetData(), INT_VALUES);
 }
 
-TEST(Resource, IsDirty)
+TEST(IResource, IsDirty)
 {
-	IntResource ir;
-	EXPECT_TRUE(ir.IsDirty());
-	EXPECT_FALSE(ir.IsDirty());
+	IntResource ir(EMPTY_INT_VALUES);
+	EXPECT_TRUE(ir.IsDirtyProtected());
+	EXPECT_FALSE(ir.IsDirtyProtected());
 
 	ir.SetData(INT_VALUES);
-	EXPECT_TRUE(ir.IsDirty());
+	EXPECT_TRUE(ir.IsDirtyProtected());
 }
 
-TEST(Resource, Checksum)
+TEST(IResource, Checksum)
 {
-	IntResource ir;
+	IntResource ir(EMPTY_INT_VALUES);
 
 	int checksum = ir.ChecksumProtected();
 	EXPECT_EQ(ir.ChecksumProtected(), checksum);
@@ -102,3 +104,4 @@ TEST(Resource, Checksum)
 	ir.SetData(INT_VALUES);
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
+

@@ -87,7 +87,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityAggregationDeserializer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Templates</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

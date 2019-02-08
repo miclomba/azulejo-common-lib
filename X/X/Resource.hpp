@@ -1,6 +1,6 @@
 
 template<typename T>
-int Resource<T>::Checksum() const
+int IResource<T>::Checksum() const
 {
 	boost::crc_32_type result;
 	size_t size = sizeof(*data_.data()) * data_.size();
@@ -9,10 +9,20 @@ int Resource<T>::Checksum() const
 }
 
 template<typename T>
-Resource<T>::~Resource() = default;
+IResource<T>::IResource(const T& data) : data_(data)
+{
+}
 
 template<typename T>
-bool Resource<T>::IsDirty() const
+IResource<T>::IResource(T&& data) : data_(std::move(data))
+{
+}
+
+template<typename T>
+IResource<T>::~IResource() = default;
+
+template<typename T>
+bool IResource<T>::IsDirty() const
 {
 	int check = Checksum();
 	if (check != checkSum_)
@@ -24,14 +34,27 @@ bool Resource<T>::IsDirty() const
 }
 
 template<typename T>
-const T& Resource<T>::Data() const
+const T& IResource<T>::Data() const
 {
 	return data_;
 }
 
 template<typename T>
-T& Resource<T>::Data()
+T& IResource<T>::Data()
 {
 	return data_;
 }
 
+template<typename T>
+void IResource<T>::Save(const std::string& path) const
+{
+	if (!IsDirty())
+		return;
+	SaveImpl(path);
+}
+
+template<typename T>
+void IResource<T>::Load(const std::string& path)
+{
+	LoadImpl(path);
+}
