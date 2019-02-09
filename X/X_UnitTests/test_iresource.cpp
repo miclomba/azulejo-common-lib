@@ -24,7 +24,7 @@ public:
 	int ChecksumProtected() { return Checksum(); }
 
 protected:
-	void SaveImpl(const std::string& path) const {}
+	void SaveImpl(const std::string& path) const { throw std::runtime_error("Not implemented"); }
 	void LoadImpl(const std::string& path) {};
 };
 }
@@ -105,3 +105,17 @@ TEST(IResource, Checksum)
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
 
+TEST(IResource, Save)
+{
+	IntResource ir(EMPTY_INT_VALUES);
+
+	EXPECT_THROW(ir.Save(""), std::runtime_error);
+	EXPECT_NO_THROW(ir.Save(""));
+}
+
+TEST(IResource, Load)
+{
+	IntResource ir(EMPTY_INT_VALUES);
+
+	EXPECT_NO_THROW(ir.Load(""));
+}
