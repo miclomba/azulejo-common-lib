@@ -12,14 +12,14 @@ namespace
 const std::string KEY = "key";
 const std::string NEW_KEY = "newKeyB";
 
-class TypeB : public global::Entity 
+class TypeB : public entity::Entity 
 {
 public:
 	TypeB() {}
 	std::string Serialize() const { return typeid(TypeB).name();  };
 };
 
-class TypeA : public global::Entity
+class TypeA : public entity::Entity
 {
 public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
@@ -27,14 +27,14 @@ public:
 	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	void AddProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
 	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
+	Entity& GetProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 	std::string Serialize() const { return typeid(TypeA).name(); };
 private:
-	TypeB& GetTypeB() { return static_cast<TypeB&>(GetAggregatedMember(KEY)); }
+	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
 };
-}
+} // end namespace anonymous
 
 TEST(Entity, MoveConstruct)
 {

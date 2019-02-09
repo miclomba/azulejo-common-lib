@@ -4,7 +4,7 @@
 #include <mutex>
 #include <thread>
 
-namespace global {
+namespace entity {
 
 IRunnableEntity::~IRunnableEntity()
 {
@@ -27,4 +27,4 @@ void IRunnableEntity::Join()
 	thread_.reset();
 }
 
-}
+} // end namespace entity

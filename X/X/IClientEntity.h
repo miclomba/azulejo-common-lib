@@ -1,5 +1,5 @@
-#ifndef global_iclient_entity
-#define global_iclient_entity
+#ifndef entity_icliententity_h
+#define entity_icliententity_h
 
 #include <memory>
 #include <string>
@@ -9,9 +9,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT IClientEntity : public Entity
+class ENTITY_DLL_EXPORT IClientEntity : public Entity
 {
 public:
 	IClientEntity();
@@ -28,6 +28,6 @@ private:
 	std::shared_ptr<boost::asio::io_service> ioService_;
 };
 
-} // namespace global
-#endif // global_iclient_entity
+} // namespace entity
+#endif // entity_icliententity_h
 

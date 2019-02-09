@@ -2,7 +2,7 @@
 
 #include <omp.h>
 
-namespace global {
+namespace entity {
 
 IOpenMPEntity::IOpenMPEntity(const int numThreads, const bool setDynamic, const bool setNested) :
 	numThreads_(numThreads), setDynamic_(setDynamic), setNested_(setNested)
@@ -22,4 +22,4 @@ void IOpenMPEntity::Start()
 	Run();
 }
 
-}
+} // end namespace entity

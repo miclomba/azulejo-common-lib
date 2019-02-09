@@ -28,7 +28,7 @@ std::string MakeDaytimeString()
 	return str;
 }
 
-class Client : public global::IClientEntity
+class Client : public entity::IClientEntity
 {
 protected:
 	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
@@ -48,7 +48,7 @@ protected:
 	}
 };
 
-class Server : public global::IServerEntity
+class Server : public entity::IServerEntity
 {
 public:
 	Server(const int port) : IServerEntity(port) {}
@@ -65,7 +65,7 @@ protected:
 		return false;
 	}
 };
-} // end namespace
+} // end namespace anonymous
 
 /*
 int main(const int argc, const char** argv)

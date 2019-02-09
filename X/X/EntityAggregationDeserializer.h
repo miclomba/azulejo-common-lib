@@ -1,5 +1,5 @@
-#ifndef global_entity_aggregation_deserializer_h
-#define global_entity_aggregation_deserializer_h
+#ifndef entity_entityaggregationdeserializer_h
+#define entity_entityaggregationdeserializer_h
 
 #include <filesystem>
 #include <functional>
@@ -11,11 +11,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "config.h"
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT EntityAggregationDeserializer
+class ENTITY_DLL_EXPORT EntityAggregationDeserializer
 {
 public:
 	virtual ~EntityAggregationDeserializer();
@@ -25,14 +25,15 @@ public:
 
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
+	bool HasSerializationKey(const std::string& key) const;
 
-	void Deserialize(Entity& entity);
+	void Deserialize(ISerializableEntity& entity);
 
 	template<typename T>
 	void RegisterEntity(const std::string& key);
 	void UnregisterEntity(const std::string& key);
 
-	std::unique_ptr<Entity> GenerateEntity(const std::string& key);
+	std::unique_ptr<ISerializableEntity> GenerateEntity(const std::string& key) const;
 
 private:
 	EntityAggregationDeserializer();
@@ -41,17 +42,17 @@ private:
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
 
-	void DeserializeWithParentKey(Entity& entity, const std::string& parentKey = "");
+	void DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey = "");
 
 	static EntityAggregationDeserializer* instance_;
 
 	std::filesystem::path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
-	std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
+	mutable std::map<std::string, std::function<std::unique_ptr<ISerializableEntity>(void)>> keyToEntityMap_;
 };
 
 #include "EntityAggregationDeserializer.hpp"
 
-} // end namespace global
-#endif // global_entity_aggregation_deserializer_h
+} // end namespace entity
+#endif // entity_entityaggregationdeserializer_h
 

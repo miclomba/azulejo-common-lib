@@ -6,7 +6,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
-namespace global {
+namespace entity {
 
 ISharedMemoryEntity::~ISharedMemoryEntity()
 {
@@ -76,4 +76,4 @@ void* ISharedMemoryEntity::GetSharedAddress() const
 	return static_cast<void*>(region.get_address());
 }
 
-}
+} // end namespace entity

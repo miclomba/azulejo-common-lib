@@ -1,8 +1,8 @@
-#ifndef x_config_h
-#define x_config_h
+#ifndef entity_config_h
+#define entity_config_h
 
 //#define BOOST_ALL_DYN_LINK
 
-#define X_DLL_EXPORT __declspec(dllexport)
+#define ENTITY_DLL_EXPORT __declspec(dllexport)
 
 #endif

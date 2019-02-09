@@ -1,5 +1,5 @@
-#ifndef global_iserver_entity
-#define global_iserver_entity
+#ifndef entity_iserverentity_h
+#define entity_iserverentity_h
 
 #include <memory>
 
@@ -8,9 +8,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT IServerEntity : public Entity
+class ENTITY_DLL_EXPORT IServerEntity : public Entity
 {
 public:
 	IServerEntity(const int port);
@@ -28,6 +28,6 @@ private:
 	std::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor_;
 };
 
-} // namespace global
-#endif // global_iserver_entity
+} // end namespace entity
+#endif // entity_iserverentity_h
 

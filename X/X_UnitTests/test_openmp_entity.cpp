@@ -11,7 +11,7 @@ namespace
 {
 const int EXPECTED_VALUE = 8;
 
-class Runnable : public global::IOpenMPEntity
+class Runnable : public entity::IOpenMPEntity
 {
 public:
 	Runnable(const int numThreads, const bool setDynamic, const bool setNested) :
@@ -92,7 +92,7 @@ public:
 private:
 	int sharedTotal_{ 0 };
 };
-}
+} // end namespace anonymous
 
 TEST(IOpenMPEntity, Run)
 {

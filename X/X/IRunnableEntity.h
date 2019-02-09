@@ -1,5 +1,5 @@
-#ifndef global_irunnable_entity
-#define global_irunnable_entity
+#ifndef entity_irunnableentity_h
+#define entity_irunnableentity_h
 
 #include <memory>
 #include <mutex>
@@ -8,9 +8,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT IRunnableEntity : public Entity
+class ENTITY_DLL_EXPORT IRunnableEntity : public Entity
 {
 public:
 	virtual ~IRunnableEntity();
@@ -27,6 +27,6 @@ private:
 	std::shared_ptr<std::thread> thread_;
 };
 
-} // namespace global
+} // namespace entity
 
-#endif // global_irunnable_entity
+#endif // entity_irunnableentity_h

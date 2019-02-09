@@ -7,7 +7,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
 using boost::property_tree::ptree;
 
@@ -32,9 +32,9 @@ std::string GetKeyPath(const std::string& key, const ptree& tree)
 	}
 	return "";
 }
-}
+} // end namespace anonymous
 
-namespace global {
+namespace entity {
 
 EntityAggregationDeserializer* EntityAggregationDeserializer::instance_ = nullptr;
 
@@ -74,6 +74,11 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
+bool EntityAggregationDeserializer::HasSerializationKey(const std::string& key) const
+{
+	return !GetKeyPath(key, serializationStructure_).empty() ? true : false;
+}
+
 void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
@@ -82,7 +87,7 @@ void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
 	keyToEntityMap_.erase(key);
 }
 
-void EntityAggregationDeserializer::Deserialize(Entity& entity)
+void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
@@ -100,7 +105,7 @@ void EntityAggregationDeserializer::Deserialize(Entity& entity)
 	DeserializeWithParentKey(entity, parentKey);
 }
 
-void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, const std::string& parentKey)
+void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
@@ -128,19 +133,20 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, con
 		auto memberEntity = GenerateEntity(key);
 		entity.AggregateMember(std::move(memberEntity));
 
-		DeserializeWithParentKey(entity.GetAggregatedMember(key), searchPath);
+		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
+		DeserializeWithParentKey(*childEntity, searchPath);
 	}
 }
 
-std::unique_ptr<Entity> EntityAggregationDeserializer::GenerateEntity(const std::string& key)
+std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const std::string& key) const
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");
 
-	std::unique_ptr<Entity> entity = keyToEntityMap_[key]();
+	std::unique_ptr<ISerializableEntity> entity = keyToEntityMap_[key]();
 	entity->SetKey(key);
 
 	return std::move(entity);
 }
 
-} // end namespace global
+} // end namespace entity

@@ -10,7 +10,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "X/Entity.h"
+#include "X/ISerializableEntity.h"
 #include "X/EntityAggregationSerializer.h"
 
 namespace fs = std::filesystem;
@@ -25,7 +25,7 @@ const std::string ENTITY_2A = "entity_2a";
 const std::string ENTITY_1B = "entity_1b";
 const std::string VALUE = "value";
 
-class TypeA : public global::Entity
+class TypeA : public entity::ISerializableEntity
 {
 public:
 	TypeA() = default;
@@ -38,7 +38,7 @@ public:
 
 	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	const Members& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetAggregatedProtectedMember(const std::string& key) { return GetAggregatedMember(key); }
+	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	const MemberKeys GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
 	void Save(boost::property_tree::ptree& tree, const std::string& path) const override
@@ -141,65 +141,65 @@ private:
 
 	std::shared_ptr<TypeA> entity_;
 };
-}
+} // end namespace entity
 
 TEST(EntityAggregationSerializer, GetInstance)
 {
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::GetInstance());
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	EXPECT_NO_THROW(entity::EntityAggregationSerializer::GetInstance());
+	auto serializer = entity::EntityAggregationSerializer::GetInstance();
 	EXPECT_TRUE(serializer);
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(entity::EntityAggregationSerializer::ResetInstance());
 }
 
 TEST(EntityAggregationSerializer, ResetInstance)
 {
-	EXPECT_NO_THROW(global::EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(entity::EntityAggregationSerializer::ResetInstance());
 }
 
 TEST(EntityAggregationSerializer, SerializeFromRoot)
 {
 	Fixture fixture(true, ENTITY_1A, ENTITY_2A, ENTITY_1B);
 
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	auto serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
-	global::EntityAggregationSerializer::ResetInstance();
+	entity::EntityAggregationSerializer::ResetInstance();
 }
 
 TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 {
 	Fixture fixture(true, ENTITY_2A, ENTITY_1B);
 
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	auto serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
-	global::EntityAggregationSerializer::ResetInstance();
+	entity::EntityAggregationSerializer::ResetInstance();
 }
 
 TEST(EntityAggregationSerializer, SerializeFromLeaf)
 {
 	Fixture fixture(true, ENTITY_1B);
 
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	auto serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
-	global::EntityAggregationSerializer::ResetInstance();
+	entity::EntityAggregationSerializer::ResetInstance();
 }
 
 TEST(EntityAggregationSerializer, SerializeFromNoKeyEntity)
 {
 	Fixture fixture(false, ENTITY_1B);
 
-	auto serializer = global::EntityAggregationSerializer::GetInstance();
+	auto serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -207,5 +207,5 @@ TEST(EntityAggregationSerializer, SerializeFromNoKeyEntity)
 	entity.SetKey("");
 	EXPECT_THROW(serializer->Serialize(entity), std::runtime_error);
 
-	global::EntityAggregationSerializer::ResetInstance();
+	entity::EntityAggregationSerializer::ResetInstance();
 }

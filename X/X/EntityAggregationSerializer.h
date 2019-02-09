@@ -1,5 +1,5 @@
-#ifndef global_entity_aggregation_serializer_h
-#define global_entity_aggregation_serializer_h
+#ifndef entity_entityaggregationserializer_h
+#define entity_entityaggregationserializer_h
 
 #include <filesystem>
 #include <string>
@@ -7,11 +7,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "config.h"
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT EntityAggregationSerializer
+class ENTITY_DLL_EXPORT EntityAggregationSerializer
 {
 public:
 	virtual ~EntityAggregationSerializer();
@@ -19,7 +19,7 @@ public:
 	static EntityAggregationSerializer* GetInstance();
 	static void ResetInstance();
 
-	void Serialize(const Entity& entity);
+	void Serialize(const ISerializableEntity& entity);
 
 	void SetSerializationPath(const std::string& pathToJSON);
 	std::string GetSerializationPath() const;
@@ -31,9 +31,7 @@ private:
 	EntityAggregationSerializer(EntityAggregationSerializer&&) = delete;
 	EntityAggregationSerializer& operator=(EntityAggregationSerializer&&) = delete;
 
-	void SerializeWithParentKey(const Entity& entity, const std::string& parentKey = "");
-
-	std::string GetKeyPath(const std::string& key, const Entity& entity) const;
+	void SerializeWithParentKey(const ISerializableEntity& entity, const std::string& parentKey = "");
 
 	static EntityAggregationSerializer* instance_;
 
@@ -41,6 +39,6 @@ private:
 	boost::property_tree::ptree serializationStructure_;
 };
 
-} // end namespace global
-#endif // global_entity_aggregation_serializer_h
+} // end namespace entity
+#endif // entity_entityaggregationserializer_h
 

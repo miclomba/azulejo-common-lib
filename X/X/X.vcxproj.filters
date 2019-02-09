@@ -48,16 +48,13 @@
     <ClCompile Include="EntityAggregationDeserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ISerializableEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.hpp">
-      <Filter>Templates</Filter>
     </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
@@ -87,6 +84,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityAggregationDeserializer.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="IResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IResource.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

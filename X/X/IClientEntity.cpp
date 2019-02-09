@@ -5,7 +5,7 @@
 
 #include <boost/asio.hpp>
 
-namespace global {
+namespace entity {
 	
 IClientEntity::IClientEntity()
 {
@@ -62,4 +62,4 @@ std::shared_ptr<boost::asio::ip::tcp::socket> IClientEntity::Connect(const std::
 	return mySocket;
 }
 
-} // namespace global
+} // namespace entity

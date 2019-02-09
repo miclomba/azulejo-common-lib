@@ -1,12 +1,12 @@
-#ifndef global_iopen_mp_entity
-#define global_iopen_mp_entity
+#ifndef entity_iopenmpentity_h
+#define entity_iopenmpentity_h
 
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT IOpenMPEntity : public Entity
+class ENTITY_DLL_EXPORT IOpenMPEntity : public Entity
 {
 public:
 	IOpenMPEntity(const int numThreads, const bool setDynamic, const bool setNested);
@@ -22,6 +22,6 @@ protected:
 	bool setNested_;
 };
 
-} // namespace global
-#endif // global_iopen_mp_entity
+} // namespace entity
+#endif // entity_iopenmpentity_h
 

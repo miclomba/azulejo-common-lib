@@ -1,5 +1,5 @@
-#ifndef global_istreamable_entity
-#define global_istreamable_entity
+#ifndef entity_istreamableentity_h
+#define entity_istreamableentity_h
 
 #include <iostream>
 #include <memory>
@@ -8,9 +8,9 @@
 #include "config.h"
 #include "Entity.h"
 
-namespace global {
+namespace entity {
 
-class X_DLL_EXPORT IStreamableEntity : public Entity
+class ENTITY_DLL_EXPORT IStreamableEntity : public Entity
 {
 public:
 	virtual ~IStreamableEntity();
@@ -20,11 +20,11 @@ public:
 
 	static std::string GetDelimeter();
 
-	friend X_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const IStreamableEntity& from);
-	friend X_DLL_EXPORT std::istream& operator>>(std::istream& from, IStreamableEntity& to);
+	friend ENTITY_DLL_EXPORT std::ostream& operator<<(std::ostream& to, const IStreamableEntity& from);
+	friend ENTITY_DLL_EXPORT std::istream& operator>>(std::istream& from, IStreamableEntity& to);
 };
 
-} // namespace global
+} // end namespace entity
 
-#endif // global_istreamable_entity
+#endif // entity_istreamableentity_h
 
