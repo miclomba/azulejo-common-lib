@@ -11,7 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "config.h"
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
 namespace entity {
 
@@ -27,13 +27,13 @@ public:
 	bool HasSerializationStructure() const;
 	bool HasSerializationKey(const std::string& key) const;
 
-	void Deserialize(Entity& entity);
+	void Deserialize(ISerializableEntity& entity);
 
 	template<typename T>
 	void RegisterEntity(const std::string& key);
 	void UnregisterEntity(const std::string& key);
 
-	std::unique_ptr<Entity> GenerateEntity(const std::string& key) const;
+	std::unique_ptr<ISerializableEntity> GenerateEntity(const std::string& key) const;
 
 private:
 	EntityAggregationDeserializer();
@@ -42,13 +42,13 @@ private:
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
 
-	void DeserializeWithParentKey(Entity& entity, const std::string& parentKey = "");
+	void DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey = "");
 
 	static EntityAggregationDeserializer* instance_;
 
 	std::filesystem::path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
-	mutable std::map<std::string, std::function<std::unique_ptr<Entity>(void)>> keyToEntityMap_;
+	mutable std::map<std::string, std::function<std::unique_ptr<ISerializableEntity>(void)>> keyToEntityMap_;
 };
 
 #include "EntityAggregationDeserializer.hpp"

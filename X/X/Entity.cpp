@@ -1,13 +1,6 @@
 #include "Entity.h"
 #include "EntityAggregationDeserializer.h"
 
-#include <iostream>
-#include <queue>
-
-#include <boost/property_tree/ptree.hpp>
-
-using boost::property_tree::ptree;
-
 namespace entity {
 
 using MemberKeys = Entity::MemberKeys;
@@ -47,20 +40,17 @@ void Entity::SetKey(const std::string& key)
 	key_ = key;
 }
 
-void Entity::Save(ptree& tree, const std::string& path) const
-{
-}
-
-void Entity::Load(ptree& tree, const std::string& path)
-{
-}
-
 MemberKeys Entity::GetAggregatedMemberKeys() const
 {
 	MemberKeys keys;
 	for (auto& e : members_)
 		keys.push_back(e.first);
 	return keys;
+}
+
+Members& Entity::GetAggregatedMembers()
+{
+	return members_;
 }
 
 const Members& Entity::GetAggregatedMembers() const
@@ -72,19 +62,7 @@ std::shared_ptr<Entity> Entity::GetAggregatedMember(const std::string& key)
 {
 	auto found = members_.find(key);
 	if (found != members_.cend())
-	{
-		if (!members_[key])
-		{
-			auto deserializer = EntityAggregationDeserializer::GetInstance();
-			if (deserializer->HasSerializationKey(key))
-			{
-				std::unique_ptr<Entity> entity = deserializer->GenerateEntity(key);
-				deserializer->Deserialize(*entity);
-				members_[key] = std::move(entity);
-			}
-		}
 		return members_[key];
-	}
 
 	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 }

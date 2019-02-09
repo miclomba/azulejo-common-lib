@@ -10,7 +10,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "X/Entity.h"
+#include "X/ISerializableEntity.h"
 #include "X/EntityAggregationDeserializer.h"
 
 namespace fs = std::filesystem;
@@ -26,7 +26,7 @@ const std::string ENTITY_1B = "entity_1b";
 const std::string BAD_KEY = "bad_key";
 const std::string VALUE = "value";
 
-class TypeA : public entity::Entity
+class TypeA : public entity::ISerializableEntity
 {
 public:
 	TypeA() = default;
@@ -39,7 +39,7 @@ public:
 	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	void AggregateProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
 
-	const Members& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
+	const Members GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	std::shared_ptr<Entity> GetAggregatedProtectedMemberPtr(const std::string& key) { return GetAggregatedMember(key); }
 	const MemberKeys GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
@@ -206,7 +206,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeRoot)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(entity::Entity()), std::runtime_error);
+	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
 	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
@@ -229,7 +229,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeIntermediate)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(entity::Entity()), std::runtime_error);
+	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
 	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
@@ -252,7 +252,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeLeaf)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(entity::Entity()), std::runtime_error);
+	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
 	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
@@ -275,7 +275,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeBadKey)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(entity::Entity()), std::runtime_error);
+	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
 	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
@@ -298,15 +298,15 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntity)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
 	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(entity::Entity()), std::runtime_error);
+	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
 	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// Create entity with unloaded member
 	std::shared_ptr<TypeA> entity = CreateEntityWithUnloadedMember(ENTITY_1A, ENTITY_2A);
-	entity::Entity::Members members = entity->GetAggregatedProtectedMembers();
-	EXPECT_TRUE(members[ENTITY_2A] == nullptr);
+	entity::ISerializableEntity::Members members = entity->GetAggregatedProtectedMembers();
+	EXPECT_TRUE(members.find(ENTITY_2A) == members.cend());
 
 	// try to lazy load the entity
 	entity::Entity& lazyLoaded = entity->GetAggregatedProtectedMember(ENTITY_2A);

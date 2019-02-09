@@ -5,7 +5,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
 using boost::property_tree::ptree;
 
@@ -30,14 +30,14 @@ void EntityAggregationSerializer::ResetInstance()
 	instance_ = nullptr;
 }
 
-void EntityAggregationSerializer::Serialize(const Entity& entity)
+void EntityAggregationSerializer::Serialize(const ISerializableEntity& entity)
 {
 	if (entity.GetKey().empty())
 		throw std::runtime_error("Cannot serialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
 	SerializeWithParentKey(entity, "");
 }
 
-void EntityAggregationSerializer::SerializeWithParentKey(const Entity& entity, const std::string& parentKey)
+void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEntity& entity, const std::string& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	

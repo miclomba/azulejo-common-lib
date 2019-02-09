@@ -7,7 +7,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entity.h"
+#include "ISerializableEntity.h"
 
 using boost::property_tree::ptree;
 
@@ -87,7 +87,7 @@ void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
 	keyToEntityMap_.erase(key);
 }
 
-void EntityAggregationDeserializer::Deserialize(Entity& entity)
+void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
@@ -105,7 +105,7 @@ void EntityAggregationDeserializer::Deserialize(Entity& entity)
 	DeserializeWithParentKey(entity, parentKey);
 }
 
-void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, const std::string& parentKey)
+void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey)
 {
 	if (!HasSerializationStructure())
 		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
@@ -133,16 +133,17 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(Entity& entity, con
 		auto memberEntity = GenerateEntity(key);
 		entity.AggregateMember(std::move(memberEntity));
 
-		DeserializeWithParentKey(*entity.GetAggregatedMember(key), searchPath);
+		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
+		DeserializeWithParentKey(*childEntity, searchPath);
 	}
 }
 
-std::unique_ptr<Entity> EntityAggregationDeserializer::GenerateEntity(const std::string& key) const
+std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const std::string& key) const
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");
 
-	std::unique_ptr<Entity> entity = keyToEntityMap_[key]();
+	std::unique_ptr<ISerializableEntity> entity = keyToEntityMap_[key]();
 	entity->SetKey(key);
 
 	return std::move(entity);

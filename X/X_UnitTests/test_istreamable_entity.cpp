@@ -50,6 +50,11 @@ public:
 private:
 	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
 };
+
+class TypeC : public entity::Entity
+{
+};
+
 } // end namespace anonymous
 
 TEST(IStreamableEntity, StreamNestedEntities)
@@ -63,7 +68,7 @@ TEST(IStreamableEntity, StreamNestedEntities)
 TEST(IStreamableEntity, ThrowOnStreamNestedEntities)
 {
 	TypeA ea;
-	auto e = std::make_shared<entity::Entity>();
+	auto e = std::make_shared<TypeC>();
 	e->SetKey(KEY);
 	EXPECT_NO_THROW(ea.AddProtectedMember(e));
 

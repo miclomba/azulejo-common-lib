@@ -6,14 +6,9 @@
 #include <string>
 #include <vector>
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "config.h"
 
 namespace entity {
-
-class EntityAggregationDeserializer;
-class EntityAggregationSerializer;
 
 class ENTITY_DLL_EXPORT Entity
 {
@@ -21,30 +16,30 @@ public:
 	using MemberKeys = std::vector<std::string>;
 	using Members = std::map<std::string, std::shared_ptr<Entity>>;
 
-	friend class EntityAggregationSerializer;
-	friend class EntityAggregationDeserializer;
-
 public:
-	Entity();
+	virtual ~Entity();
+
 	Entity(const Entity& other);
 	Entity& operator=(const Entity& other);
 	Entity(Entity&& other);
 	Entity& operator=(Entity&& other);
-	virtual ~Entity();
 
 	std::string GetKey() const;
 	void SetKey(const std::string& key);
 
-	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const;
-	virtual void Load(boost::property_tree::ptree& tree, const std::string& path);
-
 protected:
+	Entity();
+
+	// make virtual so that classes such as ISerializableEntity can override for lazy loading
+	virtual std::shared_ptr<Entity> GetAggregatedMember(const std::string& key);
+
+	Members& GetAggregatedMembers();
 	const Members& GetAggregatedMembers() const;
-	std::shared_ptr<Entity> GetAggregatedMember(const std::string& key);
+
 	MemberKeys GetAggregatedMemberKeys() const;
 
-	virtual void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
-	virtual void AggregateMember(std::shared_ptr<Entity> copied);
+	void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
+	void AggregateMember(std::shared_ptr<Entity> copied);
 
 private:
 	std::string key_;

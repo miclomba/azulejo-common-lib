@@ -127,6 +127,7 @@
     <ClCompile Include="EntityAggregationSerializer.cpp" />
     <ClCompile Include="IClientEntity.cpp" />
     <ClCompile Include="IOpenMPEntity.cpp" />
+    <ClCompile Include="ISerializableEntity.cpp" />
     <ClCompile Include="IServerEntity.cpp" />
     <ClCompile Include="IRunnableEntity.cpp" />
     <ClCompile Include="IStreamableEntity.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="EntityAggregationSerializer.h" />
     <ClInclude Include="IClientEntity.h" />
     <ClInclude Include="IOpenMPEntity.h" />
+    <ClInclude Include="ISerializableEntity.h" />
     <ClInclude Include="IServerEntity.h" />
     <ClInclude Include="IRunnableEntity.h" />
     <ClInclude Include="ISharedMemoryEntity.h" />

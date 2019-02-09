@@ -48,6 +48,9 @@
     <ClCompile Include="EntityAggregationDeserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ISerializableEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="IResource.hpp">
       <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializableEntity.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

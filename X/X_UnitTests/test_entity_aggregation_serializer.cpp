@@ -10,7 +10,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "X/Entity.h"
+#include "X/ISerializableEntity.h"
 #include "X/EntityAggregationSerializer.h"
 
 namespace fs = std::filesystem;
@@ -25,7 +25,7 @@ const std::string ENTITY_2A = "entity_2a";
 const std::string ENTITY_1B = "entity_1b";
 const std::string VALUE = "value";
 
-class TypeA : public entity::Entity
+class TypeA : public entity::ISerializableEntity
 {
 public:
 	TypeA() = default;
