@@ -5,7 +5,7 @@
 #include <string>
 #include <gtest/gtest.h>
 
-#include "X/Entity.h"
+#include "Entities/Entity.h"
 
 namespace
 {

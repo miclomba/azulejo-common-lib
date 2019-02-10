@@ -10,8 +10,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "X/ISerializableEntity.h"
-#include "X/EntityAggregationSerializer.h"
+#include "Entities/ISerializableEntity.h"
+#include "Entities/EntityAggregationSerializer.h"
 
 namespace fs = std::filesystem;
 using boost::property_tree::ptree;

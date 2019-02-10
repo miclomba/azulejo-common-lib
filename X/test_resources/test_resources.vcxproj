@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3d017588-8579-4c78-b56c-d8750d15f75d}</ProjectGuid>
+    <ProjectGuid>{5be006f3-645b-4a18-a17c-0e339d23748d}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,17 +33,15 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ProjectReference Include="..\Resources\Resources.vcxproj">
+      <Project>{191ccc0e-4c7d-4add-94c9-b9e66afccbd4}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_entity.cpp" />
-    <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
-    <ClCompile Include="test_entity_aggregation_serializer.cpp" />
-    <ClCompile Include="test_inetworkable_entity.cpp" />
-    <ClCompile Include="test_irunnable_entity.cpp" />
-    <ClCompile Include="test_ishared_memory_entity.cpp" />
-    <ClCompile Include="test_istreamable_entity.cpp" />
-    <ClCompile Include="test_openmp_entity.cpp" />
+    <ClCompile Include="test_iresource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
