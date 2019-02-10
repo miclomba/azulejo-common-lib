@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "X/IRunnableEntity.h"
+#include "Entities/IRunnableEntity.h"
 
 namespace
 {

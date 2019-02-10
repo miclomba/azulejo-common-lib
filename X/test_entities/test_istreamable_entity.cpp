@@ -7,8 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include "X/Entity.h"
-#include "X/IStreamableEntity.h"
+#include "Entities/Entity.h"
+#include "Entities/IStreamableEntity.h"
 
 using entity::IStreamableEntity;
 

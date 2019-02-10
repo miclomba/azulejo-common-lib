@@ -1,15 +1,15 @@
-#ifndef dataresource_iresource_h
-#define dataresource_iresource_h
+#ifndef resource_iresource_h
+#define resource_iresource_h
 
 #include <boost/crc.hpp>
 
 #include "config.h"
 
-namespace dataresource
+namespace resource
 {
 
 template<class T>
-class ENTITY_DLL_EXPORT IResource 
+class RESOURCE_DLL_EXPORT IResource 
 {
 public:
 	IResource(const T& data);
@@ -38,5 +38,5 @@ private:
 #include "IResource.hpp"
 
 }
-#endif // end dataresource_iresource_h
+#endif // end resource_iresource_h
 

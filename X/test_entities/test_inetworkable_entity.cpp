@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 #include <boost/array.hpp>
 
-#include "X/IClientEntity.h"
-#include "X/IServerEntity.h"
+#include "Entities/IClientEntity.h"
+#include "Entities/IServerEntity.h"
 
 namespace
 {

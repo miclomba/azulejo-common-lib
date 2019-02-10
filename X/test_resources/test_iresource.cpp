@@ -6,14 +6,14 @@
 
 #include <gtest/gtest.h>
 
-#include "X/IResource.h"
+#include "Resources/IResource.h"
 
 namespace
 {
 const std::vector<int> INT_VALUES(1,1);
 const std::vector<int> EMPTY_INT_VALUES;
 
-class IntResource : public dataresource::IResource<std::vector<int>>
+class IntResource : public resource::IResource<std::vector<int>>
 {
 public:
 	IntResource(std::vector<int>&& values) : IResource(std::move(values)) {}

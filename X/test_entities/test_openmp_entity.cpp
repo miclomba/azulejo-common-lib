@@ -5,7 +5,7 @@
 
 #include <omp.h>
 
-#include "X/IOpenMPEntity.h"
+#include "Entities/IOpenMPEntity.h"
 
 namespace
 {

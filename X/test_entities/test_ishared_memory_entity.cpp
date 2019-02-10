@@ -6,7 +6,7 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/thread.hpp> 
 
-#include "X/ISharedMemoryEntity.h"
+#include "Entities/ISharedMemoryEntity.h"
 
 namespace
 {
