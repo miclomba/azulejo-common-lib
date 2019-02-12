@@ -24,9 +24,15 @@
     <ClInclude Include="IResource.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="ResourceDeserializer.h" />
+    <ClInclude Include="ResourceSerializer.h" />
+    <ClInclude Include="ResourceSerializer.hpp" />
+    <ClInclude Include="ResourceTypeTraits.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ResourceDeserializer.cpp" />
+    <ClCompile Include="ResourceSerializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

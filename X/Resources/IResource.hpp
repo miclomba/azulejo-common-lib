@@ -1,5 +1,9 @@
+#define ENABLE_IF_CONTAINER_TEMPLATE_DEF \
+template<typename T> \
+template<typename U, typename std::enable_if_t<is_arithmetic_container<U>::value, int>> 
 
-template<typename T>
+
+ENABLE_IF_CONTAINER_TEMPLATE_DEF
 int IResource<T>::Checksum() const
 {
 	boost::crc_32_type result;
@@ -8,12 +12,12 @@ int IResource<T>::Checksum() const
 	return result.checksum();
 }
 
-template<typename T>
+ENABLE_IF_CONTAINER_TEMPLATE_DEF
 IResource<T>::IResource(const T& data) : data_(data)
 {
 }
 
-template<typename T>
+ENABLE_IF_CONTAINER_TEMPLATE_DEF
 IResource<T>::IResource(T&& data) : data_(std::move(data))
 {
 }
@@ -45,16 +49,4 @@ T& IResource<T>::Data()
 	return data_;
 }
 
-template<typename T>
-void IResource<T>::Save(const std::string& path) const
-{
-	if (!IsDirty())
-		return;
-	SaveImpl(path);
-}
-
-template<typename T>
-void IResource<T>::Load(const std::string& path)
-{
-	LoadImpl(path);
-}
+#undef ENABLE_IF_CONTAINER_TEMPLATE_DEF

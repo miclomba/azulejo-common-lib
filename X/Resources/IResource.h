@@ -1,18 +1,35 @@
 #ifndef resource_iresource_h
 #define resource_iresource_h
 
+#include <array>
+#include <string>
+#include <vector>
+
 #include <boost/crc.hpp>
 
 #include "config.h"
+#include "ResourceTypeTraits.hpp"
+
+// Helpful defines
+#define ENABLE_IF_CONTAINER_TEMPLATE_DECL \
+template<typename U = T, typename std::enable_if_t<is_arithmetic_container<U>::value, int> = 0> 
 
 namespace resource
 {
+class ResourceSerializer;
+class ResourceDeserializer;
 
-template<class T>
+template<typename T>
 class RESOURCE_DLL_EXPORT IResource 
 {
 public:
+	friend class ResourceSerializer;
+	friend class ResourceDeserializer;
+
+public:
+	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	IResource(const T& data);
+	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	IResource(T&& data);
 
 	virtual ~IResource();
@@ -20,15 +37,11 @@ public:
 	const T& Data() const;
 	T& Data();
 
-	void Save(const std::string& path) const;
-	void Load(const std::string& path);
-
 protected:
 	bool IsDirty() const;
-	int Checksum() const;
 
-	virtual void SaveImpl(const std::string& path) const = 0;
-	virtual void LoadImpl(const std::string& path) = 0;
+	ENABLE_IF_CONTAINER_TEMPLATE_DECL
+	int Checksum() const;
 
 private:
 	T data_;
@@ -36,7 +49,8 @@ private:
 };
 
 #include "IResource.hpp"
-
 }
+
+#undef ENABLE_IF_CONTAINER_TEMPLATE_DECL
 #endif // end resource_iresource_h
 
