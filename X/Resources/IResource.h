@@ -15,6 +15,13 @@ public:
 	friend class ResourceDeserializer;
 
 	virtual void Assign(const char* buff, const size_t n) = 0;
+
+protected:
+	bool IsDirty() const;
+	virtual int Checksum() const = 0;
+
+private:
+	mutable int checkSum_{ -1 };
 };
 }
 

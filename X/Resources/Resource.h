@@ -43,14 +43,10 @@ public:
 	void Assign(const char* buff, const size_t n) override;
 
 protected:
-	bool IsDirty() const;
-
-	ENABLE_IF_CONTAINER_TEMPLATE_DECL
-	int Checksum() const;
+	int Checksum() const override;
 
 private:
 	T data_;
-	mutable int checkSum_{ -1 };
 };
 
 #include "Resource.hpp"

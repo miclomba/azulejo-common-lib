@@ -30,6 +30,7 @@
     <ClInclude Include="ResourceTypeTraits.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IResource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ResourceDeserializer.cpp" />
     <ClCompile Include="ResourceSerializer.cpp" />
