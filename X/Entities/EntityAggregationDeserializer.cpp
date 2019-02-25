@@ -32,6 +32,17 @@ std::string GetKeyPath(const std::string& key, const ptree& tree)
 	}
 	return "";
 }
+
+std::string GetParentKeyPath(const std::string& keyPath)
+{
+	std::string parentKeyPath;
+
+	size_t pos = keyPath.find_last_of('.');
+	if (pos != std::string::npos)
+		parentKeyPath = keyPath.substr(0, pos);
+
+	return parentKeyPath;
+}
 } // end namespace anonymous
 
 namespace entity {
@@ -96,20 +107,11 @@ void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
 	if (keyPath.empty())
 		throw std::runtime_error("Cannot deserialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
 
-	std::string parentKey;
-
-	size_t pos = keyPath.find_last_of('.');
-	if (pos != std::string::npos)
-		parentKey = keyPath.substr(0,pos);
-
-	DeserializeWithParentKey(entity, parentKey);
+	DeserializeWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
 void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey)
 {
-	if (!HasSerializationStructure())
-		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
-
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
 	auto tree = serializationStructure_.get_child_optional(searchPath);

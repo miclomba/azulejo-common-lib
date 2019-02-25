@@ -40,6 +40,8 @@ public:
 	const T& Data() const;
 	T& Data();
 
+	void Assign(const char* buff, const size_t n) override;
+
 protected:
 	bool IsDirty() const;
 
@@ -47,8 +49,6 @@ protected:
 	int Checksum() const;
 
 private:
-	void Assign(const char* buff, const size_t n) override;
-
 	T data_;
 	mutable int checkSum_{ -1 };
 };

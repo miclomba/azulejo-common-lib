@@ -14,7 +14,6 @@ public:
 	friend class ResourceSerializer;
 	friend class ResourceDeserializer;
 
-private:
 	virtual void Assign(const char* buff, const size_t n) = 0;
 };
 }

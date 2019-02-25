@@ -107,3 +107,11 @@ TEST(Resource, Checksum)
 	ir.Data() = INT_VALUES;
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
+
+TEST(Resource, Assign)
+{
+	ContainerResource ir;
+
+	ir.Assign(reinterpret_cast<const char*>(INT_VALUES.data()), INT_VALUES.size() * sizeof(int));
+	EXPECT_EQ(ir.Data(), INT_VALUES);
+}
