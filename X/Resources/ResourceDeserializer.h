@@ -1,17 +1,17 @@
 #ifndef resource_resourcedeserializer_h
 #define resource_resourcedeserializer_h
-/*
+
 #include <filesystem>
+#include <fstream>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
-#include <utility>
-
-#include <boost/property_tree/ptree.hpp>
+#include <typeinfo>
 
 #include "config.h"
 #include "IResource.h"
+#include "Resource.h"
 
 namespace resource {
 
@@ -23,20 +23,16 @@ public:
 	static ResourceDeserializer* GetInstance();
 	static void ResetInstance();
 
-	void LoadSerializationStructure(const std::string& pathToJSON);
-	bool HasSerializationStructure() const;
-	bool HasSerializationKey(const std::string& key) const;
+	void SetSerializationPath(const std::string& binaryFilePath);
+	std::string GetSerializationPath() const;
+
+	std::unique_ptr<IResource> Deserialize(const std::string& key);
 
 	template<typename T>
-	void Deserialize(IResource<T>& resource);
+	void RegisterResource(const std::string& key);
+	void UnregisterResource(const std::string& key);
 
-	template<typename T>
-	void RegisterEntity(const std::string& key);
-	void UnregisterEntity(const std::string& key);
-
-	template<typename T>
-	std::unique_ptr<IResource<T>> GenerateEntity(const std::string& key) const;
-
+	std::unique_ptr<IResource> GenerateResource(const std::string& key) const;
 private:
 	ResourceDeserializer();
 	ResourceDeserializer(const ResourceDeserializer&) = delete;
@@ -44,20 +40,15 @@ private:
 	ResourceDeserializer(ResourceDeserializer&&) = delete;
 	ResourceDeserializer& operator=(ResourceDeserializer&&) = delete;
 
-	template<typename T>
-	void DeserializeWithParentKey(IResource<T>& resource, const std::string& parentKey = "");
+	std::string GetResourceExtension() const;
 
 	static ResourceDeserializer* instance_;
-
 	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
-
-	template<typename T>
-	mutable std::map<std::string, std::function<std::unique_ptr<IResource<T>>(void)>> keyToEntityMap_;
+	mutable std::map<std::string, std::function<std::unique_ptr<IResource>(void)>> keyToResourceMap_;
 };
 
 #include "ResourceDeserializer.hpp"
 
 } // end namespace resource
-*/
+
 #endif // resource_resourcedeserializer_h

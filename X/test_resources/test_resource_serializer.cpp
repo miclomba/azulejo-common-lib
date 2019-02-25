@@ -7,13 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/property_tree/ptree.hpp>
-
-#include "Resources/IResource.h"
+#include "Resources/Resource.h"
 #include "Resources/ResourceSerializer.h"
 
 namespace fs = std::filesystem;
-using boost::property_tree::ptree;
 
 namespace
 {
@@ -22,11 +19,11 @@ const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
 
-class ContainerResource : public resource::IResource<std::vector<int>>
+class ContainerResource : public resource::Resource<std::vector<int>>
 {
 public:
-	ContainerResource(std::vector<int>&& values) : IResource(std::move(values)) {}
-	ContainerResource(const std::vector<int>& values) : IResource(values) {}
+	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
+	ContainerResource(const std::vector<int>& values) : Resource(values) {}
 	std::vector<int> GetData() const { return Data(); }
 	void SetData(const std::vector<int>& values) { Data() = values; }
 	bool IsDirtyProtected() { return IsDirty(); }
@@ -68,45 +65,17 @@ TEST(ResourceSerializer, GetSerializationPath)
 	resource::ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceSerializer, SetSerializationStructure)
-{
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
-
-	ptree tree;
-	EXPECT_NO_THROW(serializer->SetSerializationStructure(&tree));
-
-	resource::ResourceSerializer::ResetInstance();
-}
-
-TEST(ResourceSerializer, GetSerializationStructure)
-{
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
-
-	ptree tree;
-	serializer->SetSerializationStructure(&tree);
-	EXPECT_EQ(serializer->GetSerializationStructure(), &tree);
-
-	resource::ResourceSerializer::ResetInstance();
-}
-
 TEST(ResourceSerializer, Serialize)
 {
 	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
 
-	ptree tree;
-	serializer->SetSerializationStructure(&tree);
 	serializer->SetSerializationPath(RESOURCE_ROOT);
 
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	// serialize
 	ContainerResource resource(INT_VALUES);
-	EXPECT_NO_THROW(serializer->Serialize(RESOURCE_KEY, resource));
-
-	// verify the json entry
-	auto resourceEntry = tree.get<std::string>(RESOURCE_KEY);
-	auto size = sizeof(resource.Data()[0]) * resource.Data().size();
-	EXPECT_EQ(resourceEntry, RESOURCE_KEY + ":" + std::to_string(size));
+	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY));
 
 	// verify serialization and clean up
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
@@ -120,23 +89,9 @@ TEST(ResourceSerializer, ThrowOnSerializeWithoutSerializationPath)
 {
 	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
 
-	ptree tree;
-	serializer->SetSerializationStructure(&tree);
-
 	ContainerResource resource(INT_VALUES);
-	EXPECT_THROW(serializer->Serialize(RESOURCE_KEY, resource), std::runtime_error);
+	EXPECT_THROW(serializer->Serialize(resource, RESOURCE_KEY), std::runtime_error);
 
 	resource::ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceSerializer, ThrowOnSerializeWithoutSerializationStructure)
-{
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
-
-	serializer->SetSerializationPath(RESOURCE_ROOT);
-
-	ContainerResource resource(INT_VALUES);
-	EXPECT_THROW(serializer->Serialize(RESOURCE_KEY, resource), std::runtime_error);
-
-	resource::ResourceSerializer::ResetInstance();
-}

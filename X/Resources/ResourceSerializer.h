@@ -5,10 +5,8 @@
 #include <fstream>
 #include <string>
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "config.h"
-#include "IResource.h"
+#include "Resource.h"
 
 namespace resource {
 
@@ -20,14 +18,11 @@ public:
 	static ResourceSerializer* GetInstance();
 	static void ResetInstance();
 
-	template<typename T>
-	void Serialize(const std::string& key, const IResource<T>& resource);
-
 	void SetSerializationPath(const std::string& binaryFilePath);
 	std::string GetSerializationPath() const;
 
-	void SetSerializationStructure(boost::property_tree::ptree* const tree);
-	boost::property_tree::ptree* GetSerializationStructure() const;
+	template<typename T>
+	void Serialize(const Resource<T>& resource, const std::string& key);
 
 private:
 	ResourceSerializer();
@@ -37,9 +32,7 @@ private:
 	ResourceSerializer& operator=(ResourceSerializer&&) = delete;
 
 	static ResourceSerializer* instance_;
-
 	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree* serializationStructure_{nullptr};
 };
 
 #include "ResourceSerializer.hpp"

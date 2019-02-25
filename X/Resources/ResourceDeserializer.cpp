@@ -1,37 +1,14 @@
 #include "ResourceDeserializer.h"
-/*
+
 #include <fstream>
 #include <memory>
 #include <string>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-#include "IResource.h"
-
-using boost::property_tree::ptree;
+#include "Resource.h"
 
 namespace
 {
-std::string GetKeyPath(const std::string& key, const ptree& tree)
-{
-	for (auto& keyValue : tree)
-	{
-		std::string nodeKey = keyValue.first;
-		ptree node = keyValue.second;
-
-		if (nodeKey == key)
-			return nodeKey;
-		else
-		{
-			std::string returnedKey = GetKeyPath(key, node);
-			size_t pos = returnedKey.find_last_of('.');
-			if ((pos == std::string::npos && returnedKey == key) || (pos != std::string::npos && returnedKey.substr(pos+1) == key))
-				return nodeKey + "." + returnedKey;
-		}
-	}
-	return "";
-}
+const std::string RESOURCE_EXT = ".bin";
 } // end namespace anonymous
 
 namespace resource {
@@ -55,102 +32,68 @@ void ResourceDeserializer::ResetInstance()
 	instance_ = nullptr;
 }
 
-void ResourceDeserializer::LoadSerializationStructure(const std::string& pathToJSON)
+void ResourceDeserializer::SetSerializationPath(const std::string& binaryFilePath)
 {
-	serializationPath_ = pathToJSON;
-
-	std::ifstream file(pathToJSON);
-	if (file)
-		boost::property_tree::read_json(file, serializationStructure_);
-	else
-	{
-		serializationPath_.clear();
-		throw std::runtime_error("Could not open " + pathToJSON + " when loading serialization structure");
-	}
+	serializationPath_ = binaryFilePath;
 }
 
-bool ResourceDeserializer::HasSerializationStructure() const
+std::string ResourceDeserializer::GetSerializationPath() const
 {
-	return !serializationPath_.empty() && !serializationStructure_.empty();
+	if (serializationPath_.empty())
+		throw std::runtime_error("No serialization path set for the ResourceDeserializer");
+	return serializationPath_.string();
 }
 
-bool ResourceDeserializer::HasSerializationKey(const std::string& key) const
+void ResourceDeserializer::UnregisterResource(const std::string& key)
 {
-	return !GetKeyPath(key, serializationStructure_).empty() ? true : false;
-}
-
-void ResourceDeserializer::UnregisterEntity(const std::string& key)
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
+	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDeserializer");
 
-	keyToEntityMap_.erase(key);
+	keyToResourceMap_.erase(key);
 }
 
-template<typename T>
-void ResourceDeserializer::Deserialize(IResource<T>& resource)
+std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& key)
 {
-	if (!HasSerializationStructure())
-		throw std::runtime_error("Cannot deserialize resource because no serialization structure has been loaded");
+	if (key.empty())
+		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
 
-	std::string keyPath = GetKeyPath(resource.GetKey(), serializationStructure_);
-	if (keyPath.empty())
-		throw std::runtime_error("Cannot deserialize resource because key=" + resource.GetKey() + " is not present in the loaded serialization structure");
+	std::filesystem::path serializationPath = GetSerializationPath();
+	if (serializationPath.empty())
+		throw std::runtime_error("Serialization path is empty when deserializaing resource with ResourceDeserializer");
 
-	std::string parentKey;
+	std::string fileName = key + GetResourceExtension();
+	std::ifstream inFile(serializationPath / fileName, std::ios::binary);
+	if (!inFile)
+		throw std::runtime_error("Could not open input file: " + (serializationPath / fileName).string());
 
-	size_t pos = keyPath.find_last_of('.');
-	if (pos != std::string::npos)
-		parentKey = keyPath.substr(0,pos);
+	inFile.seekg(0, std::ios::end);
+	const int size = inFile.tellg();
+	inFile.seekg(0, std::ios::beg);
 
-	DeserializeWithParentKey(resource, parentKey);
+	auto buff = std::make_unique<char*>(new char[size]);
+	inFile.read(*buff, size);
+
+	auto arithmeticContainer = GenerateResource(key);
+	arithmeticContainer->Assign(*buff, size);
+	
+	return arithmeticContainer;
 }
 
-template<typename T>
-void ResourceDeserializer::DeserializeWithParentKey(IResource<T>& resource, const std::string& parentKey)
+std::unique_ptr<IResource> ResourceDeserializer::GenerateResource(const std::string& key) const
 {
-	if (!HasSerializationStructure())
-		throw std::runtime_error("Cannot deserialize resource because no serialization structure has been loaded");
-
-	std::string searchPath = parentKey.empty() ? resource.GetKey() : parentKey + "." + resource.GetKey();
-
-	auto tree = serializationStructure_.get_child_optional(searchPath);
-	if (!tree)
-	{
-		throw std::runtime_error("Cannot locate resource key in the deserialization json structure");
-	}
-	else
-	{
-		std::string relativePath = searchPath;
-		std::replace(relativePath.begin(), relativePath.end(), '.', '/');
-
-		std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
-
-		resource.Load(*tree, absolutePath);
-	}
-
-	for (auto& child : *tree)
-	{
-		std::string key = child.first;
-		auto memberEntity = GenerateEntity(key);
-		resource.AggregateMember(std::move(memberEntity));
-
-		auto childEntity = std::static_pointer_cast<IResource<T>>(resource.GetAggregatedMember(key));
-		DeserializeWithParentKey(*childEntity, searchPath);
-	}
-}
-
-template<typename T>
-std::unique_ptr<IResource<T>> ResourceDeserializer::GenerateEntity(const std::string& key) const
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
+	if (key.empty())
+		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDeserializer");
+	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDeserializer");
 
-	std::unique_ptr<IResource<T>> resource = keyToEntityMap_[key]();
-	resource->SetKey(key);
+	std::unique_ptr<IResource> resource = keyToResourceMap_[key]();
 
-	return std::move(resource);
+	return resource;
+}
+
+std::string ResourceDeserializer::GetResourceExtension() const
+{
+	return ".bin";
 }
 
 } // end namespace resource
-*/

@@ -196,6 +196,54 @@ TEST(EntityAggregationDeserializer, HasSerializationStructure)
 	entity::EntityAggregationDeserializer::ResetInstance();
 }
 
+TEST_F(EntityAggregationDeserialization, GenerateEntity)
+{
+	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();
+
+	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
+	auto entity = deserializer->GenerateEntity(ENTITY_1A);
+	EXPECT_TRUE(entity);
+
+	entity::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, RegisterEntity)
+{
+	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+
+	entity::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, ThrowOnRegisterEntity)
+{
+	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->RegisterEntity<TypeA>(""), std::runtime_error);
+
+	entity::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, UnregisterEntity)
+{
+	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->UnregisterEntity(ENTITY_1A));
+
+	entity::EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, ThrowOnUnregisterEntity)
+{
+	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->UnregisterEntity(ENTITY_1A), std::runtime_error);
+
+	entity::EntityAggregationDeserializer::ResetInstance();
+}
+
 TEST_F(EntityAggregationDeserialization, DeserializeRoot)
 {
 	auto deserializer = entity::EntityAggregationDeserializer::GetInstance();

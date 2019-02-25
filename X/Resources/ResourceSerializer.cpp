@@ -2,12 +2,7 @@
 
 #include <string>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-#include "IResource.h"
-
-using boost::property_tree::ptree;
+#include "Resource.h"
 
 namespace resource {
 
@@ -37,17 +32,10 @@ void ResourceSerializer::SetSerializationPath(const std::string& binaryFilePath)
 
 std::string ResourceSerializer::GetSerializationPath() const
 {
+	if (serializationPath_.empty())
+		throw std::runtime_error("No serialization path set for the ResourceSerializer");
+
 	return serializationPath_.string();
-}
-
-void ResourceSerializer::SetSerializationStructure(ptree* const tree)
-{
-	serializationStructure_ = tree;
-}
-
-ptree* ResourceSerializer::GetSerializationStructure() const
-{
-	return serializationStructure_;
 }
 
 } // end namespace resource

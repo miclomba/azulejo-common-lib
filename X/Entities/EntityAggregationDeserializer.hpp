@@ -2,6 +2,9 @@
 template<typename T>
 void EntityAggregationDeserializer::RegisterEntity(const std::string& key)
 {
+	if (key.empty())
+		throw std::runtime_error("Key (" + key + ") is empty when registering entity with EntityAggregationDeserializer");
+
 	auto TFunction = []()->std::unique_ptr<T> { return std::make_unique<T>(); };
 
 	if (keyToEntityMap_.find(key) != keyToEntityMap_.cend())

@@ -21,10 +21,10 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="IResource.h" />
-    <ClInclude Include="IResource.hpp">
-      <FileType>CppCode</FileType>
-    </ClInclude>
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Resource.hpp" />
     <ClInclude Include="ResourceDeserializer.h" />
+    <ClInclude Include="ResourceDeserializer.hpp" />
     <ClInclude Include="ResourceSerializer.h" />
     <ClInclude Include="ResourceSerializer.hpp" />
     <ClInclude Include="ResourceTypeTraits.hpp" />
