@@ -68,7 +68,7 @@ TEST(IRunnableEntity, Join)
 
 	for (auto& runn : runnables)
 	{
-		//EXPECT_NO_THROW(runn->Join());
+		EXPECT_NO_THROW(runn->Join());
 	}
 
 	EXPECT_EQ(runnables[0]->GetAccum(), SumSquares(LARGE_INT));
