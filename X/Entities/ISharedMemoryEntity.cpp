@@ -8,6 +8,8 @@
 
 namespace entity {
 
+ISharedMemoryEntity::ISharedMemoryEntity() = default;
+
 ISharedMemoryEntity::~ISharedMemoryEntity()
 {
 	if (shmem_ && isShmemOwner_)
@@ -18,6 +20,11 @@ ISharedMemoryEntity::~ISharedMemoryEntity()
 			throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
 	}
 }
+
+ISharedMemoryEntity::ISharedMemoryEntity(const ISharedMemoryEntity&) = default;
+ISharedMemoryEntity& ISharedMemoryEntity::operator=(const ISharedMemoryEntity&) = default;
+ISharedMemoryEntity::ISharedMemoryEntity(ISharedMemoryEntity&&) = default;
+ISharedMemoryEntity& ISharedMemoryEntity::operator=(ISharedMemoryEntity&&) = default;
 
 void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
 {

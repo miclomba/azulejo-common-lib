@@ -14,6 +14,14 @@ public:
 	friend class ResourceSerializer;
 	friend class ResourceDeserializer;
 
+	IResource();
+	~IResource();
+
+	IResource(const IResource&);
+	IResource& operator=(const IResource&);
+	IResource(IResource&&);
+	IResource& operator=(IResource&&);
+
 	virtual void Assign(const char* buff, const size_t n) = 0;
 
 protected:

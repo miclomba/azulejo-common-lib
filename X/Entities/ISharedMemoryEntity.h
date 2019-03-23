@@ -14,7 +14,13 @@ namespace entity {
 class ENTITY_DLL_EXPORT ISharedMemoryEntity : public Entity
 {
 public:
+	ISharedMemoryEntity();
 	virtual ~ISharedMemoryEntity();
+
+	ISharedMemoryEntity(const ISharedMemoryEntity&);
+	ISharedMemoryEntity& operator=(const ISharedMemoryEntity&);
+	ISharedMemoryEntity(ISharedMemoryEntity&&);
+	ISharedMemoryEntity& operator=(ISharedMemoryEntity&&);
 
 	std::string GetSharedName() const;
 	size_t GetSharedSize() const;

@@ -35,6 +35,11 @@ public:
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	Resource(T&& data);
 
+	Resource(const Resource&);
+	Resource& operator=(const Resource&);
+	Resource(Resource&&);
+	Resource& operator=(Resource&&);
+
 	virtual ~Resource();
 
 	const T& Data() const;

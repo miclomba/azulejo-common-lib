@@ -16,6 +16,11 @@ public:
 	IServerEntity(const int port);
 	virtual ~IServerEntity();
 
+	IServerEntity(const IServerEntity&);
+	IServerEntity& operator=(const IServerEntity&);
+	IServerEntity(IServerEntity&&);
+	IServerEntity& operator=(IServerEntity&&);
+
 	void Run();
 
 protected:

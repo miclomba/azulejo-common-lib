@@ -21,8 +21,13 @@ entity::ISerializableEntity::Members GetAggregatedSerializableMembers(const enti
 
 namespace entity {
 
+ISerializableEntity::ISerializableEntity() = default;
 ISerializableEntity::~ISerializableEntity() = default;
 
+ISerializableEntity::ISerializableEntity(const ISerializableEntity&) = default;
+ISerializableEntity& ISerializableEntity::operator=(const ISerializableEntity&) = default;
+ISerializableEntity::ISerializableEntity(ISerializableEntity&&) = default;
+ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = default;
 
 std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::string& key)
 {

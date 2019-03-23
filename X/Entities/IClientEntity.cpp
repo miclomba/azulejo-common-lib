@@ -15,6 +15,11 @@ IClientEntity::IClientEntity()
 
 IClientEntity::~IClientEntity() = default;
 
+IClientEntity::IClientEntity(const IClientEntity&) = default;
+IClientEntity& IClientEntity::operator=(const IClientEntity&) = default;
+IClientEntity::IClientEntity(IClientEntity&&) = default;
+IClientEntity& IClientEntity::operator=(IClientEntity&&) = default;
+
 void IClientEntity::Run(const std::string& host, const int port)
 {
 	if (host.empty())

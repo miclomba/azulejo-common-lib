@@ -13,7 +13,13 @@ namespace entity {
 class ENTITY_DLL_EXPORT IRunnableEntity : public Entity
 {
 public:
+	IRunnableEntity();
 	virtual ~IRunnableEntity();
+
+	IRunnableEntity(const IRunnableEntity&) = delete;
+	IRunnableEntity& operator=(const IRunnableEntity&) = delete;
+	IRunnableEntity(IRunnableEntity&&) = delete;
+	IRunnableEntity& operator=(IRunnableEntity&&) = delete;
 
 	void Start();
 	void Join();

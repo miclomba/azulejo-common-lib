@@ -21,9 +21,9 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="EventEmitter.h" />
+    <ClInclude Include="EventEmitter.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EventEmitter.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -96,7 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;RESOURCES_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_69_0</AdditionalIncludeDirectories>

@@ -17,6 +17,11 @@ public:
 	IClientEntity();
 	virtual ~IClientEntity();
 
+	IClientEntity(const IClientEntity&);
+	IClientEntity& operator=(const IClientEntity&);
+	IClientEntity(IClientEntity&&);
+	IClientEntity& operator=(IClientEntity&&);
+
 	void Run(const std::string& host, const int port);
 
 protected:

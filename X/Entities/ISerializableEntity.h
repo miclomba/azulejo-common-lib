@@ -22,7 +22,13 @@ public:
 	friend class EntityAggregationDeserializer;
 
 public:
+	ISerializableEntity();
 	virtual ~ISerializableEntity();
+
+	ISerializableEntity(const ISerializableEntity&);
+	ISerializableEntity& operator=(const ISerializableEntity&);
+	ISerializableEntity(ISerializableEntity&&);
+	ISerializableEntity& operator=(ISerializableEntity&&);
 
 	virtual void Save(boost::property_tree::ptree& tree, const std::string& path) const = 0;
 	virtual void Load(boost::property_tree::ptree& tree, const std::string& path) = 0;

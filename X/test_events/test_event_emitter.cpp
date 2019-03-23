@@ -7,5 +7,9 @@
 
 
 TEST(EventEmitter, Construct) {
-  EXPECT_NO_THROW(events::EventEmitter());
+
+	events::EventEmitter<std::string(int)> emitter;
+
+
+	//emitter.Connect([](int i) {return ""; });
 }
