@@ -2,11 +2,12 @@
 #define events_event_emitter_h
 
 #include <string>
+
+#include "config.h"
+
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/slot.hpp>
-
-#include "config.h"
 
 namespace events
 {

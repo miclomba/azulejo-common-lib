@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
+#include "config.h"
+
 #include <boost/crc.hpp>
 
-#include "config.h"
 #include "IResource.h"
 #include "ResourceTypeTraits.hpp"
 

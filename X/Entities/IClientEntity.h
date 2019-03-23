@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 
+#include "config.h"
+
 #include <boost/asio.hpp>
 
-#include "config.h"
 #include "Entity.h"
 
 namespace entity {

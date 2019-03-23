@@ -24,13 +24,13 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EventEmitter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EventEmitter.hpp">
-      <Filter>Templates</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 
+#include "config.h"
+
 #include <boost/interprocess/shared_memory_object.hpp>
 
-#include "config.h"
 #include "Entity.h"
 
 namespace entity {

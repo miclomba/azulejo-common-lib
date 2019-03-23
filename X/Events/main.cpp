@@ -1,5 +1,10 @@
 #include "EventEmitter.h"
 
-int main()
+//int main()
+//{
+//}
+
+EVENTS_DLL_EXPORT void foo()
 {
+
 }

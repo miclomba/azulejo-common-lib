@@ -3,9 +3,10 @@
 
 #include <string>
 
+#include "config.h"
+
 #include <boost/property_tree/ptree.hpp>
 
-#include "config.h"
 #include "Entity.h"
 
 namespace entity {
