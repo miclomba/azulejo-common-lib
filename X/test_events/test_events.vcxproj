@@ -33,6 +33,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="test_event_channel.cpp" />
+    <ClCompile Include="test_event_consumer.cpp" />
     <ClCompile Include="test_event_emitter.cpp" />
   </ItemGroup>
   <ItemGroup>

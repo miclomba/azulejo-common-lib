@@ -24,13 +24,22 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EventEmitter.hpp">
+    <ClInclude Include="EventConsumer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventChannel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventEmitter.hpp">
+      <Filter>Templates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="EventChannel.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventConsumer.hpp">
+      <Filter>Templates</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

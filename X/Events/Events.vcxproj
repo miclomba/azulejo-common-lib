@@ -20,11 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="EventChannel.h" />
+    <ClInclude Include="EventConsumer.h" />
+    <ClInclude Include="EventConsumer.hpp" />
     <ClInclude Include="EventEmitter.h" />
     <ClInclude Include="EventEmitter.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="EventChannel.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
