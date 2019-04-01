@@ -18,4 +18,10 @@ std::function<T> EventConsumer<T>::GetSubscriber() const
 	return subscriber_;
 }
 
+TEMPLATE_T
+std::string EventConsumer<T>::GetSubscriberType() const
+{
+	return typeid(T).name();
+}
+
 #undef TEMPLATE_T

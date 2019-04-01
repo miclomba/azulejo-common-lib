@@ -3,19 +3,23 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <typeinfo>
 
 #include "config.h"
 
-#include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
+
+#include "IEventConsumer.h"
+#include "IEventEmitter.h"
+#include "EventConsumer.h"
 
 namespace events
 {
 
 template<typename T>
-class EVENTS_DLL_EXPORT EventEmitter
+class EVENTS_DLL_EXPORT EventEmitter : public IEventEmitter
 {
 public:
 	EventEmitter();
@@ -26,17 +30,14 @@ public:
 	EventEmitter(EventEmitter&&);
 	EventEmitter& operator=(EventEmitter&&);
 
-	void Connect(const std::string& key, const std::function<T>& subscriber);
-	void Disconnect(const std::string& key);
-
-	std::string GetSubscriberType() const;
-
-	void Emit() const;
+	void Connect(const std::string& key, const std::shared_ptr<IEventConsumer> subscriber) override;
+	void Emit() const override;
+	std::string GetSubscriberType() const override;
 
 private:
-	boost::signals2::signal<T> emitter_;
+	void Connect(const std::string& key, const std::function<T>& subscriber);
 
-	std::map<std::string, boost::signals2::connection> subscriberMap_;
+	boost::signals2::signal<T> emitter_;
 };
 
 #include "EventEmitter.hpp"

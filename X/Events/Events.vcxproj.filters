@@ -33,13 +33,25 @@
     <ClInclude Include="EventEmitter.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
+    <ClInclude Include="EventConsumer.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="IEventEmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IEventConsumer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EventConsumer.hpp">
-      <Filter>Templates</Filter>
+    <ClCompile Include="IEventEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEventConsumer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

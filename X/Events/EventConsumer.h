@@ -5,11 +5,13 @@
 
 #include "config.h"
 
+#include "IEventConsumer.h"
+
 namespace events
 {
 
 template<typename T>
-class EVENTS_DLL_EXPORT EventConsumer
+class EVENTS_DLL_EXPORT EventConsumer : public IEventConsumer
 {
 public:
 	EventConsumer(const std::function<T>& subscriber);
@@ -21,6 +23,8 @@ public:
 	EventConsumer& operator=(EventConsumer&&);
 
 	std::function<T> GetSubscriber() const;
+
+	std::string GetSubscriberType() const override;
 
 private:
 	std::function<T> subscriber_;

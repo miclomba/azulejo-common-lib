@@ -1,16 +1,18 @@
 #ifndef events_event_channel_h
 #define events_event_channel_h
 
+#include <functional>
+#include <map>
+#include <memory>
 #include <string>
 
 #include "config.h"
 
-#include <boost/signals2/connection.hpp>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/slot.hpp>
-
 namespace events
 {
+
+class IEventEmitter;
+class IEventConsumer;
 
 class EVENTS_DLL_EXPORT EventChannel
 {
@@ -23,11 +25,19 @@ public:
 	EventChannel(EventChannel&&);
 	EventChannel& operator=(EventChannel&&);
 
-private:
-	std::vector<boost::signals2::connection> connections_;
-};
+	void RegisterEmitter(const std::string& emitterKey, const std::shared_ptr<IEventEmitter> emitter);
+	void UnregisterEmitter(const std::string& emitterKey);
 
-//#include "EventChannel.hpp"
+	void RegisterConsumer(const std::string& consumerKey, const std::shared_ptr<IEventConsumer> consumer);
+	void UnregisterConsumer(const std::string& consumerKey);
+
+	bool IsEmitterRegistered(const std::string& emitterKey) const;
+	bool IsConsumerRegistered(const std::string& consumerKey) const;
+
+private:
+	std::map<std::string, std::shared_ptr<IEventEmitter>> emitterMap_;
+	std::map<std::string, std::shared_ptr<IEventConsumer>> consumerMap_;
+};
 
 } // end namespace events
 #endif // events_event_channel_h

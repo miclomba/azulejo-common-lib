@@ -25,9 +25,13 @@
     <ClInclude Include="EventConsumer.hpp" />
     <ClInclude Include="EventEmitter.h" />
     <ClInclude Include="EventEmitter.hpp" />
+    <ClInclude Include="IEventConsumer.h" />
+    <ClInclude Include="IEventEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventChannel.cpp" />
+    <ClCompile Include="IEventConsumer.cpp" />
+    <ClCompile Include="IEventEmitter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
