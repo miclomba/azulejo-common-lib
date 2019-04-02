@@ -27,22 +27,34 @@ private:
 TEST(EventEmitter, Connect) 
 {
 	auto consumer = std::make_shared<Consumer>();
-	int count = consumer->GetCount();
 
 	events::EventEmitter<void(void)> emitter;
 	boost::signals2::connection conn = emitter.Connect(consumer);
 	EXPECT_TRUE(conn.connected());
 }
 
-TEST(EventEmitter, Disconnect)
+TEST(EventEmitter, DisconnectConsumer)
 {
 	auto consumer = std::make_shared<Consumer>();
-	int count = consumer->GetCount();
 
 	events::EventEmitter<void(void)> emitter;
 	boost::signals2::connection conn = emitter.Connect(consumer);
+	EXPECT_TRUE(conn.connected());
 
 	consumer.reset();
+	EXPECT_FALSE(conn.connected());
+}
+
+TEST(EventEmitter, DisconnectEmitter)
+{
+	auto consumer = std::make_shared<Consumer>();
+
+	boost::signals2::connection conn;
+	{
+		events::EventEmitter<void(void)> emitter;
+		conn = emitter.Connect(consumer);
+		EXPECT_TRUE(conn.connected());
+	}
 	EXPECT_FALSE(conn.connected());
 }
 
