@@ -9,6 +9,7 @@
 
 #include "config.h"
 
+#include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
 
 #include "IEventConsumer.h"
@@ -22,6 +23,9 @@ template<typename T>
 class EVENTS_DLL_EXPORT EventEmitter : public IEventEmitter
 {
 public:
+	typedef boost::signals2::signal<T> signal_t;
+
+public:
 	EventEmitter();
 	virtual ~EventEmitter();
 
@@ -30,13 +34,11 @@ public:
 	EventEmitter(EventEmitter&&);
 	EventEmitter& operator=(EventEmitter&&);
 
-	void Connect(const std::string& key, const std::shared_ptr<IEventConsumer> subscriber) override;
+	boost::signals2::connection Connect(const std::shared_ptr<IEventConsumer> subscriber) override;
 	void Emit() const override;
 	std::string GetSubscriberType() const override;
 
 private:
-	void Connect(const std::string& key, const std::function<T>& subscriber);
-
 	boost::signals2::signal<T> emitter_;
 };
 

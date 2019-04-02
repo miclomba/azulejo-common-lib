@@ -25,15 +25,9 @@ public:
 	IEventEmitter(IEventEmitter&&);
 	IEventEmitter& operator=(IEventEmitter&&);
 
-	void Disconnect(const std::string& key);
-
-	virtual void Connect(const std::string& key, const std::shared_ptr<IEventConsumer> subscriber) = 0;
+	virtual boost::signals2::connection Connect(const std::shared_ptr<IEventConsumer> subscriber) = 0;
 	virtual void Emit() const = 0;
 	virtual std::string GetSubscriberType() const = 0;
-
-protected:
-	std::map<std::string, boost::signals2::connection> subscriberMap_;
-
 };
 
 } // end namespace events

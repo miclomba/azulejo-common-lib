@@ -12,13 +12,13 @@ TEMPLATE_T EventEmitter<T>::EventEmitter(EventEmitter<T>&&) = default;
 TEMPLATE_T EventEmitter<T>& EventEmitter<T>::operator=(EventEmitter<T>&&) = default;
 
 TEMPLATE_T
-void EventEmitter<T>::Connect(const std::string& key, const std::shared_ptr<IEventConsumer> subscriber)
+boost::signals2::connection EventEmitter<T>::Connect(const std::shared_ptr<IEventConsumer> subscriber)
 {
 	auto slot = std::dynamic_pointer_cast<EventConsumer<T>>(subscriber);
 	if (!slot)
 		throw std::runtime_error("Cannot connect event emitter to event consumer because event consumer is not of type=" + GetSubscriberType());
 
-	Connect(key, slot->GetSubscriber());
+	return emitter_.connect(EventEmitter<T>::signal_t::slot_type(slot->GetSubscriber()).track_foreign(slot));
 }
 
 TEMPLATE_T
@@ -32,19 +32,6 @@ TEMPLATE_T
 std::string EventEmitter<T>::GetSubscriberType() const
 {
 	return typeid(T).name();
-}
-
-
-TEMPLATE_T
-void EventEmitter<T>::Connect(const std::string& key, const std::function<T>& subscriber)
-{
-	if (subscriberMap_.find(key) != subscriberMap_.cend())
-	{
-		subscriberMap_[key].disconnect();
-		subscriberMap_.erase(key);
-	}
-
-	subscriberMap_[key] = emitter_.connect(subscriber);
 }
 
 #undef TEMPLATE_T

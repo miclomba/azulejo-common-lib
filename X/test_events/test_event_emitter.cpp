@@ -12,8 +12,6 @@
 
 namespace
 {
-const std::string KEY = "key";
-
 class Consumer : public events::EventConsumer<void(void)>
 {
 public:
@@ -32,23 +30,8 @@ TEST(EventEmitter, Connect)
 	int count = consumer->GetCount();
 
 	events::EventEmitter<void(void)> emitter;
-	EXPECT_NO_THROW(emitter.Connect(KEY, consumer));
-
-	emitter.Emit();
-	EXPECT_EQ(consumer->GetCount(), count + 1);
-}
-
-TEST(EventEmitter, ConnectOnSameKey)
-{
-	auto consumer = std::make_shared<Consumer>();
-	int count = consumer->GetCount();
-
-	events::EventEmitter<void(void)> emitter;
-	EXPECT_NO_THROW(emitter.Connect(KEY, consumer));
-	EXPECT_NO_THROW(emitter.Connect(KEY, consumer));
-
-	emitter.Emit();
-	EXPECT_EQ(consumer->GetCount(), count + 1);
+	boost::signals2::connection conn = emitter.Connect(consumer);
+	EXPECT_TRUE(conn.connected());
 }
 
 TEST(EventEmitter, Disconnect)
@@ -57,17 +40,10 @@ TEST(EventEmitter, Disconnect)
 	int count = consumer->GetCount();
 
 	events::EventEmitter<void(void)> emitter;
-	EXPECT_NO_THROW(emitter.Connect(KEY, consumer));
-	EXPECT_NO_THROW(emitter.Disconnect(KEY));
+	boost::signals2::connection conn = emitter.Connect(consumer);
 
-	emitter.Emit();
-	EXPECT_EQ(consumer->GetCount(), count);
-}
-
-TEST(EventEmitter, ThrowOnDisconnect)
-{
-	events::EventEmitter<void(void)> emitter;
-	EXPECT_THROW(emitter.Disconnect(KEY), std::runtime_error);
+	consumer.reset();
+	EXPECT_FALSE(conn.connected());
 }
 
 TEST(EventEmitter, GetSubscriberType) 
@@ -78,7 +54,7 @@ TEST(EventEmitter, GetSubscriberType)
 	events::EventEmitter<void(void)> emitter;
 	std::string emitterSubscriberType = emitter.GetSubscriberType();
 
-	EXPECT_NO_THROW(emitter.Connect(KEY, consumer));
+	EXPECT_NO_THROW(emitter.Connect(consumer));
 	EXPECT_EQ(emitterSubscriberType, consumerSubscriberType);
 }
 
@@ -87,7 +63,7 @@ TEST(EventEmitter, Emit)
 	auto consumer = std::make_shared<Consumer>();
 
 	events::EventEmitter<void(void)> emitter;
-	emitter.Connect(KEY, consumer);
+	emitter.Connect(consumer);
 
 	int count = consumer->GetCount();
 	EXPECT_EQ(count, 0);
