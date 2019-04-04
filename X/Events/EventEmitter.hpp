@@ -22,16 +22,15 @@ boost::signals2::connection EventEmitter<T>::Connect(const std::shared_ptr<IEven
 }
 
 TEMPLATE_T
-void EventEmitter<T>::Emit() const
-{
-	emitter_();
-}
-
-
-TEMPLATE_T
 std::string EventEmitter<T>::GetSubscriberType() const
 {
 	return typeid(T).name();
+}
+
+TEMPLATE_T
+const boost::signals2::signal<T>& EventEmitter<T>::Signal() const
+{
+	return emitter_;
 }
 
 #undef TEMPLATE_T

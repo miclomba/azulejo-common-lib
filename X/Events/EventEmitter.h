@@ -35,9 +35,9 @@ public:
 	EventEmitter& operator=(EventEmitter&&);
 
 	boost::signals2::connection Connect(const std::shared_ptr<IEventConsumer> subscriber) override;
-	void Emit() const override;
 	std::string GetSubscriberType() const override;
 
+	const boost::signals2::signal<T>& Signal() const;
 private:
 	boost::signals2::signal<T> emitter_;
 };

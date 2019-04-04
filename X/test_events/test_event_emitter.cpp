@@ -70,7 +70,7 @@ TEST(EventEmitter, GetSubscriberType)
 	EXPECT_EQ(emitterSubscriberType, consumerSubscriberType);
 }
 
-TEST(EventEmitter, Emit)
+TEST(EventEmitter, Signal)
 {
 	auto consumer = std::make_shared<Consumer>();
 
@@ -79,6 +79,6 @@ TEST(EventEmitter, Emit)
 
 	int count = consumer->GetCount();
 	EXPECT_EQ(count, 0);
-	EXPECT_NO_THROW(emitter.Emit());
+	EXPECT_NO_THROW(emitter.Signal()());
 	EXPECT_EQ(consumer->GetCount(), count + 1);
 }

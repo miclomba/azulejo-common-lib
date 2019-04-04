@@ -26,7 +26,6 @@ public:
 	IEventEmitter& operator=(IEventEmitter&&);
 
 	virtual boost::signals2::connection Connect(const std::shared_ptr<IEventConsumer> subscriber) = 0;
-	virtual void Emit() const = 0;
 	virtual std::string GetSubscriberType() const = 0;
 };
 
