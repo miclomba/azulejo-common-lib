@@ -4,10 +4,19 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "IEventConsumer.h"
 #include "IEventEmitter.h"
 #include "EventConsumer.h"
+
+namespace
+{
+std::string Concat(const std::string& consumerKey, const std::string& emitterKey)
+{
+	return consumerKey + "->" + emitterKey;
+}
+}
 
 namespace events
 {
@@ -26,10 +35,10 @@ void EventChannel::RegisterEmitter(const std::string& emitterKey, const std::sha
 
 	emitterMap_[emitterKey] = emitter;
 
-	if (IsConsumerRegistered(emitterKey))
-	{
+	//if (IsConsumerRegistered(emitterKey))
+	//{
 		//emitterMap_[key]->
-	}
+	//}
 }
 
 void EventChannel::UnregisterEmitter(const std::string& emitterKey)
@@ -39,28 +48,31 @@ void EventChannel::UnregisterEmitter(const std::string& emitterKey)
 	emitterMap_.erase(emitterKey);
 }
 
-void EventChannel::RegisterConsumer(const std::string& consumerKey, const std::shared_ptr<IEventConsumer> consumer)
-{
-	if (IsConsumerRegistered(consumerKey))
-		throw std::runtime_error("IEventConsumer with key=" + consumerKey + " is already registered in this EventChannel");
-	consumerMap_[consumerKey] = consumer;
-}
-
-void EventChannel::UnregisterConsumer(const std::string& consumerKey)
-{
-	if (!IsConsumerRegistered(consumerKey))
-		throw std::runtime_error("IEventConsumer with key=" + consumerKey + " is not registered in this EventChannel");
-	consumerMap_.erase(consumerKey);
-}
-
 bool EventChannel::IsEmitterRegistered(const std::string& emitterKey) const
 {
 	return emitterMap_.find(emitterKey) != emitterMap_.cend() ? true : false;
 }
 
-bool EventChannel::IsConsumerRegistered(const std::string& consumerKey) const
+void EventChannel::RegisterConsumer(const std::string& consumerKey, const std::string& emitterKey, const std::shared_ptr<IEventConsumer> consumer)
 {
-	return consumerMap_.find(consumerKey) != consumerMap_.cend() ? true : false;
+	std::string key = Concat(consumerKey, emitterKey);
+	if (IsConsumerRegistered(consumerKey, emitterKey))
+		throw std::runtime_error("IEventConsumer with key=" + key + " is already registered in this EventChannel");
+	consumerMap_[key] = consumer;
+}
+
+void EventChannel::UnregisterConsumer(const std::string& consumerKey, const std::string& emitterKey)
+{
+	std::string key = Concat(consumerKey, emitterKey);
+	if (!IsConsumerRegistered(consumerKey, emitterKey))
+		throw std::runtime_error("IEventConsumer with key=" + key + " is not registered in this EventChannel");
+	consumerMap_.erase(key);
+}
+
+bool EventChannel::IsConsumerRegistered(const std::string& consumerKey, const std::string& emitterKey) const
+{
+	std::string key = Concat(consumerKey, emitterKey);
+	return consumerMap_.find(key) != consumerMap_.cend() ? true : false;
 }
 
 } // end namespace events

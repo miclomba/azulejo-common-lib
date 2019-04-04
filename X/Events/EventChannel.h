@@ -28,13 +28,13 @@ public:
 	void RegisterEmitter(const std::string& emitterKey, const std::shared_ptr<IEventEmitter> emitter);
 	void UnregisterEmitter(const std::string& emitterKey);
 
-	void RegisterConsumer(const std::string& consumerKey, const std::shared_ptr<IEventConsumer> consumer);
-	void UnregisterConsumer(const std::string& consumerKey);
-
-	bool IsEmitterRegistered(const std::string& emitterKey) const;
-	bool IsConsumerRegistered(const std::string& consumerKey) const;
+	void RegisterConsumer(const std::string& consumerKey, const std::string& emitterKey, const std::shared_ptr<IEventConsumer> consumer);
+	void UnregisterConsumer(const std::string& consumerKey, const std::string& emitterKey);
 
 private:
+	bool IsEmitterRegistered(const std::string& emitterKey) const;
+	bool IsConsumerRegistered(const std::string& consumerKey, const std::string& emitterKey) const;
+
 	std::map<std::string, std::shared_ptr<IEventEmitter>> emitterMap_;
 	std::map<std::string, std::shared_ptr<IEventConsumer>> consumerMap_;
 };
