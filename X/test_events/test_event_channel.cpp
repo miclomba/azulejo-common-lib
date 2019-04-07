@@ -77,6 +77,13 @@ TEST(EventChannel, RegisterEmitterWithNonExistingConsumer) {
 	EXPECT_TRUE(signal.empty());
 }
 
+TEST(EventChannel, ThrowOnUnregisterEmitter) {
+
+	Channel channel;
+
+	EXPECT_THROW(channel.UnregisterEmitter(""), std::invalid_argument);
+}
+
 TEST(EventChannel, UnregisterEmitter) {
 
 	Channel channel;
@@ -145,6 +152,15 @@ TEST(EventChannel, RegisterConsumerWithNonExistingEmitter) {
 	EXPECT_NO_THROW(channel.RegisterConsumer(CONSUMER_KEY, INVALID_KEY, consumer));
 	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, INVALID_KEY));
 	EXPECT_TRUE(signal.empty());
+}
+
+TEST(EventChannel, ThrowOnUnregisterConsumer) {
+
+	Channel channel;
+
+	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY,""), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterConsumer("",EMITTER_KEY), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterConsumer("",""), std::invalid_argument);
 }
 
 TEST(EventChannel, UnregisterConsumer) {

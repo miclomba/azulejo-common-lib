@@ -46,6 +46,9 @@ void EventChannel::RegisterEmitter(const std::string& emitterKey, const std::sha
 
 void EventChannel::UnregisterEmitter(const std::string& emitterKey)
 {
+	if (emitterKey.empty())
+		throw std::invalid_argument("Cannot unregister emitter with empty key in EventChannel.");
+
 	if (!IsEmitterRegistered(emitterKey))
 		throw std::runtime_error("IEventEmitter with key=" + emitterKey + " is not registered in this EventChannel");
 	emitterMap_.erase(emitterKey);
@@ -83,6 +86,9 @@ void EventChannel::RegisterConsumer(const std::string& consumerKey, const std::s
 
 void EventChannel::UnregisterConsumer(const std::string& consumerKey, const std::string& emitterKey)
 {
+	if (consumerKey.empty() || emitterKey.empty())
+		throw std::invalid_argument("Cannot unregister consumer with empty key in EventChannel.");
+
 	auto key = std::make_pair(consumerKey, emitterKey);
 	if (!IsConsumerRegistered(consumerKey, emitterKey))
 		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is not registered in this EventChannel");
