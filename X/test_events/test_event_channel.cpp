@@ -31,6 +31,10 @@ TEST(EventChannel, ThrowOnRegisterEmitter) {
 	EXPECT_THROW(channel.RegisterEmitter(EMITTER_KEY, nullptr), std::invalid_argument);
 	EXPECT_THROW(channel.RegisterEmitter("", emitter), std::invalid_argument);
 	EXPECT_THROW(channel.RegisterEmitter("", nullptr), std::invalid_argument);
+
+	EXPECT_NO_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter));
+	// register an already registered emitter
+	EXPECT_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter), std::runtime_error);
 }
 
 TEST(EventChannel, RegisterEmitter) {
@@ -82,6 +86,7 @@ TEST(EventChannel, ThrowOnUnregisterEmitter) {
 	Channel channel;
 
 	EXPECT_THROW(channel.UnregisterEmitter(""), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterEmitter(EMITTER_KEY), std::runtime_error);
 }
 
 TEST(EventChannel, UnregisterEmitter) {
@@ -119,6 +124,10 @@ TEST(EventChannel, ThrowOnRegisterConsumer) {
 	EXPECT_THROW(channel.RegisterConsumer("", EMITTER_KEY, nullptr), std::invalid_argument);
 	EXPECT_THROW(channel.RegisterConsumer("", "", consumer), std::invalid_argument);
 	EXPECT_THROW(channel.RegisterConsumer("", "", nullptr), std::invalid_argument);
+
+	EXPECT_NO_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer));
+	// register an already registered consumer
+	EXPECT_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer), std::runtime_error);
 }
 
 TEST(EventChannel, RegisterConsumerWithExistingEmitter) {
@@ -161,6 +170,8 @@ TEST(EventChannel, ThrowOnUnregisterConsumer) {
 	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY,""), std::invalid_argument);
 	EXPECT_THROW(channel.UnregisterConsumer("",EMITTER_KEY), std::invalid_argument);
 	EXPECT_THROW(channel.UnregisterConsumer("",""), std::invalid_argument);
+
+	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY,EMITTER_KEY), std::runtime_error);
 }
 
 TEST(EventChannel, UnregisterConsumer) {
