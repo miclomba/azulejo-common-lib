@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "config.h"
 
@@ -31,12 +32,13 @@ public:
 	void RegisterConsumer(const std::string& consumerKey, const std::string& emitterKey, const std::shared_ptr<IEventConsumer> consumer);
 	void UnregisterConsumer(const std::string& consumerKey, const std::string& emitterKey);
 
-private:
+protected:
 	bool IsEmitterRegistered(const std::string& emitterKey) const;
 	bool IsConsumerRegistered(const std::string& consumerKey, const std::string& emitterKey) const;
 
-	std::map<std::string, std::shared_ptr<IEventEmitter>> emitterMap_;
-	std::map<std::string, std::shared_ptr<IEventConsumer>> consumerMap_;
+private:
+	std::map<std::string, std::weak_ptr<IEventEmitter>> emitterMap_;
+	std::map<std::pair<std::string, std::string>, std::weak_ptr<IEventConsumer>> consumerMap_;
 };
 
 } // end namespace events
