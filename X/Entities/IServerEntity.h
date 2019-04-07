@@ -3,9 +3,10 @@
 
 #include <memory>
 
+#include "config.h"
+
 #include <boost/asio.hpp>
 
-#include "config.h"
 #include "Entity.h"
 
 namespace entity {
@@ -15,6 +16,11 @@ class ENTITY_DLL_EXPORT IServerEntity : public Entity
 public:
 	IServerEntity(const int port);
 	virtual ~IServerEntity();
+
+	IServerEntity(const IServerEntity&);
+	IServerEntity& operator=(const IServerEntity&);
+	IServerEntity(IServerEntity&&);
+	IServerEntity& operator=(IServerEntity&&);
 
 	void Run();
 

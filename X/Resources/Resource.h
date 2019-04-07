@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
+#include "config.h"
+
 #include <boost/crc.hpp>
 
-#include "config.h"
 #include "IResource.h"
 #include "ResourceTypeTraits.hpp"
 
@@ -34,6 +35,11 @@ public:
 	Resource(const T& data);
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	Resource(T&& data);
+
+	Resource(const Resource&);
+	Resource& operator=(const Resource&);
+	Resource(Resource&&);
+	Resource& operator=(Resource&&);
 
 	virtual ~Resource();
 

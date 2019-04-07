@@ -13,6 +13,11 @@ IOpenMPEntity::~IOpenMPEntity()
 {
 }
 
+IOpenMPEntity::IOpenMPEntity(const IOpenMPEntity&) = default;
+IOpenMPEntity& IOpenMPEntity::operator=(const IOpenMPEntity&) = default;
+IOpenMPEntity::IOpenMPEntity(IOpenMPEntity&&) = default;
+IOpenMPEntity& IOpenMPEntity::operator=(IOpenMPEntity&&) = default;
+
 void IOpenMPEntity::Start()
 {
 	omp_set_num_threads(numThreads_);

@@ -1,5 +1,6 @@
+#define TEMPLATE_T template<typename T>
 #define ENABLE_IF_CONTAINER_TEMPLATE_DEF \
-template<typename T> \
+TEMPLATE_T \
 template<typename U, typename std::enable_if_t<is_arithmetic_container<U>::value, int>> 
 
 ENABLE_IF_CONTAINER_TEMPLATE_DEF
@@ -17,22 +18,27 @@ Resource<T>::Resource(T&& data) : data_(std::move(data))
 {
 }
 
-template<typename T>
+TEMPLATE_T Resource<T>::Resource(const Resource<T>&) = default;
+TEMPLATE_T Resource<T>& Resource<T>::operator=(const Resource<T>&) = default;
+TEMPLATE_T Resource<T>::Resource(Resource<T>&&) = default;
+TEMPLATE_T Resource<T>& Resource<T>::operator=(Resource<T>&&) = default;
+
+TEMPLATE_T
 Resource<T>::~Resource() = default;
 
-template<typename T>
+TEMPLATE_T
 const T& Resource<T>::Data() const
 {
 	return data_;
 }
 
-template<typename T>
+TEMPLATE_T
 T& Resource<T>::Data()
 {
 	return data_;
 }
 
-template<typename T>
+TEMPLATE_T
 void Resource<T>::Assign(const char* buff, const size_t n)
 {
 	T vBuff;
@@ -46,7 +52,7 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 	Data().assign(vBuff.begin(), vBuff.end());
 }
 
-template<typename T>
+TEMPLATE_T
 int Resource<T>::Checksum() const
 {
 	boost::crc_32_type result;
@@ -56,3 +62,4 @@ int Resource<T>::Checksum() const
 }
 
 #undef ENABLE_IF_CONTAINER_TEMPLATE_DEF
+#undef TEMPLATE_T

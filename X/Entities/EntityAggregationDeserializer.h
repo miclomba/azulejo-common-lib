@@ -8,9 +8,10 @@
 #include <string>
 #include <utility>
 
+#include "config.h"
+
 #include <boost/property_tree/ptree.hpp>
 
-#include "config.h"
 #include "ISerializableEntity.h"
 
 namespace entity {

@@ -3,6 +3,12 @@
 
 namespace resource 
 {
+IResource::IResource() = default;
+IResource::~IResource() = default;
+IResource::IResource(const IResource&) = default;
+IResource& IResource::operator=(const IResource&) = default;
+IResource::IResource(IResource&&) = default;
+IResource& IResource::operator=(IResource&&) = default;
 
 bool IResource::IsDirty() const
 {

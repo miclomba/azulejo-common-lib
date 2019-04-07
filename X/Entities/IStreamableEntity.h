@@ -13,7 +13,13 @@ namespace entity {
 class ENTITY_DLL_EXPORT IStreamableEntity : public Entity
 {
 public:
+	IStreamableEntity();
 	virtual ~IStreamableEntity();
+
+	IStreamableEntity(const IStreamableEntity&);
+	IStreamableEntity& operator=(const IStreamableEntity&);
+	IStreamableEntity(IStreamableEntity&&);
+	IStreamableEntity& operator=(IStreamableEntity&&);
 
 	virtual std::string ToString() const = 0;
 	virtual void FromString(const std::string& serialization) = 0;

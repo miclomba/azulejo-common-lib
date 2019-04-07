@@ -14,46 +14,43 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Templates">
-      <UniqueIdentifier>{a192ba3b-5699-4ef6-8bc6-01b6fc88d550}</UniqueIdentifier>
+      <UniqueIdentifier>{024d2c4e-5b13-4f2b-a6bf-27256014c3a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IResource.h">
+    <ClInclude Include="EventEmitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceSerializer.h">
+    <ClInclude Include="EventConsumer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceDeserializer.h">
+    <ClInclude Include="EventChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceTypeTraits.hpp">
+    <ClInclude Include="EventEmitter.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceSerializer.hpp">
+    <ClInclude Include="EventConsumer.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceDeserializer.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="IEventEmitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.hpp">
-      <Filter>Templates</Filter>
+    <ClInclude Include="IEventConsumer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ResourceSerializer.cpp">
+    <ClCompile Include="EventChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceDeserializer.cpp">
+    <ClCompile Include="IEventEmitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IResource.cpp">
+    <ClCompile Include="IEventConsumer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

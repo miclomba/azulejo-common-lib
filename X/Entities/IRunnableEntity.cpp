@@ -6,6 +6,8 @@
 
 namespace entity {
 
+IRunnableEntity::IRunnableEntity() = default;
+
 IRunnableEntity::~IRunnableEntity()
 {
 	if (thread_)

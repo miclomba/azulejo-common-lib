@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 
+#include "config.h"
+
 #include <boost/asio.hpp>
 
-#include "config.h"
 #include "Entity.h"
 
 namespace entity {
@@ -16,6 +17,11 @@ class ENTITY_DLL_EXPORT IClientEntity : public Entity
 public:
 	IClientEntity();
 	virtual ~IClientEntity();
+
+	IClientEntity(const IClientEntity&);
+	IClientEntity& operator=(const IClientEntity&);
+	IClientEntity(IClientEntity&&);
+	IClientEntity& operator=(IClientEntity&&);
 
 	void Run(const std::string& host, const int port);
 

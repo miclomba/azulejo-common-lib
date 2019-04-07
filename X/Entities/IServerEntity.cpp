@@ -20,6 +20,11 @@ IServerEntity::IServerEntity(const int port)
 
 IServerEntity::~IServerEntity() = default;
 
+IServerEntity::IServerEntity(const IServerEntity&) = default;
+IServerEntity& IServerEntity::operator=(const IServerEntity&) = default;
+IServerEntity::IServerEntity(IServerEntity&&) = default;
+IServerEntity& IServerEntity::operator=(IServerEntity&&) = default;
+
 std::shared_ptr<boost::asio::ip::tcp::socket> IServerEntity::Accept()
 {
 	using boost::asio::ip::tcp;

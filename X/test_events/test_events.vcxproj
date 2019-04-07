@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3d017588-8579-4c78-b56c-d8750d15f75d}</ProjectGuid>
+    <ProjectGuid>{1313b853-2a64-4119-8b8c-ef7e13582ed2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,17 +33,17 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="test_event_channel.cpp" />
+    <ClCompile Include="test_event_consumer.cpp" />
+    <ClCompile Include="test_event_emitter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_entity.cpp" />
-    <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
-    <ClCompile Include="test_entity_aggregation_serializer.cpp" />
-    <ClCompile Include="test_inetworkable_entity.cpp" />
-    <ClCompile Include="test_irunnable_entity.cpp" />
-    <ClCompile Include="test_ishared_memory_entity.cpp" />
-    <ClCompile Include="test_istreamable_entity.cpp" />
-    <ClCompile Include="test_openmp_entity.cpp" />
+    <ProjectReference Include="..\Events\Events.vcxproj">
+      <Project>{fa9de200-085d-4769-aadf-bdef22ca0077}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -79,15 +79,15 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(MSBuildThisFileDirectory)include;C:\Program Files\boost\boost_1_69_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(MSBuildThisFileDirectory)include;C:\Program Files\boost\boost_1_69_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OutDir)/Events.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

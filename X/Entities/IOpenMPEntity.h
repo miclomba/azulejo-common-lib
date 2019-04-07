@@ -12,6 +12,11 @@ public:
 	IOpenMPEntity(const int numThreads, const bool setDynamic, const bool setNested);
 	virtual ~IOpenMPEntity();
 
+	IOpenMPEntity(const IOpenMPEntity&);
+	IOpenMPEntity& operator=(const IOpenMPEntity&);
+	IOpenMPEntity(IOpenMPEntity&&);
+	IOpenMPEntity& operator=(IOpenMPEntity&&);
+
 	void Start();
 
 	virtual void Run() = 0;
