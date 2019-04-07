@@ -23,6 +23,16 @@ struct Channel : public events::EventChannel
 };
 }
 
+TEST(EventChannel, ThrowOnRegisterEmitter) {
+
+	Channel channel;
+	auto emitter = std::make_shared<events::EventEmitter<void()>>();
+
+	EXPECT_THROW(channel.RegisterEmitter(EMITTER_KEY, nullptr), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterEmitter("", emitter), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterEmitter("", nullptr), std::invalid_argument);
+}
+
 TEST(EventChannel, RegisterEmitter) {
 
 	Channel channel;
@@ -87,6 +97,21 @@ TEST(EventChannel, RegisterConsumer) {
 	EXPECT_FALSE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 	EXPECT_NO_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer));
 	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+}
+
+TEST(EventChannel, ThrowOnRegisterConsumer) {
+
+	Channel channel;
+
+	auto consumer = std::make_shared<events::EventConsumer<void()>>([]() {});
+
+	EXPECT_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, nullptr), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer(CONSUMER_KEY, "", consumer), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer(CONSUMER_KEY, "", nullptr), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer("", EMITTER_KEY, consumer), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer("", EMITTER_KEY, nullptr), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer("", "", consumer), std::invalid_argument);
+	EXPECT_THROW(channel.RegisterConsumer("", "", nullptr), std::invalid_argument);
 }
 
 TEST(EventChannel, RegisterConsumerWithExistingEmitter) {
