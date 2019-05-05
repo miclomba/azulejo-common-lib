@@ -25,6 +25,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EntitiesModule", "EntitiesM
 		{94B435D2-9DCA-42D2-8758-0D2CF9F95120} = {94B435D2-9DCA-42D2-8758-0D2CF9F95120}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResourcesModule", "ResourcesModule\ResourcesModule.vcxproj", "{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}"
+	ProjectSection(ProjectDependencies) = postProject
+		{191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4} = {191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4}
+	EndProjectSection
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "test_resources_module", "test_resources_module\test_resources_module.pyproj", "{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +118,22 @@ Global
 		{509AAC0E-0FA5-4661-B4F3-12B32EF43965}.Release|x64.Build.0 = Release|x64
 		{509AAC0E-0FA5-4661-B4F3-12B32EF43965}.Release|x86.ActiveCfg = Release|Win32
 		{509AAC0E-0FA5-4661-B4F3-12B32EF43965}.Release|x86.Build.0 = Release|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Debug|x64.ActiveCfg = Debug|x64
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Debug|x64.Build.0 = Debug|x64
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Debug|x86.ActiveCfg = Debug|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Debug|x86.Build.0 = Debug|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Release|x64.ActiveCfg = Release|x64
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Release|x64.Build.0 = Release|x64
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Release|x86.ActiveCfg = Release|Win32
+		{8CAF4564-52DF-46D0-AD0F-7726CBAC6758}.Release|x86.Build.0 = Release|Win32
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Release|x64.ActiveCfg = Release|Any CPU
+		{DCEF6CF7-DA36-4363-A683-C7F84C669BC1}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

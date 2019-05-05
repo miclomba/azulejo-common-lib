@@ -2,18 +2,19 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>6ad8ebc0-8e65-4052-a365-844f6739d245</ProjectGuid>
+    <ProjectGuid>dcef6cf7-da36-4363-a683-c7f84c669bc1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test_entities_module.py</StartupFile>
-    <SearchPath>..\x64\Debug</SearchPath>
+    <StartupFile>test_resources_module.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>test_entities_module</Name>
-    <RootNamespace>test_entities_module</RootNamespace>
-    <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <Name>test_resources_module</Name>
+    <RootNamespace>test_resources_module</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -25,15 +26,15 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="test_entities_module.py" />
+    <Compile Include="test_resources_module.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EntitiesModule\EntitiesModule.vcxproj">
-      <Name>EntitiesModule</Name>
-      <Project>{509aac0e-0fa5-4661-b4f3-12b32ef43965}</Project>
+    <ProjectReference Include="..\ResourcesModule\ResourcesModule.vcxproj">
+      <Name>ResourcesModule</Name>
+      <Project>{8caf4564-52df-46d0-ad0f-7726cbac6758}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
