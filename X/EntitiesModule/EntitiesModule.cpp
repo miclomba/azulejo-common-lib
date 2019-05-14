@@ -10,10 +10,8 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(EntitiesModule)
 {
-/*
-	class_<entity::Entity>("Entity")
+	class_<entity::Entity>("Entity", no_init)
 		.def("get_key", &entity::Entity::GetKey)
 		.def("set_key", &entity::Entity::SetKey)
-		;
-*/
+	;
 }
