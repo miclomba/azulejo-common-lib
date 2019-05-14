@@ -15,7 +15,7 @@ public:
 	friend class ResourceDeserializer;
 
 	IResource();
-	~IResource();
+	virtual ~IResource();
 
 	IResource(const IResource&);
 	IResource& operator=(const IResource&);
