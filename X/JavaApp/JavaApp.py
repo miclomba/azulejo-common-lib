@@ -7,8 +7,8 @@ class CmdJavaApp():
     def __init__(self):
         javabridge.start_vm(run_headless=True)
 
-    def start(self, script, params=dict()):
-        print(javabridge.run_script(script, params))
+    def start(self, script, paramsIn=dict(), paramsOut=dict()):
+        print(javabridge.run_script(script, bindings_in=paramsIn, bindings_out=paramsOut))
         javabridge.kill_vm()
 
 class AwtJavaApp(wx.App):
@@ -19,13 +19,13 @@ class AwtJavaApp(wx.App):
         javabridge.start_vm()
         return True
 
-    def start(self, script, params=dict()):
+    def start(self, script, paramsIn=dict(), paramsOut=dict()):
         javabridge.activate_awt()
         # Must exist (perhaps the app needs to have a top-level window?), but
         # does not have to be shown.
         frame = wx.Frame(None)
 
-        javabridge.execute_runnable_in_main_thread(javabridge.run_script(script, params))
+        javabridge.execute_runnable_in_main_thread(javabridge.run_script(script, bindings_in=paramsIn, bindings_out=paramsOut))
     
         self.MainLoop()
 
