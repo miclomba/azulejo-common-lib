@@ -12,6 +12,7 @@ class Test_JavaApp(unittest.TestCase):
 
         cmdApp.start(script, params)
 
+    @unittest.skip
     def test_awt_java_app(self):
         # GUI app
         awtApp = AwtJavaApp()
@@ -23,7 +24,7 @@ class Test_JavaApp(unittest.TestCase):
                 }
             };"""
 
-        #awtApp.start(script)
+        awtApp.start(script)
 
 if __name__ == '__main__':
     unittest.main()
