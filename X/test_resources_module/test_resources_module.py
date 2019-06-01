@@ -1,30 +1,35 @@
+import unittest
 
 from ResourcesModule import *
 
-def qc(resource):
+def qc_vec(resource):
     vec = resource.data()
 
-    vec.append(0)
-    vec.append(1)
-    print("resource:")
-    print("len=", len(vec), end="\n values=")
-    for i in vec:
-        print(i, end=" ")
-    print()
+    assert(len(vec) == 0)
+    val = 7
+    vec.append(val)
+    assert(len(vec) == 1)
+    assert(vec[0] == val)
 
-if __name__ == "__main__":
+class Test_ResourcesModule(unittest.TestCase):
 
-    vec_d = VecDouble()
-    vec_f = VecFloat()
-    vec_i = VecInt()
-    vec_ui = VecUInt()
+    def test_resources_vec_double(self):
+        vec = VecDouble()
+        resource = ResourceVecDouble(vec)
+        qc_vec(resource)
 
-    resource_d = ResourceVecDouble(vec_d)
-    resource_f = ResourceVecFloat(vec_f)
-    resource_i = ResourceVecInt(vec_i)
-    resource_ui = ResourceVecUInt(vec_ui)
+    def test_resources_vec_float(self):
+        vec = VecFloat()
+        resource = ResourceVecFloat(vec)
+        qc_vec(resource)
 
-    qc(resource_d)
-    qc(resource_f)
-    qc(resource_i)
-    qc(resource_ui)
+    def test_resources_vec_int(self):
+        vec = VecInt()
+        resource = ResourceVecInt(vec)
+        qc_vec(resource)
+
+    def test_resources_vec_uint(self):
+        vec = VecUInt()
+        resource = ResourceVecUInt(vec)
+        qc_vec(resource)
+

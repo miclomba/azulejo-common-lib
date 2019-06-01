@@ -9,7 +9,6 @@ class CmdJavaApp():
 
     def start(self, script, paramsIn=dict(), paramsOut=dict()):
         print(javabridge.run_script(script, bindings_in=paramsIn, bindings_out=paramsOut))
-        javabridge.kill_vm()
 
 class AwtJavaApp(wx.App):
     def __init__(self):
@@ -28,5 +27,3 @@ class AwtJavaApp(wx.App):
         javabridge.execute_runnable_in_main_thread(javabridge.run_script(script, bindings_in=paramsIn, bindings_out=paramsOut))
     
         self.MainLoop()
-
-        javabridge.kill_vm()

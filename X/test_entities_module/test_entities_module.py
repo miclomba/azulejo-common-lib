@@ -1,5 +1,8 @@
+import unittest
 
 from EntitiesModule import *
 
-if __name__ == "__main__":
-    pass
+class Test_EntitiesModule(unittest.TestCase):
+
+    def test_entities_module(self):
+        pass

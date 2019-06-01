@@ -46,5 +46,3 @@ class Test_JavaApp(unittest.TestCase):
 
         self.assert_(outputs["result"] == 1.5)
 
-if __name__ == '__main__':
-    unittest.main()
