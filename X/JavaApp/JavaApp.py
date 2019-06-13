@@ -5,7 +5,7 @@ import wx
 
 class CmdJavaApp():
     def __init__(self):
-        javabridge.start_vm(run_headless=True)
+        pass
 
     def start(self, script, paramsIn=dict(), paramsOut=dict()):
         print(javabridge.run_script(script, bindings_in=paramsIn, bindings_out=paramsOut))
@@ -15,7 +15,6 @@ class AwtJavaApp(wx.App):
         super(AwtJavaApp, self).__init__(False)
 
     def OnInit(self):
-        javabridge.start_vm()
         return True
 
     def start(self, script, paramsIn=dict(), paramsOut=dict()):

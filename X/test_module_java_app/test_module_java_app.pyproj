@@ -13,7 +13,8 @@
     <RootNamespace>test_module_java_app</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <Environment>JAVA_HOME=C:\Program Files\Java\jdk1.8.0_211</Environment>
+    <Environment>JAVA_HOME=C:\Program Files\Java\jdk1.8.0_211
+PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +33,11 @@
     <ProjectReference Include="..\JavaApp\JavaApp.pyproj">
       <Name>JavaApp</Name>
       <Project>{97dd6584-f8f5-4440-b6f8-9517419e5223}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\ResourcesModule\ResourcesModule.vcxproj">
+      <Name>ResourcesModule</Name>
+      <Project>{8caf4564-52df-46d0-ad0f-7726cbac6758}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
