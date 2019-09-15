@@ -3,6 +3,7 @@
 #include <ctime>
 #include <exception>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -66,6 +67,46 @@ protected:
 	}
 };
 } // end namespace anonymous
+
+TEST(IServerEntity, Construct)
+{
+	EXPECT_NO_THROW(Server server(PORT));
+}
+
+TEST(IServerEntity, ConstructThrowsWhenPortIsNegative)
+{
+	EXPECT_THROW(Server server(-1), std::runtime_error);
+}
+
+TEST(IServerEntity, ConstructThrowsWhenPortIsTooLarge)
+{
+	int port = std::numeric_limits<unsigned short>::max() + 1;
+	EXPECT_THROW(Server server(port), std::runtime_error);
+}
+
+TEST(IClientEntity, Construct)
+{
+	EXPECT_NO_THROW(Client client());
+}
+
+TEST(IClientEntity, RunThrowsWhenHostIsEmpty)
+{
+	Client client;
+	EXPECT_THROW(client.Run("", PORT), std::runtime_error);
+}
+
+TEST(IClientEntity, RunThrowsWhenPortIsNegative)
+{
+	Client client;
+	EXPECT_THROW(client.Run(HOST,-1), std::runtime_error);
+}
+
+TEST(IClientEntity, RunThrowsWhenPortIsTooLarge)
+{
+	Client client;
+	int port = std::numeric_limits<unsigned short>::max() + 1;
+	EXPECT_THROW(client.Run(HOST,port), std::runtime_error);
+}
 
 /*
 int main(const int argc, const char** argv)

@@ -1,8 +1,10 @@
 #include "IServerEntity.h"
 
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
+#include <string>
 
 #include <boost/asio.hpp>
 
@@ -12,8 +14,8 @@ IServerEntity::IServerEntity(const int port)
 {
 	using boost::asio::ip::tcp;
 
-	if (port < 1)
-		throw std::runtime_error("Cannot construct IServerEntity because port provided is < 1");
+	if (port < 0 || port > std::numeric_limits<unsigned short>::max())
+		throw std::runtime_error("Cannot construct IServerEntity because port provided is invalid: " + std::to_string(port));
 
 	ioService_ = std::make_shared<boost::asio::io_service>();
 	acceptor_ = std::make_shared<tcp::acceptor>(*ioService_, tcp::endpoint(tcp::v4(), port));
@@ -47,7 +49,7 @@ void IServerEntity::Run()
 		bool doWork = true;
 		while (doWork)
 		{
-			auto mySocket = Accept();
+			std::shared_ptr<tcp::socket> mySocket = Accept();
 			doWork = Work(mySocket);
 		}
 	}

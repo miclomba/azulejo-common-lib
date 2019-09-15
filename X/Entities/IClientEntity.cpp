@@ -1,7 +1,9 @@
 #include "IClientEntity.h"
 
 #include <iostream>
+#include <limits>
 #include <memory>
+#include <stdexcept>
 
 #include <boost/asio.hpp>
 
@@ -24,8 +26,8 @@ void IClientEntity::Run(const std::string& host, const int port)
 {
 	if (host.empty())
 		throw std::runtime_error("Cannot run IClientEntity because host=''");
-	if (port < 1)
-		throw std::runtime_error("Cannot run IClientEntity because port < 1");
+	if (port < 0 || port > std::numeric_limits<unsigned short>::max())
+		throw std::runtime_error("Cannot run IClientEntity because port is invalid: " + std::to_string(port));
 
 	try
 	{
