@@ -29,7 +29,7 @@ ISerializableEntity& ISerializableEntity::operator=(const ISerializableEntity&) 
 ISerializableEntity::ISerializableEntity(ISerializableEntity&&) = default;
 ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = default;
 
-std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::string& key)
+std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::string& key) const
 {
 	Entity::MemberMap& members = Entity::GetAggregatedMembers();
 	auto found = members.find(key);

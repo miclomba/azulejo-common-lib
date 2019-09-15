@@ -32,10 +32,9 @@ protected:
 	Entity();
 
 	// make virtual so that classes such as ISerializableEntity can override for lazy loading
-	virtual SharedMember GetAggregatedMember(const Key& key);
+	virtual SharedMember GetAggregatedMember(const Key& key) const;
 
-	std::map<Key, SharedMember>& GetAggregatedMembers();
-	const std::map<Key, SharedMember>& GetAggregatedMembers() const;
+	std::map<Key, SharedMember>& GetAggregatedMembers() const;
 
 	std::vector<Key> GetAggregatedMemberKeys() const;
 
@@ -44,7 +43,7 @@ protected:
 
 private:
 	Key key_;
-	std::map<Key, SharedMember> membersMap_;
+	mutable std::map<Key, SharedMember> membersMap_;
 };
 
 } // end namespace entity

@@ -47,7 +47,7 @@ public:
 	const std::map<Key, SharedMember>& GetProtectedMembers() const { return GetAggregatedMembers(); };
 	std::map<Key, SharedMember>& GetProtectedMembers() { return GetAggregatedMembers(); };
 
-	SharedMember GetProtectedMember(const Key& key) { return GetAggregatedMember(key); }
+	SharedMember GetProtectedMember(const Key& key) const { return GetAggregatedMember(key); }
 	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() const { return 1; }
 	std::string Serialize() const { return typeid(TypeA).name(); };
@@ -55,6 +55,28 @@ private:
 	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(MEMBER_KEY)); }
 };
 } // end namespace anonymous
+
+TEST(Entity, GetKey)
+{
+	TypeA obj(KEY, MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, KEY);
+}
+
+TEST(Entity, GetKeyFromConst)
+{
+	const TypeA obj(KEY, MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, KEY);
+}
+
+TEST(Entity, SetKey)
+{
+	TypeA obj(KEY, MEMBER_KEY);
+	obj.SetKey(MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, MEMBER_KEY);
+}
 
 TEST(Entity, MoveConstruct)
 {
@@ -165,6 +187,14 @@ TEST(Entity, GetAggregatedMember)
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
+TEST(Entity, GetAggregatedMemberFromConst)
+{
+	const TypeA ea(KEY, MEMBER_KEY);
+	EXPECT_NO_THROW(ea.GetProtectedMember(MEMBER_KEY));
+	SharedMember member = ea.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
+}
+
 TEST(Entity, GetAggregatedMemberThrows)
 {
 	TypeA ea;
@@ -185,7 +215,7 @@ TEST(Entity, GetAggregatedMembers)
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
-TEST(Entity, GetAggregatedMembersConst)
+TEST(Entity, GetAggregatedMembersFromConst)
 {
 	const TypeA ea(KEY, MEMBER_KEY);
 
@@ -202,6 +232,18 @@ TEST(Entity, GetAggregatedMembersConst)
 TEST(Entity, GetAggregatedMembersKeys)
 {
 	TypeA ea(KEY, MEMBER_KEY);
+
+	EXPECT_NO_THROW(ea.GetProtectedMemberKeys());
+	const std::vector<Key> keys = ea.GetProtectedMemberKeys();
+
+	EXPECT_EQ(ea.GetExpectedMemberCount(), keys.size());
+	EXPECT_GT(ea.GetExpectedMemberCount(), size_t(0));
+	EXPECT_EQ(keys[0], MEMBER_KEY);
+}
+
+TEST(Entity, GetAggregatedMembersKeysFromConst)
+{
+	const TypeA ea(KEY, MEMBER_KEY);
 
 	EXPECT_NO_THROW(ea.GetProtectedMemberKeys());
 	const std::vector<Key> keys = ea.GetProtectedMemberKeys();

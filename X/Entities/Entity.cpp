@@ -59,17 +59,12 @@ std::vector<Key> Entity::GetAggregatedMemberKeys() const
 	return keys;
 }
 
-std::map<Key,SharedMember>& Entity::GetAggregatedMembers()
+std::map<Key,SharedMember>& Entity::GetAggregatedMembers() const
 {
 	return membersMap_;
 }
 
-const std::map<Key,SharedMember>& Entity::GetAggregatedMembers() const
-{
-	return membersMap_;
-}
-
-SharedMember Entity::GetAggregatedMember(const Key& key)
+SharedMember Entity::GetAggregatedMember(const Key& key) const
 {
 	auto found = membersMap_.find(key);
 	if (found != membersMap_.cend())
