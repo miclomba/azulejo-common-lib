@@ -11,23 +11,28 @@
 
 #include "Entities/Entity.h"
 
+using entity::Entity;
+
+using Key = entity::Entity::Key;
+using SharedMember = entity::Entity::SharedMember;
+
 namespace
 {
 const std::string KEY = "key";
 const std::string MEMBER_KEY = "member_key";
 const std::string NEW_KEY = "newKeyB";
 
-class TypeB : public entity::Entity 
+class TypeB : public Entity 
 {
 public:
 	TypeB() {}
 	std::string Serialize() const { return typeid(TypeB).name();  };
 };
 
-class TypeA : public entity::Entity
+class TypeA : public Entity
 {
 public:
-	TypeA(const std::string& key, const std::string& memberKey) 
+	TypeA(const Key& key, const Key& memberKey) 
 	{ 
 		SetKey(key);
 		auto e = std::make_shared<TypeB>(); 
@@ -35,12 +40,16 @@ public:
 		AggregateMember(e); 
 	}
 	TypeA() {}
-	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
-	void AddProtectedMember(const std::string& key) { AggregateMember(key); };
-	const std::map<std::string, std::shared_ptr<Entity>>& GetProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
-	const std::vector<std::string> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
-	size_t GetExpectedMemberCount() { return 1; }
+	
+	void AddProtectedMember(SharedMember entity) { AggregateMember(std::move(entity)); };
+	void AddProtectedMember(const Key& key) { AggregateMember(key); };
+
+	const std::map<Key, SharedMember>& GetProtectedMembers() const { return GetAggregatedMembers(); };
+	std::map<Key, SharedMember>& GetProtectedMembers() { return GetAggregatedMembers(); };
+
+	SharedMember GetProtectedMember(const Key& key) { return GetAggregatedMember(key); }
+	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
+	size_t GetExpectedMemberCount() const { return 1; }
 	std::string Serialize() const { return typeid(TypeA).name(); };
 private:
 	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(MEMBER_KEY)); }
@@ -50,23 +59,32 @@ private:
 TEST(Entity, MoveConstruct)
 {
 	TypeA ea(KEY, MEMBER_KEY);
-	entity::Entity& entity = ea.GetProtectedMember(MEMBER_KEY);
+	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
+
 	// move
 	TypeA eaMoved(std::move(ea));
 
-	EXPECT_EQ(&entity, &eaMoved.GetProtectedMember(MEMBER_KEY));
+	entity::Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
+
+	EXPECT_EQ(KEY, eaMoved.GetKey());
+	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
 }
 
 TEST(Entity, MoveAssign)
 {
 	TypeA ea(KEY, MEMBER_KEY);
-	entity::Entity& entity = ea.GetProtectedMember(MEMBER_KEY);
-
-	TypeA eaMoved;
+	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
 
 	// move assign
+	TypeA eaMoved;
 	EXPECT_NO_THROW(eaMoved = std::move(ea));
-	EXPECT_EQ(&entity, &eaMoved.GetProtectedMember(MEMBER_KEY));
+
+	entity::Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
+
+	EXPECT_EQ(KEY, eaMoved.GetKey());
+	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
 }
 
 TEST(Entity, CopyConstruct)
@@ -86,11 +104,12 @@ TEST(Entity, CopyAssign)
 
 	// copy assign
 	EXPECT_NO_THROW(eaCopied = ea);
+
 	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
 	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
 }
 
-TEST(Entity, AddMember)
+TEST(Entity, AggregateMember)
 {
 	TypeA ea;
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
@@ -101,7 +120,7 @@ TEST(Entity, AddMember)
 	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
 }
 
-TEST(Entity, AddMemberWithKey)
+TEST(Entity, AggregateMemberKey)
 {
 	TypeA ea;
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
@@ -110,7 +129,7 @@ TEST(Entity, AddMemberWithKey)
 	EXPECT_EQ(ea.GetProtectedMembers().size(), count + 1);
 }
 
-TEST(Entity, ThrowOnAddMemberUsingExistingKeyCase1)
+TEST(Entity, AggregateMemberThrowsWhenUsingExistingKeyCase1)
 {
 	TypeA ea;
 	auto e = std::make_shared<TypeB>();
@@ -122,7 +141,7 @@ TEST(Entity, ThrowOnAddMemberUsingExistingKeyCase1)
 	EXPECT_THROW(ea.AddProtectedMember(e2), std::runtime_error);
 }
 
-TEST(Entity, ThrowOnAddMemberUsingExistingKeyCase2)
+TEST(Entity, AggregateMemberThrowsWhenUsingExistingKeyCase2)
 {
 	TypeA ea;
 	auto e = std::make_shared<TypeB>();
@@ -132,37 +151,62 @@ TEST(Entity, ThrowOnAddMemberUsingExistingKeyCase2)
 	EXPECT_THROW(ea.AddProtectedMember(NEW_KEY), std::runtime_error);
 }
 
-TEST(Entity, ThrowOnAddMemberNullptr)
+TEST(Entity, AggregateMemberThrowsWhenGivenNullptr)
 {
 	TypeA ea;
 	EXPECT_THROW(ea.AddProtectedMember(std::shared_ptr<TypeA>()), std::runtime_error);
 }
 
-TEST(Entity, GetMember)
+TEST(Entity, GetAggregatedMember)
 {
 	TypeA ea(KEY, MEMBER_KEY);
 	EXPECT_NO_THROW(ea.GetProtectedMember(MEMBER_KEY));
+	SharedMember member = ea.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
-TEST(Entity, ThrowOnGetMember)
+TEST(Entity, GetAggregatedMemberThrows)
 {
 	TypeA ea;
 	EXPECT_THROW(ea.GetProtectedMember(MEMBER_KEY), std::runtime_error);
 }
 
-TEST(Entity, GetMembers)
+TEST(Entity, GetAggregatedMembers)
 {
 	TypeA ea(KEY, MEMBER_KEY);
+
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
-	size_t count = 1;
-	EXPECT_EQ(count, ea.GetProtectedMembers().size());
+	std::map<Key, SharedMember>& members = ea.GetProtectedMembers();
+	
+	auto iter = members.find(MEMBER_KEY);
+	SharedMember member = iter->second;
+
+	EXPECT_EQ(ea.GetExpectedMemberCount(), members.size());
+	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
-TEST(Entity, GetMembersKeys)
+TEST(Entity, GetAggregatedMembersConst)
+{
+	const TypeA ea(KEY, MEMBER_KEY);
+
+	EXPECT_NO_THROW(ea.GetProtectedMembers());
+	const std::map<Key, SharedMember>& members = ea.GetProtectedMembers();
+
+	auto iter = members.find(MEMBER_KEY);
+	SharedMember member = iter->second;
+
+	EXPECT_EQ(ea.GetExpectedMemberCount(), members.size());
+	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
+}
+
+TEST(Entity, GetAggregatedMembersKeys)
 {
 	TypeA ea(KEY, MEMBER_KEY);
+
 	EXPECT_NO_THROW(ea.GetProtectedMemberKeys());
-	const std::vector<std::string> keys = ea.GetProtectedMemberKeys();
-	EXPECT_EQ(keys.size(), ea.GetExpectedMemberCount());
+	const std::vector<Key> keys = ea.GetProtectedMemberKeys();
+
+	EXPECT_EQ(ea.GetExpectedMemberCount(), keys.size());
+	EXPECT_GT(ea.GetExpectedMemberCount(), size_t(0));
 	EXPECT_EQ(keys[0], MEMBER_KEY);
 }
