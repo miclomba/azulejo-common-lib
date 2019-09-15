@@ -21,43 +21,37 @@ const std::string TYPEA = "TypeA";
 const std::string TYPEB = "TypeB";
 const char DELIM = ':';
 
-class TypeB : public entity::IStreamableEntity 
+struct TypeB : public entity::IStreamableEntity 
 {
-public:
 	std::string ToString() const override { return TYPEB; };
-
-	std::string unstreamedTypeString;
 	void FromString(const std::string& str) override
 	{
 		auto n = str.find(IStreamableEntity::GetDelimeter());
 		unstreamedTypeString = str.substr(0, n);
 	};
+
+	std::string GetUnstreamedType() const { return unstreamedTypeString; };
+private:
+	std::string unstreamedTypeString;
 };
 
-class TypeA : public entity::IStreamableEntity
+struct TypeA : public entity::IStreamableEntity
 {
-public:
-	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
+	TypeA(const std::string& key) 
+	{ 
+		auto e = std::make_shared<TypeB>(); 
+		e->SetKey(key); 
+		AggregateMember(e); 
+	}
 	TypeA() {}
 
-	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
-	const MemberMap& GetProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetProtectedMember(const Key& key) { return *GetAggregatedMember(key); }
-	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
-	size_t GetExpectedMemberCount() { return 1; }
-
-	std::string ToString() const { return data_; };
+	std::string ToString() const override { return TYPEA; };
 	void FromString(const std::string& str) override {};
 
-	std::string data_ = TYPEA;
-private:
-	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(KEY)); }
+	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 };
 
-class TypeC : public entity::Entity
-{
-};
-
+struct TypeC : public entity::Entity {};
 } // end namespace anonymous
 
 TEST(IStreamableEntity, StreamNestedEntities)
@@ -92,9 +86,9 @@ TEST(IStreamableEntity, UnstreamEntity)
 	std::stringstream sstream;
 	sstream << TypeB();
 	TypeB b;
-	EXPECT_TRUE(b.unstreamedTypeString.empty());
+	EXPECT_TRUE(b.GetUnstreamedType().empty());
 	sstream >> b;
-	EXPECT_EQ(b.unstreamedTypeString, TYPEB);
+	EXPECT_EQ(b.GetUnstreamedType(), TYPEB);
 }
 
 TEST(IStreamableEntity, GetDelimiter)

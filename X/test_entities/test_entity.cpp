@@ -22,16 +22,13 @@ const std::string KEY = "key";
 const std::string MEMBER_KEY = "member_key";
 const std::string NEW_KEY = "newKeyB";
 
-class TypeB : public Entity 
+struct TypeB : public Entity 
 {
-public:
 	TypeB() {}
-	std::string Serialize() const { return typeid(TypeB).name();  };
 };
 
-class TypeA : public Entity
+struct TypeA : public Entity
 {
-public:
 	TypeA(const Key& key, const Key& memberKey) 
 	{ 
 		SetKey(key);
@@ -50,9 +47,6 @@ public:
 	SharedEntity GetProtectedMember(const Key& key) const { return GetAggregatedMember(key); }
 	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() const { return 1; }
-	std::string Serialize() const { return typeid(TypeA).name(); };
-private:
-	TypeB& GetTypeB() { return static_cast<TypeB&>(*GetAggregatedMember(MEMBER_KEY)); }
 };
 } // end namespace anonymous
 

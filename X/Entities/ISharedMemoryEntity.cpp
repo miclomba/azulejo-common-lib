@@ -1,6 +1,7 @@
 #include "ISharedMemoryEntity.h"
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -14,7 +15,7 @@ ISharedMemoryEntity::~ISharedMemoryEntity()
 {
 	if (shmem_ && isShmemOwner_)
 	{
-		auto name = shmem_->get_name();
+		const char* name = shmem_->get_name();
 		bool removed = boost::interprocess::shared_memory_object::remove(name);
 		if (!removed)
 			throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
@@ -35,8 +36,8 @@ void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
 
 	shmem_ = std::make_shared<shared_memory_object>(create_only, name.c_str(), read_write);
 
-	auto currentSize = GetSharedSize();
-	auto desiredSize = static_cast<offset_t>(size);
+	size_t currentSize = GetSharedSize();
+	offset_t desiredSize = static_cast<offset_t>(size);
 
 	if (desiredSize > currentSize)
 		shmem_->truncate(desiredSize);
