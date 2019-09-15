@@ -2,6 +2,7 @@
 #include "config.h"
 
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -47,7 +48,7 @@ TEST(IRunnableEntity, Start)
 	EXPECT_EQ(runn.GetAccum(), x*x);
 }
 
-TEST(IRunnableEntity, ThrowOnStart)
+TEST(IRunnableEntity, StartThrows)
 {
 	const int x = 3;
 	Runnable runn(x);
@@ -63,18 +64,16 @@ TEST(IRunnableEntity, Join)
 	for (int i = 0; i <= LARGE_INT; ++i)
 		runnables.push_back(std::make_shared<Runnable>(i));
 
-	for (auto& runn : runnables)
+	for (std::shared_ptr<Runnable>& runn : runnables)
 		runn->Start();
 
-	for (auto& runn : runnables)
-	{
+	for (std::shared_ptr<Runnable>& runn : runnables)
 		EXPECT_NO_THROW(runn->Join());
-	}
 
 	EXPECT_EQ(runnables[0]->GetAccum(), SumSquares(LARGE_INT));
 }
 
-TEST(IRunnableEntity, ThrowOnJoin)
+TEST(IRunnableEntity, JoinThrows)
 {
 	const int x = 3;
 	Runnable runn(x);

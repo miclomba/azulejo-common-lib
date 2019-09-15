@@ -29,7 +29,6 @@ protected:
 
 private:
 	std::mutex mtx_;
-
 	std::shared_ptr<std::thread> thread_;
 };
 
