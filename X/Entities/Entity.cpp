@@ -12,7 +12,7 @@
 namespace entity {
 
 using Key = Entity::Key;
-using SharedMember = Entity::SharedMember;
+using SharedEntity = Entity::SharedEntity;
 
 Entity::Entity() = default;
 
@@ -20,7 +20,7 @@ Entity::Entity(Entity&&) = default;
 Entity::Entity(const Entity& other) :
 	key_(other.key_)
 {
-	for (const std::pair<Key,SharedMember>& e : other.membersMap_)
+	for (const std::pair<Key,SharedEntity>& e : other.membersMap_)
 		membersMap_[e.first] = std::make_shared<Entity>(*e.second);
 }
 
@@ -33,7 +33,7 @@ Entity& Entity::operator=(const Entity& other)
 	key_ = other.key_;
 
 	membersMap_.clear();
-	for (const std::pair<Key,SharedMember>& e : other.membersMap_)
+	for (const std::pair<Key,SharedEntity>& e : other.membersMap_)
 		membersMap_[e.first] = std::make_shared<Entity>(*e.second);
 }
 
@@ -54,17 +54,17 @@ void Entity::SetKey(const Key& key)
 std::vector<Key> Entity::GetAggregatedMemberKeys() const
 {
 	std::vector<Key> keys;
-	for (const std::pair<Key, SharedMember>& e : membersMap_)
+	for (const std::pair<Key, SharedEntity>& e : membersMap_)
 		keys.push_back(e.first);
 	return keys;
 }
 
-std::map<Key,SharedMember>& Entity::GetAggregatedMembers() const
+std::map<Key,SharedEntity>& Entity::GetAggregatedMembers() const
 {
 	return membersMap_;
 }
 
-SharedMember Entity::GetAggregatedMember(const Key& key) const
+SharedEntity Entity::GetAggregatedMember(const Key& key) const
 {
 	auto found = membersMap_.find(key);
 	if (found != membersMap_.cend())
@@ -82,7 +82,7 @@ void Entity::AggregateMember(const Key& key)
 	membersMap_[key] = nullptr;
 }
 
-void Entity::AggregateMember(SharedMember sharedObj)
+void Entity::AggregateMember(SharedEntity sharedObj)
 {
 	if (!sharedObj)
 		throw std::runtime_error("Entity is nullptr when aggregating entity");

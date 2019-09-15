@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -38,9 +39,10 @@ class TypeA : public entity::IStreamableEntity
 public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
 	TypeA() {}
-	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
+
+	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 	const MemberMap& GetProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
+	Entity& GetProtectedMember(const Key& key) { return *GetAggregatedMember(key); }
 	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 
@@ -95,7 +97,7 @@ TEST(IStreamableEntity, UnstreamEntity)
 	EXPECT_EQ(b.unstreamedTypeString, TYPEB);
 }
 
-TEST(IStreamableEntity, Delimiter)
+TEST(IStreamableEntity, GetDelimiter)
 {
 	EXPECT_EQ(IStreamableEntity::GetDelimeter(), std::string(1,DELIM));
 }

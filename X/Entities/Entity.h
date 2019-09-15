@@ -14,8 +14,8 @@ class ENTITY_DLL_EXPORT Entity
 {
 public:
 	using Key = std::string;
-	using SharedMember = std::shared_ptr<Entity>;
-	using MemberMap = std::map<Key, SharedMember>;
+	using SharedEntity = std::shared_ptr<Entity>;
+	using MemberMap = std::map<Key, SharedEntity>;
 
 public:
 	virtual ~Entity();
@@ -32,18 +32,18 @@ protected:
 	Entity();
 
 	// make virtual so that classes such as ISerializableEntity can override for lazy loading
-	virtual SharedMember GetAggregatedMember(const Key& key) const;
+	virtual SharedEntity GetAggregatedMember(const Key& key) const;
 
-	std::map<Key, SharedMember>& GetAggregatedMembers() const;
+	std::map<Key, SharedEntity>& GetAggregatedMembers() const;
 
 	std::vector<Key> GetAggregatedMemberKeys() const;
 
 	void AggregateMember(const Key& key);
-	void AggregateMember(SharedMember sharedObj);
+	void AggregateMember(SharedEntity sharedObj);
 
 private:
 	Key key_;
-	mutable std::map<Key, SharedMember> membersMap_;
+	mutable std::map<Key, SharedEntity> membersMap_;
 };
 
 } // end namespace entity

@@ -1,6 +1,13 @@
 #include "IStreamableEntity.h"
 
+#include "Entity.h"
+
+#include <fstream>
+#include <memory>
 #include <queue>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace
 {
@@ -8,6 +15,9 @@ const char DELIM = ':';
 }
 
 namespace entity {
+
+using Key = Entity::Key;
+using SharedEntity = Entity::SharedEntity;
 
 IStreamableEntity::IStreamableEntity() = default;
 
@@ -30,9 +40,9 @@ std::ostream& operator<<(std::ostream& to, const IStreamableEntity& from)
 
 	while (!que.empty())
 	{
-		auto front = que.front();
+		const IStreamableEntity* front = que.front();
 		que.pop();
-		for (auto& e : front->GetAggregatedMembers())
+		for (const std::pair<Key,SharedEntity>& e : front->GetAggregatedMembers())
 		{
 			auto se = std::dynamic_pointer_cast<IStreamableEntity>(e.second);
 			if (!se)

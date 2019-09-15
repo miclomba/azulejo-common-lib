@@ -1,8 +1,7 @@
 #ifndef entity_istreamableentity_h
 #define entity_istreamableentity_h
 
-#include <iostream>
-#include <memory>
+#include <fstream>
 #include <string>
 
 #include "config.h"

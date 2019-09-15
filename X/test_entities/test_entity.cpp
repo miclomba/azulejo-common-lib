@@ -14,7 +14,7 @@
 using entity::Entity;
 
 using Key = entity::Entity::Key;
-using SharedMember = entity::Entity::SharedMember;
+using SharedEntity = entity::Entity::SharedEntity;
 
 namespace
 {
@@ -41,13 +41,13 @@ public:
 	}
 	TypeA() {}
 	
-	void AddProtectedMember(SharedMember entity) { AggregateMember(std::move(entity)); };
+	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 	void AddProtectedMember(const Key& key) { AggregateMember(key); };
 
-	const std::map<Key, SharedMember>& GetProtectedMembers() const { return GetAggregatedMembers(); };
-	std::map<Key, SharedMember>& GetProtectedMembers() { return GetAggregatedMembers(); };
+	const std::map<Key, SharedEntity>& GetProtectedMembers() const { return GetAggregatedMembers(); };
+	std::map<Key, SharedEntity>& GetProtectedMembers() { return GetAggregatedMembers(); };
 
-	SharedMember GetProtectedMember(const Key& key) const { return GetAggregatedMember(key); }
+	SharedEntity GetProtectedMember(const Key& key) const { return GetAggregatedMember(key); }
 	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() const { return 1; }
 	std::string Serialize() const { return typeid(TypeA).name(); };
@@ -183,7 +183,7 @@ TEST(Entity, GetAggregatedMember)
 {
 	TypeA ea(KEY, MEMBER_KEY);
 	EXPECT_NO_THROW(ea.GetProtectedMember(MEMBER_KEY));
-	SharedMember member = ea.GetProtectedMember(MEMBER_KEY);
+	SharedEntity member = ea.GetProtectedMember(MEMBER_KEY);
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
@@ -191,7 +191,7 @@ TEST(Entity, GetAggregatedMemberFromConst)
 {
 	const TypeA ea(KEY, MEMBER_KEY);
 	EXPECT_NO_THROW(ea.GetProtectedMember(MEMBER_KEY));
-	SharedMember member = ea.GetProtectedMember(MEMBER_KEY);
+	SharedEntity member = ea.GetProtectedMember(MEMBER_KEY);
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
 }
 
@@ -206,10 +206,10 @@ TEST(Entity, GetAggregatedMembers)
 	TypeA ea(KEY, MEMBER_KEY);
 
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
-	std::map<Key, SharedMember>& members = ea.GetProtectedMembers();
+	std::map<Key, SharedEntity>& members = ea.GetProtectedMembers();
 	
 	auto iter = members.find(MEMBER_KEY);
-	SharedMember member = iter->second;
+	SharedEntity member = iter->second;
 
 	EXPECT_EQ(ea.GetExpectedMemberCount(), members.size());
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
@@ -220,10 +220,10 @@ TEST(Entity, GetAggregatedMembersFromConst)
 	const TypeA ea(KEY, MEMBER_KEY);
 
 	EXPECT_NO_THROW(ea.GetProtectedMembers());
-	const std::map<Key, SharedMember>& members = ea.GetProtectedMembers();
+	const std::map<Key, SharedEntity>& members = ea.GetProtectedMembers();
 
 	auto iter = members.find(MEMBER_KEY);
-	SharedMember member = iter->second;
+	SharedEntity member = iter->second;
 
 	EXPECT_EQ(ea.GetExpectedMemberCount(), members.size());
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
