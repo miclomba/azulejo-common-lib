@@ -6,7 +6,7 @@
 
 namespace
 {
-entity::ISerializableEntity::Members GetAggregatedSerializableMembers(const entity::Entity::Members& allMembers)
+entity::ISerializableEntity::Members GetAggregatedSerializableMembers(const entity::Entity::MemberMap& allMembers)
 {
 	entity::ISerializableEntity::Members members;
 
@@ -31,7 +31,7 @@ ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = def
 
 std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::string& key)
 {
-	Entity::Members& members = Entity::GetAggregatedMembers();
+	Entity::MemberMap& members = Entity::GetAggregatedMembers();
 	auto found = members.find(key);
 	if (found != members.cend())
 	{

@@ -39,7 +39,7 @@ public:
 	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
 	const Members& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
-	const MemberKeys GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
+	const std::vector<Key> GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
 	void Save(boost::property_tree::ptree& tree, const std::string& path) const override
 	{

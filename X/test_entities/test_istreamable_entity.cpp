@@ -4,6 +4,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -38,9 +39,9 @@ public:
 	TypeA(const std::string& key) { auto e = std::make_shared<TypeB>(); e->SetKey(key); AggregateMember(e); }
 	TypeA() {}
 	void AddProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
-	const Members& GetProtectedMembers() { return GetAggregatedMembers(); };
+	const MemberMap& GetProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
-	const MemberKeys GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
+	const std::vector<Key> GetProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 	size_t GetExpectedMemberCount() { return 1; }
 
 	std::string ToString() const { return data_; };

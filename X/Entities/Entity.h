@@ -13,8 +13,9 @@ namespace entity {
 class ENTITY_DLL_EXPORT Entity
 {
 public:
-	using MemberKeys = std::vector<std::string>;
-	using Members = std::map<std::string, std::shared_ptr<Entity>>;
+	using Key = std::string;
+	using SharedMember = std::shared_ptr<Entity>;
+	using MemberMap = std::map<Key, SharedMember>;
 
 public:
 	virtual ~Entity();
@@ -24,26 +25,26 @@ public:
 	Entity(Entity&& other);
 	Entity& operator=(Entity&& other);
 
-	std::string GetKey() const;
-	void SetKey(const std::string& key);
+	Key GetKey() const;
+	void SetKey(const Key& key);
 
 protected:
 	Entity();
 
 	// make virtual so that classes such as ISerializableEntity can override for lazy loading
-	virtual std::shared_ptr<Entity> GetAggregatedMember(const std::string& key);
+	virtual SharedMember GetAggregatedMember(const Key& key);
 
-	Members& GetAggregatedMembers();
-	const Members& GetAggregatedMembers() const;
+	std::map<Key, SharedMember>& GetAggregatedMembers();
+	const std::map<Key, SharedMember>& GetAggregatedMembers() const;
 
-	MemberKeys GetAggregatedMemberKeys() const;
+	std::vector<Key> GetAggregatedMemberKeys() const;
 
-	void AggregateMember(const std::string& key, std::shared_ptr<Entity> copied);
-	void AggregateMember(std::shared_ptr<Entity> copied);
+	void AggregateMember(const Key& key);
+	void AggregateMember(SharedMember sharedObj);
 
 private:
-	std::string key_;
-	Members members_;
+	Key key_;
+	std::map<Key, SharedMember> membersMap_;
 };
 
 } // end namespace entity

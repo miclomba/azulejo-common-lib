@@ -37,12 +37,12 @@ public:
 	}
 
 	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
-	void AggregateProtectedMember(const std::string& key, std::shared_ptr<Entity> entity) { AggregateMember(key, std::move(entity)); };
+	void AggregateProtectedMember(const std::string& key) { AggregateMember(key); };
 
 	const Members GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	std::shared_ptr<Entity> GetAggregatedProtectedMemberPtr(const std::string& key) { return GetAggregatedMember(key); }
-	const MemberKeys GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
+	const std::vector<Key> GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
 	void Save(boost::property_tree::ptree& tree, const std::string& path) const override
 	{
@@ -97,7 +97,7 @@ std::shared_ptr<TypeA> CreateEntityWithUnloadedMember(const std::string& root, c
 
 	rootEntity->SetKey(root);
 
-	rootEntity->AggregateProtectedMember(leaf,nullptr);
+	rootEntity->AggregateProtectedMember(leaf);
 
 	return rootEntity;
 }
@@ -378,7 +378,7 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntityWithoutSerialization)
 
 	// Create entity with unloaded member
 	TypeA entity;
-	entity.AggregateProtectedMember(BAD_KEY, nullptr);
+	entity.AggregateProtectedMember(BAD_KEY);
 
 	// try to lazy load the entity
 	std::shared_ptr<entity::Entity> lazyLoaded = entity.GetAggregatedProtectedMemberPtr(BAD_KEY);
