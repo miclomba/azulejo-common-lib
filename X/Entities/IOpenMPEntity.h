@@ -19,9 +19,9 @@ public:
 
 	void Start();
 
+protected:
 	virtual void Run() = 0;
 
-protected:
 	int numThreads_;
 	bool setDynamic_; 
 	bool setNested_;

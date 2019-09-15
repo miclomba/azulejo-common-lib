@@ -1,6 +1,8 @@
 
 #include "config.h"
 
+#include <stdexcept>
+
 #include <gtest/gtest.h>
 
 #include <omp.h>
@@ -11,27 +13,18 @@ namespace
 {
 const int EXPECTED_VALUE = 8;
 
-class Runnable : public entity::IOpenMPEntity
+struct Runnable : public entity::IOpenMPEntity
 {
-public:
 	Runnable(const int numThreads, const bool setDynamic, const bool setNested) :
 		IOpenMPEntity(numThreads,setDynamic,setNested) 
 	{
 	}
 
-	int GetSharedTotal() 
-	{ 
-		return sharedTotal_;
-	}
+	int GetSharedTotal()  { return sharedTotal_; }
 
+protected:
 	void Run() override 
 	{
-		omp_set_num_threads(numThreads_);
-		// can the implementation vary the number of threads dynamically (some impl don't support this)
-		omp_set_dynamic(setDynamic_);
-		// are nested parallel regions supported (some impl don't support this)
-		omp_set_nested(setNested_);
-
 		// Create an atomic
 		#pragma omp atomic
 		int sharedAtomic = 0;
@@ -94,9 +87,14 @@ private:
 };
 } // end namespace anonymous
 
-TEST(IOpenMPEntity, Run)
+TEST(IOpenMPEntity, ConstructorThrows)
+{
+	EXPECT_THROW(Runnable(-4, false, false), std::runtime_error);
+}
+
+TEST(IOpenMPEntity, Start)
 {
 	Runnable openmp(4,false,false);
-	EXPECT_NO_THROW(openmp.Run());
+	EXPECT_NO_THROW(openmp.Start());
 	EXPECT_EQ(openmp.GetSharedTotal(), EXPECTED_VALUE);
 }
