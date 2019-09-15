@@ -1,4 +1,4 @@
-#include <cstdlib>
+//#include <cstdlib>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -15,30 +15,67 @@
 namespace
 {
 const std::string NAME = "shmem";
+const std::string OTHER_NAME = "other_shmem";
 const size_t SIZE = 1024;
 
-class ShareableCreator : public entity::ISharedMemoryEntity
-{
-};
-
-class ShareableAccessor : public entity::ISharedMemoryEntity
-{
-};
+struct ShareableCreator : public entity::ISharedMemoryEntity {};
+struct ShareableAccessor : public entity::ISharedMemoryEntity {};
 } // end namespace anonymous
-/*
-TEST(ISharedMemoryEntity, OpenOrCreate)
+
+TEST(ISharedMemoryEntity, Create)
 {
 	ShareableCreator shareable;
 
 	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
 }
 
-TEST(ISharedMemoryEntity, ThrowOnOpenOrCreate)
+TEST(ISharedMemoryEntity, CreateThrowsWhenSharedMemoryAlreadyExists)
+{
+	ShareableCreator shareable;
+	ShareableCreator otherShareable;
+
+	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_THROW(otherShareable.Create(NAME, SIZE), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, CreateWhenAlreadyCreatedThrows)
 {
 	ShareableCreator shareable;
 
+	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_THROW(shareable.Create(OTHER_NAME, SIZE), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, CreateUsingEmptyNameThrows)
+{
+	ShareableCreator shareable;
+
+	EXPECT_THROW(shareable.Create("", SIZE), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, CreateUsingInvalidSizeThrows)
+{
+	ShareableCreator shareable;
+
+	EXPECT_THROW(shareable.Create(NAME, 0), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, Open)
+{
+	ShareableCreator shareable;
+	ShareableCreator otherShareable;
+
 	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
-	EXPECT_THROW(shareable.Create(NAME, SIZE), std::runtime_error);
+	EXPECT_NO_THROW(otherShareable.Open(NAME));
+}
+
+TEST(ISharedMemoryEntity, OpenThrows)
+{
+	ShareableCreator shareable;
+	ShareableCreator otherShareable;
+
+	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
 }
 
 TEST(ISharedMemoryEntity, GetSharedName)
@@ -48,14 +85,14 @@ TEST(ISharedMemoryEntity, GetSharedName)
 	shareable.Create(NAME,SIZE);
 	EXPECT_EQ(NAME,shareable.GetSharedName());
 }
-*/
+
 TEST(ISharedMemoryEntity, ThrowOnGetSharedName)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedName(), std::runtime_error);
 }
-/*
+
 TEST(ISharedMemoryEntity, GetSharedSize)
 {
 	ShareableCreator shareable;
@@ -63,14 +100,14 @@ TEST(ISharedMemoryEntity, GetSharedSize)
 	shareable.Create(NAME,SIZE);
 	EXPECT_EQ(SIZE, shareable.GetSharedSize());
 }
-*/
+
 TEST(ISharedMemoryEntity, ThrowOnGetSharedSize)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedSize(), std::runtime_error);
 }
-/*
+
 TEST(ISharedMemoryEntity, GetSharedAddress)
 {
 	ShareableCreator shareable;
@@ -78,13 +115,14 @@ TEST(ISharedMemoryEntity, GetSharedAddress)
 	shareable.Create(NAME,SIZE);
 	EXPECT_NO_THROW(shareable.GetSharedAddress());
 }
-*/
+
 TEST(ISharedMemoryEntity, ThrowOnGetSharedAddress)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedAddress(), std::runtime_error);
 }
+
 /*
 int main(int argc, const char** argv)
 {

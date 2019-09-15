@@ -31,10 +31,21 @@ void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
 {
 	using namespace boost::interprocess;
 
+	if (size <= 0)
+		throw std::runtime_error("Shared memory cannot be allocated with an invalid size: " + std::to_string(size));
+	if (name.empty())
+		throw std::runtime_error("Shared memory cannot be allocated without a name");
 	if (shmem_)
 		throw std::runtime_error("Shared memory already allocated using name=" + std::string(shmem_->get_name()));
 
-	shmem_ = std::make_shared<shared_memory_object>(create_only, name.c_str(), read_write);
+	try
+	{
+		shmem_ = std::make_shared<shared_memory_object>(create_only, name.c_str(), read_write);
+	}
+	catch (std::exception&)
+	{
+		throw std::runtime_error("Shared memory cannot be allocated because " + name + " is already allocated");
+	}
 
 	size_t currentSize = GetSharedSize();
 	offset_t desiredSize = static_cast<offset_t>(size);
@@ -52,7 +63,14 @@ void ISharedMemoryEntity::Open(const std::string& name)
 	if (shmem_)
 		throw std::runtime_error("Shared memory already allocated using name=" + std::string(shmem_->get_name()));
 
-	shmem_ = std::make_shared<shared_memory_object>(open_only, name.c_str(), read_write);
+	try
+	{
+		shmem_ = std::make_shared<shared_memory_object>(open_only, name.c_str(), read_write);
+	}
+	catch (std::exception&)
+	{
+		throw std::runtime_error("Shared memory cannot be allocated because " + name + " is already allocated");
+	}
 }
 
 std::string ISharedMemoryEntity::GetSharedName() const
