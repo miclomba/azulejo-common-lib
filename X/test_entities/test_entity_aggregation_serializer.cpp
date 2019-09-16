@@ -20,8 +20,8 @@ namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using entity::Entity;
-using entity::ISerializableEntity;
 using entity::EntityAggregationSerializer;
+using entity::ISerializableEntity;
 using Key = entity::Entity::Key;
 using SerializableMemberMap = entity::ISerializableEntity::SerializableMemberMap;
 

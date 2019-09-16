@@ -41,24 +41,23 @@ ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = def
 SharedEntity ISerializableEntity::GetAggregatedMember(const Key& key) const
 {
 	MemberMap& members = Entity::GetAggregatedMembers();
+
 	auto found = members.find(key);
-	if (found != members.cend())
+	if (found == members.cend())
+		throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
+	
+	if (!members[key])
 	{
-		if (!members[key])
+		EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+		if (deserializer->HasSerializationKey(key))
 		{
-			EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-			if (deserializer->HasSerializationKey(key))
-			{
-				std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
+			std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
 
-				deserializer->Deserialize(*entity);
-				members[key] = std::move(entity);
-			}
+			deserializer->Deserialize(*entity);
+			members[key] = std::move(entity);
 		}
-		return members[key];
 	}
-
-	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
+	return members[key];
 }
 
 SerializableMemberMap ISerializableEntity::GetAggregatedMembers()
