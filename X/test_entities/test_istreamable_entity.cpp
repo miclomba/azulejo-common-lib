@@ -12,6 +12,7 @@
 #include "Entities/Entity.h"
 #include "Entities/IStreamableEntity.h"
 
+using entity::Entity;
 using entity::IStreamableEntity;
 
 namespace
@@ -21,7 +22,7 @@ const std::string TYPEA = "TypeA";
 const std::string TYPEB = "TypeB";
 const char DELIM = ':';
 
-struct TypeB : public entity::IStreamableEntity 
+struct TypeB : public IStreamableEntity 
 {
 	std::string ToString() const override { return TYPEB; };
 	void FromString(const std::string& str) override
@@ -35,7 +36,7 @@ private:
 	std::string unstreamedTypeString;
 };
 
-struct TypeA : public entity::IStreamableEntity
+struct TypeA : public IStreamableEntity
 {
 	TypeA(const std::string& key) 
 	{ 
@@ -51,7 +52,7 @@ struct TypeA : public entity::IStreamableEntity
 	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 };
 
-struct TypeC : public entity::Entity {};
+struct TypeC : public Entity {};
 } // end namespace anonymous
 
 TEST(IStreamableEntity, StreamNestedEntities)

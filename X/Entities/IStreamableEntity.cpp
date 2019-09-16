@@ -9,15 +9,17 @@
 #include <string>
 #include <utility>
 
-namespace
-{
-const char DELIM = ':';
-}
-
-namespace entity {
+using entity::Entity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
+
+namespace
+{
+const char DELIM = ':';
+} // end namespace
+
+namespace entity {
 
 IStreamableEntity::IStreamableEntity() = default;
 

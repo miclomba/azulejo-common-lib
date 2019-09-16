@@ -12,14 +12,16 @@
 
 #include "Entities/ISharedMemoryEntity.h"
 
+using entity::ISharedMemoryEntity;
+
 namespace
 {
 const std::string NAME = "shmem";
 const std::string OTHER_NAME = "other_shmem";
 const size_t SIZE = 1024;
 
-struct ShareableCreator : public entity::ISharedMemoryEntity {};
-struct ShareableAccessor : public entity::ISharedMemoryEntity {};
+struct ShareableCreator : public ISharedMemoryEntity {};
+struct ShareableAccessor : public ISharedMemoryEntity {};
 } // end namespace anonymous
 
 TEST(ISharedMemoryEntity, Create)

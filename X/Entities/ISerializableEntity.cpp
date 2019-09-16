@@ -7,14 +7,16 @@
 
 #include "EntityAggregationDeserializer.h"
 
+using entity::Entity;
+using entity::ISerializableEntity;
+
+using Key = Entity::Key;
+using SharedEntity = Entity::SharedEntity;
+using MemberMap = ISerializableEntity::MemberMap;
+using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
+
 namespace
 {
-using entity::ISerializableEntity;
-using Key = entity::Entity::Key;
-using SharedEntity = entity::Entity::SharedEntity;
-using MemberMap = entity::ISerializableEntity::MemberMap;
-using SerializableMemberMap = entity::ISerializableEntity::SerializableMemberMap;
-
 SerializableMemberMap GetAggregatedSerializableMembers(const MemberMap& allMembers)
 {
 	SerializableMemberMap members;
@@ -26,7 +28,7 @@ SerializableMemberMap GetAggregatedSerializableMembers(const MemberMap& allMembe
 	}
 	return members;
 }
-}
+} // end namespace
 
 namespace entity {
 

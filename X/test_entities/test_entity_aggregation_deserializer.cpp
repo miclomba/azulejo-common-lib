@@ -19,11 +19,13 @@
 namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
+using entity::Entity;
 using entity::EntityAggregationDeserializer;
 using entity::ISerializableEntity;
-using Key = entity::Entity::Key;
-using SharedEntity = entity::Entity::SharedEntity;
-using SerializationMembersMap = entity::ISerializableEntity::SerializableMemberMap;
+
+using Key = Entity::Key;
+using SharedEntity = Entity::SharedEntity;
+using SerializationMembersMap = ISerializableEntity::SerializableMemberMap;
 
 namespace
 {
@@ -35,9 +37,8 @@ const std::string ENTITY_1B = "entity_1b";
 const std::string BAD_KEY = "bad_key";
 const std::string VALUE = "value";
 
-class TypeA : public ISerializableEntity
+struct TypeA : public ISerializableEntity
 {
-public:
 	TypeA() = default;
 	~TypeA()
 	{

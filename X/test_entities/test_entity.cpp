@@ -13,8 +13,8 @@
 
 using entity::Entity;
 
-using Key = entity::Entity::Key;
-using SharedEntity = entity::Entity::SharedEntity;
+using Key = Entity::Key;
+using SharedEntity = Entity::SharedEntity;
 
 namespace
 {
@@ -80,7 +80,7 @@ TEST(Entity, MoveConstruct)
 	// move
 	TypeA eaMoved(std::move(ea));
 
-	entity::Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
+	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
 	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
 
 	EXPECT_EQ(KEY, eaMoved.GetKey());
@@ -96,7 +96,7 @@ TEST(Entity, MoveAssign)
 	TypeA eaMoved;
 	EXPECT_NO_THROW(eaMoved = std::move(ea));
 
-	entity::Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
+	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
 	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
 
 	EXPECT_EQ(KEY, eaMoved.GetKey());

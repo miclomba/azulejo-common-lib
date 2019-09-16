@@ -9,16 +9,16 @@
 
 #include "ISerializableEntity.h"
 
+namespace pt = boost::property_tree;
+
 namespace
 {
-using boost::property_tree::ptree;
-
-std::string GetKeyPath(const std::string& key, const ptree& tree)
+std::string GetKeyPath(const std::string& key, const pt::ptree& tree)
 {
 	for (auto& keyValue : tree)
 	{
 		std::string nodeKey = keyValue.first;
-		ptree node = keyValue.second;
+		pt::ptree node = keyValue.second;
 
 		if (nodeKey == key)
 			return nodeKey;

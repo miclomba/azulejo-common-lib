@@ -13,6 +13,9 @@
 #include "Entities/IClientEntity.h"
 #include "Entities/IServerEntity.h"
 
+using entity::IClientEntity;
+using entity::IServerEntity;
+
 namespace
 {
 const int SLEEP_TIME_MS = 15000;
@@ -29,7 +32,7 @@ std::string MakeDaytimeString()
 	return str;
 }
 
-class Client : public entity::IClientEntity
+class Client : public IClientEntity
 {
 protected:
 	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
@@ -49,7 +52,7 @@ protected:
 	}
 };
 
-class Server : public entity::IServerEntity
+class Server : public IServerEntity
 {
 public:
 	Server(const int port) : IServerEntity(port) {}

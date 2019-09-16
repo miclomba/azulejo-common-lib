@@ -9,11 +9,13 @@
 
 #include "Entities/IOpenMPEntity.h"
 
+using entity::IOpenMPEntity;
+
 namespace
 {
 const int EXPECTED_VALUE = 8;
 
-struct Runnable : public entity::IOpenMPEntity
+struct Runnable : public IOpenMPEntity
 {
 	Runnable(const int numThreads, const bool setDynamic, const bool setNested) :
 		IOpenMPEntity(numThreads,setDynamic,setNested) 

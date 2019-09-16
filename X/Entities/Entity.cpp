@@ -9,10 +9,12 @@
 
 #include "EntityAggregationDeserializer.h"
 
-namespace entity {
+using entity::Entity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
+
+namespace entity {
 
 Entity::Entity() = default;
 

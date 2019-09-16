@@ -9,6 +9,8 @@
 
 #include "Entities/IRunnableEntity.h"
 
+using entity::IRunnableEntity;
+
 namespace
 {
 const int LARGE_INT = 2000;
@@ -21,7 +23,7 @@ int SumSquares(const int x)
 	return accum;
 }
 
-class Runnable : public entity::IRunnableEntity
+class Runnable : public IRunnableEntity
 {
 public:
 	Runnable(const int x) : x_(x) { accum_ = 0; };
