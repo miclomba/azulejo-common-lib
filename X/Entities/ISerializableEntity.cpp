@@ -12,23 +12,7 @@ using entity::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
-using MemberMap = ISerializableEntity::MemberMap;
 using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
-
-namespace
-{
-SerializableMemberMap GetAggregatedSerializableMembers(const MemberMap& allMembers)
-{
-	SerializableMemberMap members;
-
-	for (const std::pair<Key, SharedEntity>& member : allMembers)
-	{
-		if (member.second && std::dynamic_pointer_cast<ISerializableEntity>(member.second))
-			members.insert(std::make_pair(member.first, std::static_pointer_cast<ISerializableEntity>(member.second)));
-	}
-	return members;
-}
-} // end namespace
 
 namespace entity {
 
@@ -62,14 +46,17 @@ SharedEntity ISerializableEntity::GetAggregatedMember(const Key& key) const
 	return members[key];
 }
 
-SerializableMemberMap ISerializableEntity::GetAggregatedMembers()
+SerializableMemberMap ISerializableEntity::GetAggregatedMembers() const
 {
-	return GetAggregatedSerializableMembers(Entity::GetAggregatedMembers());
-}
+	SerializableMemberMap members;
 
-const SerializableMemberMap ISerializableEntity::GetAggregatedMembers() const
-{
-	return GetAggregatedSerializableMembers(Entity::GetAggregatedMembers());
+	const MemberMap& allMembers = Entity::GetAggregatedMembers();
+	for (const std::pair<Key, SharedEntity>& member : allMembers)
+	{
+		if (member.second && std::dynamic_pointer_cast<ISerializableEntity>(member.second))
+			members.insert(std::make_pair(member.first, std::static_pointer_cast<ISerializableEntity>(member.second)));
+	}
+	return members;
 }
 
 } // end namespace entity

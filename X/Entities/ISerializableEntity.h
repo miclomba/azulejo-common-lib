@@ -38,10 +38,9 @@ public:
 	virtual void Load(boost::property_tree::ptree& tree, const std::string& path) = 0;
 
 protected:
-	std::shared_ptr<Entity> GetAggregatedMember(const std::string& key) const override;
+	SharedEntity GetAggregatedMember(const Key& key) const override;
 
-	SerializableMemberMap GetAggregatedMembers();
-	const SerializableMemberMap GetAggregatedMembers() const;
+	SerializableMemberMap GetAggregatedMembers() const;
 };
 
 } // end namespace entity

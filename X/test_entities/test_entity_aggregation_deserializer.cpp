@@ -46,13 +46,11 @@ struct TypeA : public ISerializableEntity
 			fs::remove(path_);
 	}
 
-	void AggregateProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 	void AggregateProtectedMember(const Key& key) { AggregateMember(key); };
 
 	const SerializationMembersMap GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
 	SharedEntity GetAggregatedProtectedMember(const Key& key) { return GetAggregatedMember(key); }
 	SharedEntity GetAggregatedProtectedMemberPtr(const Key& key) { return GetAggregatedMember(key); }
-	const std::vector<Key> GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
 	void Save(pt::ptree& tree, const std::string& path) const override
 	{

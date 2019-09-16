@@ -50,7 +50,7 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 
 	entity.Save(tree, absolutePath);
 
-	auto& members = entity.GetAggregatedMembers();
+	auto members = entity.GetAggregatedMembers();
 	for (auto& m : members)
 		SerializeWithParentKey(*m.second,searchPath);
 
