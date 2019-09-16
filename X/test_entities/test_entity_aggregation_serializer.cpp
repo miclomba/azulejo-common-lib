@@ -16,6 +16,10 @@
 namespace fs = std::filesystem;
 using boost::property_tree::ptree;
 
+using entity::Entity;
+using entity::ISerializableEntity;
+using SerializableMemberMap = entity::ISerializableEntity::SerializableMemberMap;
+
 namespace
 {
 const std::string JSON_ROOT = "C:/users/miclomba/Downloads"; 
@@ -37,7 +41,7 @@ public:
 	}
 
 	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
-	const Members& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
+	const SerializableMemberMap& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
 	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
 	const std::vector<Key> GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 

@@ -1,19 +1,28 @@
 #include "ISerializableEntity.h"
 
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "EntityAggregationDeserializer.h"
 
 namespace
 {
-entity::ISerializableEntity::Members GetAggregatedSerializableMembers(const entity::Entity::MemberMap& allMembers)
-{
-	entity::ISerializableEntity::Members members;
+using entity::ISerializableEntity;
+using Key = entity::Entity::Key;
+using SharedEntity = entity::Entity::SharedEntity;
+using MemberMap = entity::ISerializableEntity::MemberMap;
+using SerializableMemberMap = entity::ISerializableEntity::SerializableMemberMap;
 
-	for (auto& member : allMembers)
+SerializableMemberMap GetAggregatedSerializableMembers(const MemberMap& allMembers)
+{
+	SerializableMemberMap members;
+
+	for (const std::pair<Key, SharedEntity>& member : allMembers)
 	{
-		if (member.second && dynamic_cast<entity::ISerializableEntity*>(member.second.get()))
-			members.insert(std::make_pair(member.first, std::static_pointer_cast<entity::ISerializableEntity>(member.second)));
+		if (member.second && std::dynamic_pointer_cast<ISerializableEntity>(member.second))
+			members.insert(std::make_pair(member.first, std::static_pointer_cast<ISerializableEntity>(member.second)));
 	}
 	return members;
 }
@@ -29,15 +38,15 @@ ISerializableEntity& ISerializableEntity::operator=(const ISerializableEntity&) 
 ISerializableEntity::ISerializableEntity(ISerializableEntity&&) = default;
 ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = default;
 
-std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::string& key) const
+SharedEntity ISerializableEntity::GetAggregatedMember(const Key& key) const
 {
-	Entity::MemberMap& members = Entity::GetAggregatedMembers();
+	MemberMap& members = Entity::GetAggregatedMembers();
 	auto found = members.find(key);
 	if (found != members.cend())
 	{
 		if (!members[key])
 		{
-			auto deserializer = EntityAggregationDeserializer::GetInstance();
+			EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 			if (deserializer->HasSerializationKey(key))
 			{
 				std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
@@ -52,12 +61,12 @@ std::shared_ptr<Entity> ISerializableEntity::GetAggregatedMember(const std::stri
 	throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 }
 
-ISerializableEntity::Members ISerializableEntity::GetAggregatedMembers()
+SerializableMemberMap ISerializableEntity::GetAggregatedMembers()
 {
 	return GetAggregatedSerializableMembers(Entity::GetAggregatedMembers());
 }
 
-const ISerializableEntity::Members ISerializableEntity::GetAggregatedMembers() const
+const SerializableMemberMap ISerializableEntity::GetAggregatedMembers() const
 {
 	return GetAggregatedSerializableMembers(Entity::GetAggregatedMembers());
 }

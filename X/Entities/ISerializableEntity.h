@@ -1,6 +1,8 @@
 #ifndef entity_iserializableentity_h
 #define entity_iserializableentity_h
 
+#include <map>
+#include <memory>
 #include <string>
 
 #include "config.h"
@@ -17,7 +19,8 @@ class EntityAggregationSerializer;
 class ENTITY_DLL_EXPORT ISerializableEntity : public Entity
 {
 public:
-	using Members = std::map<std::string, std::shared_ptr<ISerializableEntity>>;
+	using SharedSerializable = std::shared_ptr<ISerializableEntity>;
+	using SerializableMemberMap = std::map<Key, SharedSerializable>;
 
 	friend class EntityAggregationSerializer;
 	friend class EntityAggregationDeserializer;
@@ -37,8 +40,8 @@ public:
 protected:
 	std::shared_ptr<Entity> GetAggregatedMember(const std::string& key) const override;
 
-	Members GetAggregatedMembers();
-	const Members GetAggregatedMembers() const;
+	SerializableMemberMap GetAggregatedMembers();
+	const SerializableMemberMap GetAggregatedMembers() const;
 };
 
 } // end namespace entity

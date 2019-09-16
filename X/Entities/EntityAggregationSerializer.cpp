@@ -7,9 +7,9 @@
 
 #include "ISerializableEntity.h"
 
-using boost::property_tree::ptree;
-
 namespace entity {
+
+using boost::property_tree::ptree;
 
 EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
 

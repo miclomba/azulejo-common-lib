@@ -8,7 +8,7 @@
 #include <boost/asio.hpp>
 
 namespace entity {
-	
+
 IClientEntity::IClientEntity()
 {
 	using boost::asio::ip::tcp;

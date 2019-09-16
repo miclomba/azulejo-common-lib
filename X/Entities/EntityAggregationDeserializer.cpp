@@ -9,10 +9,10 @@
 
 #include "ISerializableEntity.h"
 
-using boost::property_tree::ptree;
-
 namespace
 {
+using boost::property_tree::ptree;
+
 std::string GetKeyPath(const std::string& key, const ptree& tree)
 {
 	for (auto& keyValue : tree)
