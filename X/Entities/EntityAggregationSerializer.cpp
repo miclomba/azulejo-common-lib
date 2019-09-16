@@ -1,19 +1,25 @@
 #include "EntityAggregationSerializer.h"
 
+#include <algorithm>
+#include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "ISerializableEntity.h"
 
+namespace pt = boost::property_tree;
+
 using entity::Entity;
+using entity::ISerializableEntity;
 
 using Key = Entity::Key;
+using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
+using SharedSerializable = ISerializableEntity::SharedSerializable;
 
 namespace entity {
-
-using boost::property_tree::ptree;
 
 EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
 
@@ -45,7 +51,7 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
-	auto tree = serializationStructure_.put_child(searchPath, ptree());
+	pt::ptree& tree = serializationStructure_.put_child(searchPath, pt::ptree());
 
 	std::string relativePath = searchPath;
 	std::replace(relativePath.begin(), relativePath.end(), '.', '/');
@@ -54,8 +60,8 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 
 	entity.Save(tree, absolutePath);
 
-	auto members = entity.GetAggregatedMembers();
-	for (auto& m : members)
+	SerializableMemberMap members = entity.GetAggregatedMembers();
+	for (const std::pair<Key,SharedSerializable>& m : members)
 		SerializeWithParentKey(*m.second,searchPath);
 
 	if (parentKey.empty())

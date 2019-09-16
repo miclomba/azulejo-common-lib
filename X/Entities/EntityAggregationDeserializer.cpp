@@ -2,7 +2,9 @@
 
 #include <fstream>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -19,7 +21,7 @@ namespace
 {
 std::string GetKeyPath(const Key& key, const pt::ptree& tree)
 {
-	for (auto& keyValue : tree)
+	for (const std::pair<std::string, pt::ptree>& keyValue : tree)
 	{
 		std::string nodeKey = keyValue.first;
 		pt::ptree node = keyValue.second;
@@ -118,7 +120,7 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
-	auto tree = serializationStructure_.get_child_optional(searchPath);
+	boost::optional<pt::ptree&> tree = serializationStructure_.get_child_optional(searchPath);
 	if (!tree)
 	{
 		throw std::runtime_error("Cannot locate entity key in the deserialization json structure");
@@ -133,10 +135,10 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 		entity.Load(*tree, absolutePath);
 	}
 
-	for (auto& child : *tree)
+	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{
 		std::string key = child.first;
-		auto memberEntity = GenerateEntity(key);
+		std::unique_ptr<ISerializableEntity> memberEntity = GenerateEntity(key);
 		entity.AggregateMember(std::move(memberEntity));
 
 		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
