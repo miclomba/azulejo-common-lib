@@ -11,9 +11,13 @@
 
 namespace pt = boost::property_tree;
 
+using entity::Entity;
+
+using Key = Entity::Key;
+
 namespace
 {
-std::string GetKeyPath(const std::string& key, const pt::ptree& tree)
+std::string GetKeyPath(const Key& key, const pt::ptree& tree)
 {
 	for (auto& keyValue : tree)
 	{
@@ -85,12 +89,12 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
-bool EntityAggregationDeserializer::HasSerializationKey(const std::string& key) const
+bool EntityAggregationDeserializer::HasSerializationKey(const Key& key) const
 {
 	return !GetKeyPath(key, serializationStructure_).empty() ? true : false;
 }
 
-void EntityAggregationDeserializer::UnregisterEntity(const std::string& key)
+void EntityAggregationDeserializer::UnregisterEntity(const Key& key)
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
 		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDeserializer");
@@ -110,7 +114,7 @@ void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
 	DeserializeWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
-void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity& entity, const std::string& parentKey)
+void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity& entity, const Key& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
@@ -140,7 +144,7 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 	}
 }
 
-std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const std::string& key) const
+std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const Key& key) const
 {
 	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");

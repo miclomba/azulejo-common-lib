@@ -32,7 +32,7 @@ private:
 	EntityAggregationSerializer(EntityAggregationSerializer&&) = delete;
 	EntityAggregationSerializer& operator=(EntityAggregationSerializer&&) = delete;
 
-	void SerializeWithParentKey(const ISerializableEntity& entity, const std::string& parentKey = "");
+	void SerializeWithParentKey(const ISerializableEntity& entity, const Entity::Key& parentKey = "");
 
 	static EntityAggregationSerializer* instance_;
 

@@ -7,6 +7,10 @@
 
 #include "ISerializableEntity.h"
 
+using entity::Entity;
+
+using Key = Entity::Key;
+
 namespace entity {
 
 using boost::property_tree::ptree;
@@ -37,7 +41,7 @@ void EntityAggregationSerializer::Serialize(const ISerializableEntity& entity)
 	SerializeWithParentKey(entity, "");
 }
 
-void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEntity& entity, const std::string& parentKey)
+void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEntity& entity, const Key& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
