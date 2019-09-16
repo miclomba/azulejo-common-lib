@@ -2,6 +2,9 @@
 
 #include <filesystem>
 #include <fstream>
+#include <map>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,10 +17,12 @@
 #include "Entities/EntityAggregationSerializer.h"
 
 namespace fs = std::filesystem;
-using boost::property_tree::ptree;
+namespace pt = boost::property_tree;
 
 using entity::Entity;
 using entity::ISerializableEntity;
+using entity::EntityAggregationSerializer;
+using Key = entity::Entity::Key;
 using SerializableMemberMap = entity::ISerializableEntity::SerializableMemberMap;
 
 namespace
@@ -37,21 +42,21 @@ public:
 	~TypeA()
 	{
 		if (!path_.empty())
-			std::filesystem::remove(path_);
+			fs::remove(path_);
 	}
 
-	void AggregateProtectedMember(std::shared_ptr<Entity> entity) { AggregateMember(std::move(entity)); };
+	void AggregateProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
 	const SerializableMemberMap& GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
-	Entity& GetAggregatedProtectedMember(const std::string& key) { return *GetAggregatedMember(key); }
+	Entity& GetAggregatedProtectedMember(const Key& key) { return *GetAggregatedMember(key); }
 	const std::vector<Key> GetAggregatedProtectedMemberKeys() const { return GetAggregatedMemberKeys(); }
 
-	void Save(boost::property_tree::ptree& tree, const std::string& path) const override
+	void Save(pt::ptree& tree, const std::string& path) const override
 	{
 		path_ = path;
-		std::filesystem::create_directories(path);
+		fs::create_directories(path);
 	}
 
-	void Load(boost::property_tree::ptree& tree, const std::string& path) override
+	void Load(pt::ptree& tree, const std::string& path) override
 	{
 		EXPECT_TRUE(fs::exists(path));
 	}
@@ -60,7 +65,7 @@ private:
 	mutable std::string path_;
 };
 
-std::shared_ptr<TypeA> CreateEntity(const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
+std::shared_ptr<TypeA> CreateEntity(const Key& root, const std::string& intermediate = "", const Key& leaf = "")
 {
 	auto rootEntity = std::make_shared<TypeA>();
 	auto leafEntity = std::make_shared<TypeA>();
@@ -104,7 +109,7 @@ public:
 
 		// validate serialization
 		EXPECT_FALSE(fs::exists(jsonFile_));
-		for (auto& dir : directoryList_)
+		for (std::string& dir : directoryList_)
 			EXPECT_FALSE(fs::exists(fs::path(JSON_ROOT) / dir));
 
 		entity_ = CreateEntity(root, intermediate, leaf);
@@ -116,13 +121,13 @@ public:
 		{
 			// validate serialization
 			EXPECT_TRUE(fs::exists(jsonFile_));
-			for (auto& dir : directoryList_)
+			for (std::string& dir : directoryList_)
 				EXPECT_TRUE(fs::exists(fs::path(JSON_ROOT) / dir));
 
 			// cleanup serialization
 			fs::remove(jsonFile_);
 			EXPECT_FALSE(fs::exists(jsonFile_));
-			auto directories = fs::path(JSON_ROOT) / entity_->GetKey();
+			fs::path directories = fs::path(JSON_ROOT) / entity_->GetKey();
 			fs::remove_all(directories);
 			EXPECT_FALSE(fs::exists(directories));
 		}
@@ -150,7 +155,7 @@ private:
 TEST(EntityAggregationSerializer, GetInstance)
 {
 	EXPECT_NO_THROW(entity::EntityAggregationSerializer::GetInstance());
-	auto serializer = entity::EntityAggregationSerializer::GetInstance();
+	EntityAggregationSerializer* serializer = entity::EntityAggregationSerializer::GetInstance();
 	EXPECT_TRUE(serializer);
 	EXPECT_NO_THROW(entity::EntityAggregationSerializer::ResetInstance());
 }
@@ -164,7 +169,7 @@ TEST(EntityAggregationSerializer, SerializeFromRoot)
 {
 	Fixture fixture(true, ENTITY_1A, ENTITY_2A, ENTITY_1B);
 
-	auto serializer = entity::EntityAggregationSerializer::GetInstance();
+	EntityAggregationSerializer* serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -177,7 +182,7 @@ TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 {
 	Fixture fixture(true, ENTITY_2A, ENTITY_1B);
 
-	auto serializer = entity::EntityAggregationSerializer::GetInstance();
+	EntityAggregationSerializer* serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -190,7 +195,7 @@ TEST(EntityAggregationSerializer, SerializeFromLeaf)
 {
 	Fixture fixture(true, ENTITY_1B);
 
-	auto serializer = entity::EntityAggregationSerializer::GetInstance();
+	EntityAggregationSerializer* serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -203,7 +208,7 @@ TEST(EntityAggregationSerializer, SerializeFromNoKeyEntity)
 {
 	Fixture fixture(false, ENTITY_1B);
 
-	auto serializer = entity::EntityAggregationSerializer::GetInstance();
+	EntityAggregationSerializer* serializer = entity::EntityAggregationSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
 
