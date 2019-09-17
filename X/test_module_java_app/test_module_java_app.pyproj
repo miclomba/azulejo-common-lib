@@ -15,6 +15,7 @@
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>JAVA_HOME=C:\Program Files\Java\jdk1.8.0_211
 PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +41,9 @@ PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
       <Project>{8caf4564-52df-46d0-ad0f-7726cbac6758}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -1,4 +1,5 @@
 #requires jre/jdk-8u211-windows-x64
+#requires pip install (numpy, javabridge, wxPython)
 import javabridge
 import os
 import wx
