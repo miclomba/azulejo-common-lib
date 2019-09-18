@@ -92,9 +92,8 @@ std::vector<std::string> LocalSerializationPaths(const std::string& root, const 
 	return directories;
 }
 
-class EntityAggregationSerializerFixture 
+struct EntityAggregationSerializerFixture 
 {
-public:
 	EntityAggregationSerializerFixture(bool expectSerialization, const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
 	{
 		expectSerialization_ = expectSerialization;

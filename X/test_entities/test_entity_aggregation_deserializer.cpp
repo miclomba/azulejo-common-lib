@@ -114,9 +114,8 @@ void RemoveJSONFile(const std::string& jsonFile)
 	EXPECT_FALSE(fs::exists(jsonFile));
 }
 
-class EntityAggregationDeserializerFixture : public testing::Test
+struct EntityAggregationDeserializerFixture : public testing::Test
 {
-public:
 	EntityAggregationDeserializerFixture()
 	{
 		// create serialization structure

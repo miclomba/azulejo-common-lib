@@ -1,11 +1,14 @@
 #include <functional>
 #include <typeinfo>
+#include <string>
 
 #include "config.h"
 
 #include <gtest/gtest.h>
 
 #include "Events/EventConsumer.h"
+
+using events::EventConsumer;
 
 namespace
 {
@@ -15,12 +18,12 @@ const std::string SUBSCRIBER_TYPE = typeid(int(void)).name();
 
 TEST(EventConsumer, Construct) 
 {
-	EXPECT_NO_THROW(events::EventConsumer<int(void)> consumer(SUBSCRIBER));
+	EXPECT_NO_THROW(EventConsumer<int(void)> consumer(SUBSCRIBER));
 }
 
 TEST(EventConsumer, GetSubscriber) 
 {
-	events::EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
 	EXPECT_NO_THROW(consumer.GetSubscriber());
 
 	std::function<int(void)> subscriber = consumer.GetSubscriber();
@@ -29,7 +32,7 @@ TEST(EventConsumer, GetSubscriber)
 
 TEST(EventConsumer, GetSubscriberType)
 {
-	events::EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
 	
 	const std::string subscriberType = consumer.GetSubscriberType();
 

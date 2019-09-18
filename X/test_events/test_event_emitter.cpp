@@ -10,12 +10,14 @@
 #include "Events/EventConsumer.h"
 #include "Events/EventEmitter.h"
 
+using events::EventConsumer;
+using events::EventEmitter;
+
 namespace
 {
-class Consumer : public events::EventConsumer<void(void)>
+struct Consumer : public EventConsumer<void(void)>
 {
-public:
-	Consumer() : events::EventConsumer<void(void)>([this]() { this->count_++; }) {};
+	Consumer() : EventConsumer<void(void)>([this]() { this->count_++; }) {};
 	~Consumer() = default;
 
 	int GetCount() const { return count_; }
@@ -28,7 +30,7 @@ TEST(EventEmitter, Connect)
 {
 	auto consumer = std::make_shared<Consumer>();
 
-	events::EventEmitter<void(void)> emitter;
+	EventEmitter<void(void)> emitter;
 	boost::signals2::connection conn = emitter.Connect(consumer);
 	EXPECT_TRUE(conn.connected());
 }
@@ -37,7 +39,7 @@ TEST(EventEmitter, DisconnectConsumer)
 {
 	auto consumer = std::make_shared<Consumer>();
 
-	events::EventEmitter<void(void)> emitter;
+	EventEmitter<void(void)> emitter;
 	boost::signals2::connection conn = emitter.Connect(consumer);
 	EXPECT_TRUE(conn.connected());
 
@@ -51,7 +53,7 @@ TEST(EventEmitter, DisconnectEmitter)
 
 	boost::signals2::connection conn;
 	{
-		events::EventEmitter<void(void)> emitter;
+		EventEmitter<void(void)> emitter;
 		conn = emitter.Connect(consumer);
 		EXPECT_TRUE(conn.connected());
 	}
@@ -63,7 +65,7 @@ TEST(EventEmitter, GetSubscriberType)
 	auto consumer = std::make_shared<Consumer>();
 	std::string consumerSubscriberType = consumer->GetSubscriberType();
 
-	events::EventEmitter<void(void)> emitter;
+	EventEmitter<void(void)> emitter;
 	std::string emitterSubscriberType = emitter.GetSubscriberType();
 
 	EXPECT_NO_THROW(emitter.Connect(consumer));
@@ -74,7 +76,7 @@ TEST(EventEmitter, Signal)
 {
 	auto consumer = std::make_shared<Consumer>();
 
-	events::EventEmitter<void(void)> emitter;
+	EventEmitter<void(void)> emitter;
 	emitter.Connect(consumer);
 
 	int count = consumer->GetCount();
