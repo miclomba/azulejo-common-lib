@@ -33,7 +33,6 @@ const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";
 const std::string ENTITY_1B = "entity_1b";
-const std::string VALUE = "value";
 
 struct TypeA : public ISerializableEntity
 {
@@ -93,10 +92,10 @@ std::vector<std::string> LocalSerializationPaths(const std::string& root, const 
 	return directories;
 }
 
-class Fixture
+class EntityAggregationSerializerFixture 
 {
 public:
-	Fixture(bool expectSerialization, const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
+	EntityAggregationSerializerFixture(bool expectSerialization, const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
 	{
 		expectSerialization_ = expectSerialization;
 
@@ -112,7 +111,7 @@ public:
 		entity_ = CreateEntity(root, intermediate, leaf);
 	}
 
-	~Fixture()
+	~EntityAggregationSerializerFixture()
 	{
 		if (expectSerialization_)
 		{
@@ -162,9 +161,23 @@ TEST(EntityAggregationSerializer, ResetInstance)
 	EXPECT_NO_THROW(EntityAggregationSerializer::ResetInstance());
 }
 
+TEST(EntityAggregationSerializer, SetSerializationPath)
+{
+	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EXPECT_NO_THROW(serializer->SetSerializationPath(JSON_ROOT));
+	EXPECT_TRUE(serializer->GetSerializationPath() == JSON_ROOT);
+}
+
+TEST(EntityAggregationSerializer, GetSerializationPath)
+{
+	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	serializer->SetSerializationPath(JSON_ROOT);
+	EXPECT_TRUE(serializer->GetSerializationPath() == JSON_ROOT);
+}
+
 TEST(EntityAggregationSerializer, SerializeFromRoot)
 {
-	Fixture fixture(true, ENTITY_1A, ENTITY_2A, ENTITY_1B);
+	EntityAggregationSerializerFixture fixture(true, ENTITY_1A, ENTITY_2A, ENTITY_1B);
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
@@ -177,7 +190,7 @@ TEST(EntityAggregationSerializer, SerializeFromRoot)
 
 TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 {
-	Fixture fixture(true, ENTITY_2A, ENTITY_1B);
+	EntityAggregationSerializerFixture fixture(true, ENTITY_2A, ENTITY_1B);
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
@@ -190,7 +203,7 @@ TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 
 TEST(EntityAggregationSerializer, SerializeFromLeaf)
 {
-	Fixture fixture(true, ENTITY_1B);
+	EntityAggregationSerializerFixture fixture(true, ENTITY_1B);
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
@@ -201,9 +214,9 @@ TEST(EntityAggregationSerializer, SerializeFromLeaf)
 	EntityAggregationSerializer::ResetInstance();
 }
 
-TEST(EntityAggregationSerializer, SerializeFromNoKeyEntity)
+TEST(EntityAggregationSerializer, SerializeThrows)
 {
-	Fixture fixture(false, ENTITY_1B);
+	EntityAggregationSerializerFixture fixture(false, ENTITY_1B);
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 

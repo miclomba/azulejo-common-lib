@@ -68,17 +68,6 @@ private:
 	mutable std::string path_;
 };
 
-std::vector<std::string> LocalSerializationPaths()
-{
-	std::vector<std::string> directories;
-
-	directories.push_back(ENTITY_1A);
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A).string());
-	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A / ENTITY_1B).string());
-
-	return directories;
-}
-
 std::vector<std::string> CreateEntityFile(const std::string& filePath)
 {
 	std::vector<std::string> directories;
@@ -125,10 +114,10 @@ void RemoveJSONFile(const std::string& jsonFile)
 	EXPECT_FALSE(fs::exists(jsonFile));
 }
 
-class EntityAggregationDeserialization : public testing::Test
+class EntityAggregationDeserializerFixture : public testing::Test
 {
 public:
-	EntityAggregationDeserialization()
+	EntityAggregationDeserializerFixture()
 	{
 		// create serialization structure
 		jsonFile_ = (fs::path(JSON_ROOT) / JSON_FILE).string();
@@ -146,7 +135,7 @@ public:
 		}
 	}
 
-	~EntityAggregationDeserialization()
+	~EntityAggregationDeserializerFixture()
 	{
 		// cleanup serialization
 		fs::remove(jsonFile_);
@@ -218,7 +207,7 @@ TEST(EntityAggregationDeserializer, HasSerializationStructure)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, HasSerializationKeyFalse)
+TEST(EntityAggregationDeserializer, HasSerializationKeyFalse)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -227,7 +216,7 @@ TEST_F(EntityAggregationDeserialization, HasSerializationKeyFalse)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, HasSerializationKeyTrue)
+TEST(EntityAggregationDeserializer, HasSerializationKeyTrue)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -237,7 +226,7 @@ TEST_F(EntityAggregationDeserialization, HasSerializationKeyTrue)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, RegisterEntity)
+TEST(EntityAggregationDeserializer, RegisterEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -248,7 +237,7 @@ TEST_F(EntityAggregationDeserialization, RegisterEntity)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingEmptyKey)
+TEST(EntityAggregationDeserializer, RegisterEntityThrowsUsingEmptyKey)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -257,7 +246,7 @@ TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingEmptyKey)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingDuplicateKey)
+TEST(EntityAggregationDeserializer, RegisterEntityThrowsUsingDuplicateKey)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -269,7 +258,7 @@ TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingDuplicateKey)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, UnregisterEntity)
+TEST(EntityAggregationDeserializer, UnregisterEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -282,7 +271,7 @@ TEST_F(EntityAggregationDeserialization, UnregisterEntity)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, UnregisterEntityThrows)
+TEST(EntityAggregationDeserializer, UnregisterEntityThrows)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -292,7 +281,7 @@ TEST_F(EntityAggregationDeserialization, UnregisterEntityThrows)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, GenerateEntity)
+TEST(EntityAggregationDeserializer, GenerateEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -304,7 +293,7 @@ TEST_F(EntityAggregationDeserialization, GenerateEntity)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, GenerateEntityThrows)
+TEST(EntityAggregationDeserializer, GenerateEntityThrows)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -314,7 +303,7 @@ TEST_F(EntityAggregationDeserialization, GenerateEntityThrows)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeRoot)
+TEST_F(EntityAggregationDeserializerFixture, DeserializeRoot)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -345,7 +334,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeRoot)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeIntermediate)
+TEST_F(EntityAggregationDeserializerFixture, DeserializeIntermediate)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -370,7 +359,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeIntermediate)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeLeaf)
+TEST_F(EntityAggregationDeserializerFixture, DeserializeLeaf)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -392,7 +381,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeLeaf)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithoutSerializationStructure)
+TEST(EntityAggregationDeserializer, DeserializeThrowsWithoutSerializationStructure)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -401,7 +390,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithoutSerializationSt
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithBadKey)
+TEST_F(EntityAggregationDeserializerFixture, DeserializeThrowsWithBadKey)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -414,7 +403,7 @@ TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithBadKey)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, LazyLoadEntity)
+TEST_F(EntityAggregationDeserializerFixture, LazyLoadEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -437,7 +426,7 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntity)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, LazyLoadEntityWithoutSerialization)
+TEST_F(EntityAggregationDeserializerFixture, LazyLoadEntityWithoutSerialization)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
