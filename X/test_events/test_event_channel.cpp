@@ -36,7 +36,7 @@ struct Channel : public EventChannel
 		return EventChannel::IsConsumerRegistered(consumerKey, emitterKey); 
 	};
 };
-}
+} // end namespace
 
 TEST(EventChannel, ThrowOnRegisterEmitter) {
 

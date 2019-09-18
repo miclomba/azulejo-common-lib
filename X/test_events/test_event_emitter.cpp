@@ -24,7 +24,7 @@ struct Consumer : public EventConsumer<void(void)>
 private:
 	int count_ = 0;
 };
-}
+} // end namespace
 
 TEST(EventEmitter, Connect) 
 {

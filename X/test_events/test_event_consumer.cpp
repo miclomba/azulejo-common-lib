@@ -14,7 +14,7 @@ namespace
 {
 std::function<int(void)> SUBSCRIBER = [] () { return 7; };
 const std::string SUBSCRIBER_TYPE = typeid(int(void)).name();
-}
+} // end namespace
 
 TEST(EventConsumer, Construct) 
 {
