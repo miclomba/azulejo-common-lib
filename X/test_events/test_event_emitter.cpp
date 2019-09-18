@@ -1,5 +1,6 @@
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 
@@ -33,6 +34,12 @@ TEST(EventEmitter, Connect)
 	EventEmitter<void(void)> emitter;
 	boost::signals2::connection conn = emitter.Connect(consumer);
 	EXPECT_TRUE(conn.connected());
+}
+
+TEST(EventEmitter, ConnectThrows)
+{
+	EventEmitter<void(void)> emitter;
+	EXPECT_THROW(emitter.Connect(nullptr), std::runtime_error);
 }
 
 TEST(EventEmitter, DisconnectConsumer)
