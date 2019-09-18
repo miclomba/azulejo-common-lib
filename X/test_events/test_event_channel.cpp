@@ -38,7 +38,17 @@ struct Channel : public EventChannel
 };
 } // end namespace
 
-TEST(EventChannel, ThrowOnRegisterEmitter) {
+TEST(EventChannel, RegisterEmitter) {
+
+	Channel channel;
+	auto emitter = std::make_shared<EventEmitter<void()>>();
+
+	EXPECT_FALSE(channel.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_NO_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter));
+	EXPECT_TRUE(channel.IsEmitterRegistered(EMITTER_KEY));
+}
+
+TEST(EventChannel, RegisterEmitterThrows) {
 
 	Channel channel;
 	auto emitter = std::make_shared<EventEmitter<void()>>();
@@ -52,16 +62,6 @@ TEST(EventChannel, ThrowOnRegisterEmitter) {
 	EXPECT_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter), std::runtime_error);
 }
 
-TEST(EventChannel, RegisterEmitter) {
-
-	Channel channel;
-	auto emitter = std::make_shared<EventEmitter<void()>>();
-
-	EXPECT_FALSE(channel.IsEmitterRegistered(EMITTER_KEY));
-	EXPECT_NO_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter));
-	EXPECT_TRUE(channel.IsEmitterRegistered(EMITTER_KEY));
-}
-
 TEST(EventChannel, RegisterEmitterWithExistingConsumer) {
 
 	Channel channel;
@@ -71,8 +71,8 @@ TEST(EventChannel, RegisterEmitterWithExistingConsumer) {
 
 	auto emitter = std::make_shared<EventEmitter<void()>>();
 	const s2::signal<void()>& signal = emitter->Signal();
-	EXPECT_TRUE(signal.empty());
 
+	EXPECT_TRUE(signal.empty());
 	EXPECT_FALSE(channel.IsEmitterRegistered(EMITTER_KEY));
 	EXPECT_NO_THROW(channel.RegisterEmitter(EMITTER_KEY, emitter));
 	EXPECT_TRUE(channel.IsEmitterRegistered(EMITTER_KEY));
@@ -96,14 +96,6 @@ TEST(EventChannel, RegisterEmitterWithNonExistingConsumer) {
 	EXPECT_TRUE(signal.empty());
 }
 
-TEST(EventChannel, ThrowOnUnregisterEmitter) {
-
-	Channel channel;
-
-	EXPECT_THROW(channel.UnregisterEmitter(""), std::invalid_argument);
-	EXPECT_THROW(channel.UnregisterEmitter(EMITTER_KEY), std::runtime_error);
-}
-
 TEST(EventChannel, UnregisterEmitter) {
 
 	Channel channel;
@@ -113,6 +105,14 @@ TEST(EventChannel, UnregisterEmitter) {
 	EXPECT_TRUE(channel.IsEmitterRegistered(EMITTER_KEY));
 	EXPECT_NO_THROW(channel.UnregisterEmitter(EMITTER_KEY));
 	EXPECT_FALSE(channel.IsEmitterRegistered(EMITTER_KEY));
+}
+
+TEST(EventChannel, UnregisterEmitterThrows) {
+
+	Channel channel;
+
+	EXPECT_THROW(channel.UnregisterEmitter(""), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterEmitter(EMITTER_KEY), std::runtime_error);
 }
 
 TEST(EventChannel, RegisterConsumer) {
@@ -126,7 +126,7 @@ TEST(EventChannel, RegisterConsumer) {
 	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
 
-TEST(EventChannel, ThrowOnRegisterConsumer) {
+TEST(EventChannel, RegisterConsumerThrows) {
 
 	Channel channel;
 
@@ -143,6 +143,29 @@ TEST(EventChannel, ThrowOnRegisterConsumer) {
 	EXPECT_NO_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer));
 	// register an already registered consumer
 	EXPECT_THROW(channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer), std::runtime_error);
+}
+
+TEST(EventChannel, UnregisterConsumer) {
+
+	Channel channel;
+
+	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
+
+	channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
+	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+	EXPECT_NO_THROW(channel.UnregisterConsumer(CONSUMER_KEY, EMITTER_KEY));
+	EXPECT_FALSE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+}
+
+TEST(EventChannel, UnregisterConsumerThrows) {
+
+	Channel channel;
+
+	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY, ""), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterConsumer("", EMITTER_KEY), std::invalid_argument);
+	EXPECT_THROW(channel.UnregisterConsumer("", ""), std::invalid_argument);
+
+	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY, EMITTER_KEY), std::runtime_error);
 }
 
 TEST(EventChannel, RegisterConsumerWithExistingEmitter) {
@@ -166,37 +189,9 @@ TEST(EventChannel, RegisterConsumerWithNonExistingEmitter) {
 
 	Channel channel;
 
-	auto emitter = std::make_shared<EventEmitter<void()>>();
-	const s2::signal<void()>& signal = emitter->Signal();
-	EXPECT_TRUE(signal.empty());
-
 	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
 
 	EXPECT_FALSE(channel.IsConsumerRegistered(CONSUMER_KEY, INVALID_KEY));
 	EXPECT_NO_THROW(channel.RegisterConsumer(CONSUMER_KEY, INVALID_KEY, consumer));
 	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, INVALID_KEY));
-	EXPECT_TRUE(signal.empty());
-}
-
-TEST(EventChannel, ThrowOnUnregisterConsumer) {
-
-	Channel channel;
-
-	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY,""), std::invalid_argument);
-	EXPECT_THROW(channel.UnregisterConsumer("",EMITTER_KEY), std::invalid_argument);
-	EXPECT_THROW(channel.UnregisterConsumer("",""), std::invalid_argument);
-
-	EXPECT_THROW(channel.UnregisterConsumer(CONSUMER_KEY,EMITTER_KEY), std::runtime_error);
-}
-
-TEST(EventChannel, UnregisterConsumer) {
-
-	Channel channel;
-
-	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
-
-	channel.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
-	EXPECT_TRUE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
-	EXPECT_NO_THROW(channel.UnregisterConsumer(CONSUMER_KEY, EMITTER_KEY));
-	EXPECT_FALSE(channel.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
