@@ -25,6 +25,7 @@ using entity::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
+using SharedSerializable = ISerializableEntity::SharedSerializable;
 using SerializationMembersMap = ISerializableEntity::SerializableMemberMap;
 
 namespace
@@ -110,6 +111,20 @@ std::shared_ptr<TypeA> CreateEntityWithUnloadedMember(const Key& root, const Key
 	return rootEntity;
 }
 
+std::string CreateJSONFile()
+{
+	std::string jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
+	CreateEntityFile(jsonFile);
+	EXPECT_TRUE(fs::exists(jsonFile));
+	return jsonFile;
+}
+
+void RemoveJSONFile(const std::string& jsonFile)
+{
+	fs::remove(jsonFile);
+	EXPECT_FALSE(fs::exists(jsonFile));
+}
+
 class EntityAggregationDeserialization : public testing::Test
 {
 public:
@@ -169,37 +184,110 @@ TEST(EntityAggregationDeserializer, LoadSerializationStructure)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
+	std::string jsonFile = CreateJSONFile(); 
+
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
+
+	RemoveJSONFile(jsonFile);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST(EntityAggregationDeserializer, LoadSerializationStructureThrows)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
 	std::string jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
 	EXPECT_FALSE(fs::exists(jsonFile));
 
 	EXPECT_THROW(deserializer->LoadSerializationStructure(jsonFile), std::runtime_error);
-
-	CreateEntityFile(jsonFile);
-	EXPECT_TRUE(fs::exists(jsonFile));
-
-	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
-
-	fs::remove(jsonFile);
-	EXPECT_FALSE(fs::exists(jsonFile));
-
-	EntityAggregationDeserializer::ResetInstance();
 }
 
 TEST(EntityAggregationDeserializer, HasSerializationStructure)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	std::string jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
-	EXPECT_FALSE(fs::exists(jsonFile));
-	CreateEntityFile(jsonFile);
-	EXPECT_TRUE(fs::exists(jsonFile));
+	std::string jsonFile = CreateJSONFile(); 
 
 	EXPECT_FALSE(deserializer->HasSerializationStructure());
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
 	EXPECT_TRUE(deserializer->HasSerializationStructure());
 
-	fs::remove(jsonFile);
-	EXPECT_FALSE(fs::exists(jsonFile));
+	RemoveJSONFile(jsonFile);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, HasSerializationKeyFalse)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, HasSerializationKeyTrue)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, RegisterEntity)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingEmptyKey)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->RegisterEntity<TypeA>(""), std::runtime_error);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, RegisterEntityThrowsUsingDuplicateKey)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A), std::runtime_error);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, UnregisterEntity)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->UnregisterEntity(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, UnregisterEntityThrows)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_THROW(deserializer->UnregisterEntity(ENTITY_1A), std::runtime_error);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -211,43 +299,17 @@ TEST_F(EntityAggregationDeserialization, GenerateEntity)
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(ENTITY_1A);
 	EXPECT_TRUE(entity);
+	EXPECT_TRUE(entity->GetKey() == ENTITY_1A);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, RegisterEntity)
+TEST_F(EntityAggregationDeserialization, GenerateEntityThrows)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-
-	EntityAggregationDeserializer::ResetInstance();
-}
-
-TEST_F(EntityAggregationDeserialization, ThrowOnRegisterEntity)
-{
-	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-
-	EXPECT_THROW(deserializer->RegisterEntity<TypeA>(""), std::runtime_error);
-
-	EntityAggregationDeserializer::ResetInstance();
-}
-
-TEST_F(EntityAggregationDeserialization, UnregisterEntity)
-{
-	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-
-	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_NO_THROW(deserializer->UnregisterEntity(ENTITY_1A));
-
-	EntityAggregationDeserializer::ResetInstance();
-}
-
-TEST_F(EntityAggregationDeserialization, ThrowOnUnregisterEntity)
-{
-	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-
-	EXPECT_THROW(deserializer->UnregisterEntity(ENTITY_1A), std::runtime_error);
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_THROW(deserializer->GenerateEntity(ENTITY_1A), std::runtime_error);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -256,21 +318,29 @@ TEST_F(EntityAggregationDeserialization, DeserializeRoot)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
-	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
-
-	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// deserialize an entity
 	TypeA entity1a;
 	entity1a.SetKey(ENTITY_1A);
 	EXPECT_NO_THROW(deserializer->Deserialize(entity1a));
+
+	// verify
+	SerializationMembersMap membersMap = entity1a.GetAggregatedProtectedMembers();
+	EXPECT_TRUE(membersMap.size() == size_t(1));
+	auto entity2a = std::static_pointer_cast<TypeA>(entity1a.GetAggregatedProtectedMember(ENTITY_2A));
+	EXPECT_TRUE(entity2a);
+	EXPECT_TRUE(entity2a->GetKey() == ENTITY_2A);
+
+	membersMap = entity2a->GetAggregatedProtectedMembers();
+	EXPECT_TRUE(membersMap.size() == size_t(1));
+	auto entity1b = std::static_pointer_cast<TypeA>(entity2a->GetAggregatedProtectedMember(ENTITY_1B));
+	EXPECT_TRUE(entity1b);
+	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -279,21 +349,23 @@ TEST_F(EntityAggregationDeserialization, DeserializeIntermediate)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
-	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
-
-	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// deserialize an entity
 	TypeA entity2a;
 	entity2a.SetKey(ENTITY_2A);
 	EXPECT_NO_THROW(deserializer->Deserialize(entity2a));
+
+	// verify
+	SerializationMembersMap membersMap = entity2a.GetAggregatedProtectedMembers();
+	EXPECT_TRUE(membersMap.size() == size_t(1));
+	auto entity1b = std::static_pointer_cast<TypeA>(entity2a.GetAggregatedProtectedMember(ENTITY_1B));
+	EXPECT_TRUE(entity1b);
+	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -302,15 +374,10 @@ TEST_F(EntityAggregationDeserialization, DeserializeLeaf)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
-	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
-
-	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// deserialize an entity
@@ -318,25 +385,28 @@ TEST_F(EntityAggregationDeserialization, DeserializeLeaf)
 	entity1b.SetKey(ENTITY_1B);
 	EXPECT_NO_THROW(deserializer->Deserialize(entity1b));
 
+	// verify
+	SerializationMembersMap membersMap = entity1b.GetAggregatedProtectedMembers();
+	EXPECT_TRUE(membersMap.empty());
+
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserialization, DeserializeBadKey)
+TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithoutSerializationStructure)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
-	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
-	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
-	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
-
-	// try to deserialize without a serialization structure
 	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
 
-	// load serialization structure
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST_F(EntityAggregationDeserialization, DeserializeThrowsWithBadKey)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
-	// deserialize an entity
 	TypeA badEntity;
 	badEntity.SetKey(BAD_KEY);
 	EXPECT_THROW(deserializer->Deserialize(badEntity), std::runtime_error);
@@ -348,15 +418,10 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
-	// try to deserialize without a serialization structure
-	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
-
-	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// Create entity with unloaded member
@@ -376,12 +441,10 @@ TEST_F(EntityAggregationDeserialization, LazyLoadEntityWithoutSerialization)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	// register deserialization types
 	deserializer->RegisterEntity<TypeA>(ENTITY_1A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_2A);
 	deserializer->RegisterEntity<TypeA>(ENTITY_1B);
 
-	// load serialization structure
 	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(GetJSONFile()));
 
 	// Create entity with unloaded member

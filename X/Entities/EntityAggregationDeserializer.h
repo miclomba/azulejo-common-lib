@@ -24,16 +24,18 @@ public:
 	static EntityAggregationDeserializer* GetInstance();
 	static void ResetInstance();
 
+	// structure
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
-	bool HasSerializationKey(const Entity::Key& key) const;
 
-	void Deserialize(ISerializableEntity& entity);
-
+	// registration
 	template<typename T>
 	void RegisterEntity(const Entity::Key& key);
 	void UnregisterEntity(const Entity::Key& key);
+	bool HasSerializationKey(const Entity::Key& key) const;
 
+	// deserialization & generation
+	void Deserialize(ISerializableEntity& entity);
 	std::unique_ptr<ISerializableEntity> GenerateEntity(const Entity::Key& key) const;
 
 private:

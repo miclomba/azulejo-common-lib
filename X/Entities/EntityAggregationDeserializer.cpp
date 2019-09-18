@@ -93,7 +93,7 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 
 bool EntityAggregationDeserializer::HasSerializationKey(const Key& key) const
 {
-	return !GetKeyPath(key, serializationStructure_).empty() ? true : false;
+	return keyToEntityMap_.find(key) != keyToEntityMap_.cend();
 }
 
 void EntityAggregationDeserializer::UnregisterEntity(const Key& key)
@@ -102,6 +102,17 @@ void EntityAggregationDeserializer::UnregisterEntity(const Key& key)
 		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDeserializer");
 
 	keyToEntityMap_.erase(key);
+}
+
+std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const Key& key) const
+{
+	if (!HasSerializationKey(key))
+		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");
+
+	std::unique_ptr<ISerializableEntity> entity = keyToEntityMap_[key]();
+	entity->SetKey(key);
+
+	return std::move(entity);
 }
 
 void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
@@ -144,17 +155,6 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
 		DeserializeWithParentKey(*childEntity, searchPath);
 	}
-}
-
-std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const Key& key) const
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
-		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");
-
-	std::unique_ptr<ISerializableEntity> entity = keyToEntityMap_[key]();
-	entity->SetKey(key);
-
-	return std::move(entity);
 }
 
 } // end namespace entity
