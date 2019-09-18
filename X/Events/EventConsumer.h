@@ -2,6 +2,8 @@
 #define events_event_consumer_h
 
 #include <functional>
+#include <string>
+#include <typeinfo>
 
 #include "config.h"
 

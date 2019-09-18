@@ -1,8 +1,6 @@
 #ifndef events_event_emitter_h
 #define events_event_emitter_h
 
-#include <functional>
-#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>

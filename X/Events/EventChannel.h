@@ -1,7 +1,6 @@
 #ifndef events_event_channel_h
 #define events_event_channel_h
 
-#include <functional>
 #include <map>
 #include <memory>
 #include <string>

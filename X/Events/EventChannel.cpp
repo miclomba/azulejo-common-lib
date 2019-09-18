@@ -1,6 +1,5 @@
 #include "EventChannel.h"
 
-#include <functional>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -66,7 +65,7 @@ void EventChannel::RegisterConsumer(const std::string& consumerKey, const std::s
 	if (!consumer)
 		throw std::invalid_argument("Cannot register NULL consumer in EventChannel.");
 
-	auto key = std::make_pair(consumerKey, emitterKey);
+	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
 	if (IsConsumerRegistered(consumerKey, emitterKey))
 		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is already registered in this EventChannel");
 
@@ -89,7 +88,7 @@ void EventChannel::UnregisterConsumer(const std::string& consumerKey, const std:
 	if (consumerKey.empty() || emitterKey.empty())
 		throw std::invalid_argument("Cannot unregister consumer with empty key in EventChannel.");
 
-	auto key = std::make_pair(consumerKey, emitterKey);
+	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
 	if (!IsConsumerRegistered(consumerKey, emitterKey))
 		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is not registered in this EventChannel");
 	consumerMap_.erase(key);
@@ -97,7 +96,7 @@ void EventChannel::UnregisterConsumer(const std::string& consumerKey, const std:
 
 bool EventChannel::IsConsumerRegistered(const std::string& consumerKey, const std::string& emitterKey) const
 {
-	auto key = std::make_pair(consumerKey, emitterKey);
+	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
 	return consumerMap_.find(key) != consumerMap_.cend() ? true : false;
 }
 

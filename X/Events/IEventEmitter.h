@@ -1,7 +1,6 @@
 #ifndef events_ievent_emitter_h
 #define events_ievent_emitter_h
 
-#include <map>
 #include <memory>
 #include <string>
 
