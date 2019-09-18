@@ -48,7 +48,7 @@
     <ClCompile Include="test_server_entity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ClientServer.h" />
+    <ClInclude Include="Client.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
