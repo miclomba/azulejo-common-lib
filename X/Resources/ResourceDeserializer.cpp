@@ -47,6 +47,8 @@ std::string ResourceDeserializer::GetSerializationPath() const
 
 void ResourceDeserializer::UnregisterResource(const std::string& key)
 {
+	if (key.empty())
+		throw std::runtime_error("Key (" + key + ") is empty when unregistering resource with ResourceDeserializer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDeserializer");
 

@@ -2,6 +2,9 @@
 template<typename T>
 void ResourceSerializer::Serialize(const Resource<T>& resource, const std::string& key)
 {
+	if (key.empty())
+		throw std::runtime_error("Cannot serialize resource with empty key");
+
 	const std::string RESOURCE_EXT = ".bin";
 
 	auto serializationPath = fs::path(GetSerializationPath());

@@ -68,6 +68,15 @@ TEST(ResourceSerializer, GetSerializationPath)
 	ResourceSerializer::ResetInstance();
 }
 
+TEST(ResourceSerializer, GetSerializationPathThrows)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	EXPECT_THROW(serializer->GetSerializationPath(), std::runtime_error);
+
+	ResourceSerializer::ResetInstance();
+}
+
 TEST(ResourceSerializer, Serialize)
 {
 	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
@@ -88,7 +97,19 @@ TEST(ResourceSerializer, Serialize)
 	ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceSerializer, ThrowOnSerializeWithoutSerializationPath)
+TEST(ResourceSerializer, SerializeThrowsUsingEmptyKey)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+
+	ContainerResource resource(INT_VALUES);
+	EXPECT_THROW(serializer->Serialize(resource, ""), std::runtime_error);
+
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
 {
 	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
