@@ -114,3 +114,11 @@ TEST(Resource, Assign)
 	ir.Assign(reinterpret_cast<const char*>(INT_VALUES.data()), INT_VALUES.size() * sizeof(int));
 	EXPECT_EQ(ir.Data(), INT_VALUES);
 }
+
+TEST(Resource, AssignThrows)
+{
+	ContainerResource ir;
+
+	EXPECT_THROW(ir.Assign(nullptr, INT_VALUES.size() * sizeof(int)), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES.data()), 0), std::runtime_error);
+}
