@@ -17,7 +17,7 @@ using resource::ResourceSerializer;
 
 namespace
 {
-const std::string RESOURCE_ROOT = "C:/users/miclomba/Downloads"; 
+const std::string RESOURCE_ROOT = (fs::path("C:/") / "users" / "miclomba" / "Downloads").string(); 
 const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
