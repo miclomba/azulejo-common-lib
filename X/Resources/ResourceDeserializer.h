@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 
@@ -48,7 +49,6 @@ private:
 };
 
 #include "ResourceDeserializer.hpp"
-
 } // end namespace resource
 
 #endif // resource_resourcedeserializer_h

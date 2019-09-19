@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-#include <array>
 #include <vector>
 
 #include <gtest/gtest.h>

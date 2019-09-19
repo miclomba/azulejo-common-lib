@@ -1,5 +1,6 @@
 #include "ResourceSerializer.h"
 
+#include <stdexcept>
 #include <string>
 
 #include "Resource.h"
