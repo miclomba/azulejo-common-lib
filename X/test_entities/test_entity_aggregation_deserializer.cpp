@@ -28,9 +28,15 @@ using SharedEntity = Entity::SharedEntity;
 using SharedSerializable = ISerializableEntity::SharedSerializable;
 using SerializationMembersMap = ISerializableEntity::SerializableMemberMap;
 
+#ifdef _WIN32
+#define ROOT "C:/"
+#else
+#define ROOT "/"
+#endif
+
 namespace
 {
-const std::string JSON_ROOT = (fs::path("C:/") / "users" / "miclomba" / "Downloads").string(); 
+const std::string JSON_ROOT = (fs::path(ROOT) / "users" / "miclomba" / "Downloads").string(); 
 const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";

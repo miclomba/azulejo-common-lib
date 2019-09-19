@@ -15,9 +15,15 @@ namespace fs = std::filesystem;
 using resource::Resource;
 using resource::ResourceSerializer;
 
+#ifdef _WIN32
+#define ROOT "C:/"
+#else
+#define ROOT "/"
+#endif
+
 namespace
 {
-const std::string RESOURCE_ROOT = (fs::path("C:/") / "users" / "miclomba" / "Downloads").string(); 
+const std::string RESOURCE_ROOT = (fs::path(ROOT) / "users" / "miclomba" / "Downloads").string(); 
 const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
