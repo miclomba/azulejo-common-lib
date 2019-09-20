@@ -50,26 +50,9 @@ struct TypeA : public Entity
 };
 } // end namespace anonymous
 
-TEST(Entity, GetKey)
+TEST(Entity, Construct)
 {
-	TypeA obj(KEY, MEMBER_KEY);
-	Key key = obj.GetKey();
-	EXPECT_EQ(key, KEY);
-}
-
-TEST(Entity, GetKeyFromConst)
-{
-	const TypeA obj(KEY, MEMBER_KEY);
-	Key key = obj.GetKey();
-	EXPECT_EQ(key, KEY);
-}
-
-TEST(Entity, SetKey)
-{
-	TypeA obj(KEY, MEMBER_KEY);
-	obj.SetKey(MEMBER_KEY);
-	Key key = obj.GetKey();
-	EXPECT_EQ(key, MEMBER_KEY);
+	EXPECT_NO_THROW(TypeB entity);
 }
 
 TEST(Entity, MoveConstruct)
@@ -123,6 +106,28 @@ TEST(Entity, CopyAssign)
 
 	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
 	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
+}
+
+TEST(Entity, GetKey)
+{
+	TypeA obj(KEY, MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, KEY);
+}
+
+TEST(Entity, GetKeyFromConst)
+{
+	const TypeA obj(KEY, MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, KEY);
+}
+
+TEST(Entity, SetKey)
+{
+	TypeA obj(KEY, MEMBER_KEY);
+	obj.SetKey(MEMBER_KEY);
+	Key key = obj.GetKey();
+	EXPECT_EQ(key, MEMBER_KEY);
 }
 
 TEST(Entity, AggregateMember)

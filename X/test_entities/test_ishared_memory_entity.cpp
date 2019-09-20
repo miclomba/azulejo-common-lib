@@ -24,6 +24,11 @@ struct ShareableCreator : public ISharedMemoryEntity {};
 struct ShareableAccessor : public ISharedMemoryEntity {};
 } // end namespace anonymous
 
+TEST(ISharedMemoryEntity, Construct)
+{
+	EXPECT_NO_THROW(ShareableCreator shareable());
+}
+
 TEST(ISharedMemoryEntity, CopyConstruct)
 {
 	ShareableCreator shareable;

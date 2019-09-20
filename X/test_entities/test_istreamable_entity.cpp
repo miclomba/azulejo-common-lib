@@ -55,6 +55,11 @@ struct TypeA : public IStreamableEntity
 struct TypeC : public Entity {};
 } // end namespace anonymous
 
+TEST(IStreamableEntity, Construct)
+{
+	EXPECT_NO_THROW(TypeA streamable());
+}
+
 TEST(IStreamableEntity, CopyConstruct)
 {
 	TypeA streamable;

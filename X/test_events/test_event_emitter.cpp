@@ -27,6 +27,11 @@ private:
 };
 } // end namespace
 
+TEST(EventEmitter, Construct)
+{
+	EXPECT_NO_THROW(EventEmitter<void(void)> emitter);
+}
+
 TEST(EventEmitter, MoveConstruct)
 {
 	EventEmitter<void(void)> emitter;

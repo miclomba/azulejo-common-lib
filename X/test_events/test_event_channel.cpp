@@ -38,6 +38,11 @@ struct Channel : public EventChannel
 };
 } // end namespace
 
+TEST(EventChannel, Construct)
+{
+	EXPECT_NO_THROW(Channel channel);
+}
+
 TEST(EventChannel, CopyConstruct)
 {
 	Channel channel;
