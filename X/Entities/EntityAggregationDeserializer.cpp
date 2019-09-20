@@ -27,7 +27,9 @@ std::string GetKeyPath(const Key& key, const pt::ptree& tree)
 		pt::ptree node = keyValue.second;
 
 		if (nodeKey == key)
+		{
 			return nodeKey;
+		}
 		else
 		{
 			std::string returnedKey = GetKeyPath(key, node);
@@ -78,7 +80,9 @@ void EntityAggregationDeserializer::LoadSerializationStructure(const std::string
 
 	std::ifstream file(pathToJSON);
 	if (file)
+	{
 		boost::property_tree::read_json(file, serializationStructure_);
+	}
 	else
 	{
 		serializationPath_.clear();

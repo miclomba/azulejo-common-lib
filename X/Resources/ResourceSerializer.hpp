@@ -12,18 +12,18 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	if (! fs::exists(serializationPath))
 		fs::create_directories(serializationPath);
 
-	if (resource.IsDirty())
-	{
-		const T& data = resource.Data();
-		const char* buff = reinterpret_cast<const char*>(data.data());
-		int size = sizeof(data[0]) * data.size();
+	if (!resource.IsDirty())
+		return;
 
-		const std::string fileName = key + RESOURCE_EXT;
-		std::ofstream outfile(serializationPath / fileName, std::ios::binary);
-		if (!outfile)
-			throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+	const T& data = resource.Data();
+	const char* buff = reinterpret_cast<const char*>(data.data());
+	int size = sizeof(data[0]) * data.size();
 
-		outfile.write(buff, sizeof(data[0]) * data.size());
-	}
+	const std::string fileName = key + RESOURCE_EXT;
+	std::ofstream outfile(serializationPath / fileName, std::ios::binary);
+	if (!outfile)
+		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+
+	outfile.write(buff, sizeof(data[0]) * data.size());
 }
 

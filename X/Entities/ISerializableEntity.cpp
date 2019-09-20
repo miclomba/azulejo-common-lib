@@ -32,16 +32,16 @@ SharedEntity ISerializableEntity::GetAggregatedMember(const Key& key) const
 	if (found == members.cend())
 		throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 	
-	if (!members[key])
-	{
-		EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-		if (deserializer->HasSerializationKey(key))
-		{
-			std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
+	if (members[key])
+		return members[key];
 
-			deserializer->Deserialize(*entity);
-			members[key] = std::move(entity);
-		}
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+	if (deserializer->HasSerializationKey(key))
+	{
+		std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
+
+		deserializer->Deserialize(*entity);
+		members[key] = std::move(entity);
 	}
 	return members[key];
 }

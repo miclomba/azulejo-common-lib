@@ -13,13 +13,13 @@ ISharedMemoryEntity::ISharedMemoryEntity() = default;
 
 ISharedMemoryEntity::~ISharedMemoryEntity()
 {
-	if (shmem_ && isShmemOwner_)
-	{
-		const char* name = shmem_->get_name();
-		bool removed = boost::interprocess::shared_memory_object::remove(name);
-		if (!removed)
-			throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
-	}
+	if (!shmem_ || !isShmemOwner_)
+		return;
+
+	const char* name = shmem_->get_name();
+	bool removed = boost::interprocess::shared_memory_object::remove(name);
+	if (!removed)
+		throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
 }
 
 ISharedMemoryEntity::ISharedMemoryEntity(const ISharedMemoryEntity&) = default;
