@@ -27,6 +27,19 @@ private:
 };
 } // end namespace
 
+TEST(EventEmitter, MoveConstruct)
+{
+	EventEmitter<void(void)> emitter;
+	EXPECT_NO_THROW(EventEmitter<void(void)> copy(std::move(emitter)));
+}
+
+TEST(EventEmitter, MoveAssign)
+{
+	EventEmitter<void(void)> emitter;
+	EventEmitter<void(void)> copy;
+	EXPECT_NO_THROW(copy = std::move(emitter));
+}
+
 TEST(EventEmitter, Connect) 
 {
 	auto consumer = std::make_shared<Consumer>();

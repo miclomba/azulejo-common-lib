@@ -38,6 +38,32 @@ struct Channel : public EventChannel
 };
 } // end namespace
 
+TEST(EventChannel, CopyConstruct)
+{
+	Channel channel;
+	EXPECT_NO_THROW(Channel copy(channel));
+}
+
+TEST(EventChannel, CopyAssign)
+{
+	Channel channel;
+	Channel copy;
+	EXPECT_NO_THROW(copy = channel);
+}
+
+TEST(EventChannel, MoveConstruct)
+{
+	Channel channel;
+	EXPECT_NO_THROW(Channel copy(std::move(channel)));
+}
+
+TEST(EventChannel, MoveAssign)
+{
+	Channel channel;
+	Channel copy;
+	EXPECT_NO_THROW(copy = std::move(channel));
+}
+
 TEST(EventChannel, RegisterEmitter) {
 
 	Channel channel;

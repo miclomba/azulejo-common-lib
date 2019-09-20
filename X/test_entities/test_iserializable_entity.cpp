@@ -41,6 +41,32 @@ struct TypeB : public Entity
 };
 } // end namespace
 
+TEST(ISerializableEntity, CopyConstruct)
+{
+	TypeA serializable(ROOT_KEY);
+	EXPECT_NO_THROW(TypeA copy(serializable));
+}
+
+TEST(ISerializableEntity, CopyAssign)
+{
+	TypeA serializable(ROOT_KEY);
+	TypeA copy(ROOT_KEY);
+	EXPECT_NO_THROW(copy = serializable);
+}
+
+TEST(ISerializableEntity, MoveConstruct)
+{
+	TypeA serializable(ROOT_KEY);
+	EXPECT_NO_THROW(TypeA copy(std::move(serializable)));
+}
+
+TEST(ISerializableEntity, MoveAssign)
+{
+	TypeA serializable(ROOT_KEY);
+	TypeA copy(ROOT_KEY);
+	EXPECT_NO_THROW(copy = std::move(serializable));
+}
+
 TEST(ISerializableEntity, GetAggregatedMembers)
 {
 	TypeA obj = TypeA(ROOT_KEY);

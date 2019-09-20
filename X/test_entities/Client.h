@@ -15,6 +15,13 @@ namespace networking {
 
 class Client : public entity::IClientEntity
 {
+public:
+	Client() = default;
+	Client(const Client&) = default;
+	Client& operator=(const Client&) = default;
+	Client(Client&&) = default;
+	Client& operator=(Client&&) = default;
+
 protected:
 	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
 	{

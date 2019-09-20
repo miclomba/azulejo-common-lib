@@ -28,8 +28,8 @@ public:
 	EventEmitter();
 	virtual ~EventEmitter();
 
-	EventEmitter(const EventEmitter&);
-	EventEmitter& operator=(const EventEmitter&);
+	EventEmitter(const EventEmitter&) = delete;
+	EventEmitter& operator=(const EventEmitter&) = delete;
 	EventEmitter(EventEmitter&&);
 	EventEmitter& operator=(EventEmitter&&);
 

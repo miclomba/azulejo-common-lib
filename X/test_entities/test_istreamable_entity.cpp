@@ -55,6 +55,32 @@ struct TypeA : public IStreamableEntity
 struct TypeC : public Entity {};
 } // end namespace anonymous
 
+TEST(IStreamableEntity, CopyConstruct)
+{
+	TypeA streamable;
+	EXPECT_NO_THROW(TypeA copy(streamable));
+}
+
+TEST(IStreamableEntity, CopyAssign)
+{
+	TypeA streamable;
+	TypeA copy;
+	EXPECT_NO_THROW(copy = streamable);
+}
+
+TEST(IStreamableEntity, MoveConstruct)
+{
+	TypeA streamable;
+	EXPECT_NO_THROW(TypeA copy(std::move(streamable)));
+}
+
+TEST(IStreamableEntity, MoveAssign)
+{
+	TypeA streamable;
+	TypeA copy;
+	EXPECT_NO_THROW(copy = std::move(streamable));
+}
+
 TEST(IStreamableEntity, StreamNestedEntities)
 {
 	std::stringstream sstream;

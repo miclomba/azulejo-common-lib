@@ -6,8 +6,6 @@ EventEmitter<T>::EventEmitter()
 }
 
 TEMPLATE_T EventEmitter<T>::~EventEmitter() = default;
-TEMPLATE_T EventEmitter<T>::EventEmitter(const EventEmitter<T>&) = default;
-TEMPLATE_T EventEmitter<T>& EventEmitter<T>::operator=(const EventEmitter<T>&) = default;
 TEMPLATE_T EventEmitter<T>::EventEmitter(EventEmitter<T>&&) = default;
 TEMPLATE_T EventEmitter<T>& EventEmitter<T>::operator=(EventEmitter<T>&&) = default;
 

@@ -21,6 +21,32 @@ TEST(EventConsumer, Construct)
 	EXPECT_NO_THROW(EventConsumer<int(void)> consumer(SUBSCRIBER));
 }
 
+TEST(EventConsumer, CopyConstruct)
+{
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EXPECT_NO_THROW(EventConsumer<int(void)> copy(consumer));
+}
+
+TEST(EventConsumer, CopyAssign)
+{
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EventConsumer<int(void)> copy(SUBSCRIBER);
+	EXPECT_NO_THROW(copy = consumer);
+}
+
+TEST(EventConsumer, MoveConstruct)
+{
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EXPECT_NO_THROW(EventConsumer<int(void)> copy(std::move(consumer)));
+}
+
+TEST(EventConsumer, MoveAssign)
+{
+	EventConsumer<int(void)> consumer(SUBSCRIBER);
+	EventConsumer<int(void)> copy(SUBSCRIBER);
+	EXPECT_NO_THROW(copy = std::move(consumer));
+}
+
 TEST(EventConsumer, GetSubscriber) 
 {
 	EventConsumer<int(void)> consumer(SUBSCRIBER);

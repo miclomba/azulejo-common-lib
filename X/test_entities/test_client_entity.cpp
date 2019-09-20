@@ -21,6 +21,32 @@ TEST(IClientEntity, Construct)
 	EXPECT_NO_THROW(Client client());
 }
 
+TEST(IClientEntity, CopyConstruct)
+{
+	Client client;
+	EXPECT_NO_THROW(Client copy(client));
+}
+
+TEST(IClientEntity, CopyAssign)
+{
+	Client client;
+	Client copy;
+	EXPECT_NO_THROW(copy = client);
+}
+
+TEST(IClientEntity, MoveConstruct)
+{
+	Client client;
+	EXPECT_NO_THROW(Client copy(std::move(client)));
+}
+
+TEST(IClientEntity, MoveAssign)
+{
+	Client client;
+	Client copy;
+	EXPECT_NO_THROW(copy = std::move(client));
+}
+
 TEST(IClientEntity, RunThrowsWhenHostIsEmpty)
 {
 	Client client;
