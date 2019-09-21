@@ -33,43 +33,49 @@ TEST(Resource, Construct)
 
 TEST(Resource, MoveConstruct)
 {
-	ContainerResource ir(INT_VALUES);
+	ContainerResource source(INT_VALUES);
+	int sourceChecksum = source.ChecksumProtected();
 
 	// move
-	ContainerResource irMoved(std::move(ir));
+	ContainerResource target(std::move(source));
 
-	EXPECT_EQ(irMoved.Data(), INT_VALUES);
+	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
 TEST(Resource, MoveAssign)
 {
-	ContainerResource ir(INT_VALUES);
-	ContainerResource irMoved(EMPTY_INT_VALUES);
+	ContainerResource source(INT_VALUES);
+	int sourceChecksum = source.ChecksumProtected();
+	ContainerResource target(EMPTY_INT_VALUES);
 
 	// move assign
-	EXPECT_NO_THROW(irMoved = std::move(ir));
+	EXPECT_NO_THROW(target = std::move(source));
 
-	EXPECT_EQ(irMoved.Data(), INT_VALUES);
+	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
 TEST(Resource, CopyConstruct)
 {
-	ContainerResource ir(INT_VALUES);
+	ContainerResource source(INT_VALUES);
 
 	// copy
-	ContainerResource irCopied(ir);
-	EXPECT_EQ(irCopied.Data(), INT_VALUES);
+	ContainerResource target(source);
+	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource, CopyAssign)
 {
-	ContainerResource ir(INT_VALUES);
-	ContainerResource irCopied(EMPTY_INT_VALUES);
+	ContainerResource source(INT_VALUES);
+	ContainerResource target(EMPTY_INT_VALUES);
 
 	// copy assign
-	EXPECT_NO_THROW(irCopied = ir);
+	EXPECT_NO_THROW(target = source);
 
-	EXPECT_EQ(irCopied.Data(), INT_VALUES);
+	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource, SetData)

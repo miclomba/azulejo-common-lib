@@ -34,15 +34,29 @@ TEST(EventEmitter, Construct)
 
 TEST(EventEmitter, MoveConstruct)
 {
-	EventEmitter<void(void)> emitter;
-	EXPECT_NO_THROW(EventEmitter<void(void)> copy(std::move(emitter)));
+	EventEmitter<void(void)> source;
+	int arity = source.Signal().arity;
+	size_t numSlots = source.Signal().num_slots();
+	bool isEmpty = source.Signal().empty();
+
+	EventEmitter<void(void)> target(std::move(source));
+	EXPECT_EQ(arity, target.Signal().arity);
+	EXPECT_EQ(numSlots, target.Signal().num_slots());
+	EXPECT_EQ(isEmpty, target.Signal().empty());
 }
 
 TEST(EventEmitter, MoveAssign)
 {
-	EventEmitter<void(void)> emitter;
-	EventEmitter<void(void)> copy;
-	EXPECT_NO_THROW(copy = std::move(emitter));
+	EventEmitter<void(void)> source;
+	int arity = source.Signal().arity;
+	size_t numSlots = source.Signal().num_slots();
+	bool isEmpty = source.Signal().empty();
+
+	EventEmitter<void(void)> target;
+	EXPECT_NO_THROW(target = std::move(source));
+	EXPECT_EQ(arity, target.Signal().arity);
+	EXPECT_EQ(numSlots, target.Signal().num_slots());
+	EXPECT_EQ(isEmpty, target.Signal().empty());
 }
 
 TEST(EventEmitter, Connect) 
