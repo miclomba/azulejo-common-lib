@@ -45,28 +45,28 @@ TEST(EventChannel, Construct)
 
 TEST(EventChannel, CopyConstruct)
 {
-	Channel channel;
-	EXPECT_NO_THROW(Channel copy(channel));
+	Channel source;
+	EXPECT_NO_THROW(Channel target(source));
 }
 
 TEST(EventChannel, CopyAssign)
 {
-	Channel channel;
-	Channel copy;
-	EXPECT_NO_THROW(copy = channel);
+	Channel source;
+	Channel target;
+	EXPECT_NO_THROW(target = source);
 }
 
 TEST(EventChannel, MoveConstruct)
 {
-	Channel channel;
-	EXPECT_NO_THROW(Channel copy(std::move(channel)));
+	Channel source;
+	EXPECT_NO_THROW(Channel target(std::move(source)));
 }
 
 TEST(EventChannel, MoveAssign)
 {
-	Channel channel;
-	Channel copy;
-	EXPECT_NO_THROW(copy = std::move(channel));
+	Channel source;
+	Channel target;
+	EXPECT_NO_THROW(target = std::move(source));
 }
 
 TEST(EventChannel, RegisterEmitter) {
