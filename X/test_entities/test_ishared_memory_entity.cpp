@@ -29,32 +29,6 @@ TEST(ISharedMemoryEntity, Construct)
 	EXPECT_NO_THROW(ShareableCreator shareable());
 }
 
-TEST(ISharedMemoryEntity, CopyConstruct)
-{
-	ShareableCreator shareable;
-	EXPECT_NO_THROW(ShareableCreator copy(shareable));
-}
-
-TEST(ISharedMemoryEntity, CopyAssign)
-{
-	ShareableCreator shareable;
-	ShareableCreator copy;
-	EXPECT_NO_THROW(copy = shareable);
-}
-
-TEST(ISharedMemoryEntity, MoveConstruct)
-{
-	ShareableCreator shareable;
-	EXPECT_NO_THROW(ShareableCreator copy(std::move(shareable)));
-}
-
-TEST(ISharedMemoryEntity, MoveAssign)
-{
-	ShareableCreator shareable;
-	ShareableCreator copy;
-	EXPECT_NO_THROW(copy = std::move(shareable));
-}
-
 TEST(ISharedMemoryEntity, Create)
 {
 	ShareableCreator shareable;
@@ -154,6 +128,15 @@ TEST(ISharedMemoryEntity, ThrowOnGetSharedAddress)
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedAddress(), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, IsSharedMemoryOwner)
+{
+	ShareableCreator shareable;
+	EXPECT_FALSE(shareable.IsSharedMemoryOwner());
+
+	shareable.Create(NAME, SIZE);
+	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
 }
 
 /*

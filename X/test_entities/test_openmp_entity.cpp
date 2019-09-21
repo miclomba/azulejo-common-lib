@@ -102,46 +102,46 @@ TEST(IOpenMPEntity, Construct)
 
 TEST(IOpenMPEntity, CopyConstruct)
 {
-	Runnable runnable(1, false, false);
-	Runnable copy(runnable);
+	Runnable source(1, false, false);
+	Runnable target(source);
 
-	EXPECT_EQ(runnable.GetNumThreads(), copy.GetNumThreads());
-	EXPECT_EQ(runnable.GetSetDynamic(), copy.GetSetDynamic());
-	EXPECT_EQ(runnable.GetSetNested(), copy.GetSetNested());
+	EXPECT_EQ(source.GetNumThreads(), target.GetNumThreads());
+	EXPECT_EQ(source.GetSetDynamic(), target.GetSetDynamic());
+	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
 TEST(IOpenMPEntity, CopyAssign)
 {
-	Runnable runnable(1, false, false);
-	Runnable copy(2, true, true);
+	Runnable source(1, false, false);
+	Runnable target(2, true, true);
 
-	copy = runnable;
+	target = source;
 
-	EXPECT_EQ(runnable.GetNumThreads(), copy.GetNumThreads());
-	EXPECT_EQ(runnable.GetSetDynamic(), copy.GetSetDynamic());
-	EXPECT_EQ(runnable.GetSetNested(), copy.GetSetNested());
+	EXPECT_EQ(source.GetNumThreads(), target.GetNumThreads());
+	EXPECT_EQ(source.GetSetDynamic(), target.GetSetDynamic());
+	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
 TEST(IOpenMPEntity, MoveConstruct)
 {
-	Runnable runnable(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
-	Runnable copy(std::move(runnable));
+	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
+	Runnable target(std::move(source));
 
-	EXPECT_EQ(NUM_THREADS, copy.GetNumThreads());
-	EXPECT_EQ(SET_DYNAMIC, copy.GetSetDynamic());
-	EXPECT_EQ(SET_NESTED, copy.GetSetNested());
+	EXPECT_EQ(NUM_THREADS, target.GetNumThreads());
+	EXPECT_EQ(SET_DYNAMIC, target.GetSetDynamic());
+	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
 TEST(IOpenMPEntity, MoveAssign)
 {
-	Runnable runnable(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
-	Runnable copy(NUM_THREADS + 1, !SET_DYNAMIC, !SET_NESTED);
+	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
+	Runnable target(NUM_THREADS + 1, !SET_DYNAMIC, !SET_NESTED);
 
-	copy = std::move(runnable);
+	target = std::move(source);
 
-	EXPECT_EQ(NUM_THREADS, copy.GetNumThreads());
-	EXPECT_EQ(SET_DYNAMIC, copy.GetSetDynamic());
-	EXPECT_EQ(SET_NESTED, copy.GetSetNested());
+	EXPECT_EQ(NUM_THREADS, target.GetNumThreads());
+	EXPECT_EQ(SET_DYNAMIC, target.GetSetDynamic());
+	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
 TEST(IOpenMPEntity, ConstructorThrows)

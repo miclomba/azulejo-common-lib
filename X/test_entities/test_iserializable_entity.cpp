@@ -49,28 +49,28 @@ TEST(ISerializableEntity, Construct)
 
 TEST(ISerializableEntity, CopyConstruct)
 {
-	TypeA serializable(ROOT_KEY);
-	EXPECT_NO_THROW(TypeA copy(serializable));
+	TypeA source(ROOT_KEY);
+	EXPECT_NO_THROW(TypeA target(source));
 }
 
 TEST(ISerializableEntity, CopyAssign)
 {
-	TypeA serializable(ROOT_KEY);
-	TypeA copy(ROOT_KEY);
-	EXPECT_NO_THROW(copy = serializable);
+	TypeA source(ROOT_KEY);
+	TypeA target(ROOT_KEY);
+	EXPECT_NO_THROW(target = source);
 }
 
 TEST(ISerializableEntity, MoveConstruct)
 {
-	TypeA serializable(ROOT_KEY);
-	EXPECT_NO_THROW(TypeA copy(std::move(serializable)));
+	TypeA source(ROOT_KEY);
+	EXPECT_NO_THROW(TypeA target(std::move(source)));
 }
 
 TEST(ISerializableEntity, MoveAssign)
 {
-	TypeA serializable(ROOT_KEY);
-	TypeA copy(ROOT_KEY);
-	EXPECT_NO_THROW(copy = std::move(serializable));
+	TypeA source(ROOT_KEY);
+	TypeA target(ROOT_KEY);
+	EXPECT_NO_THROW(target = std::move(source));
 }
 
 TEST(ISerializableEntity, GetAggregatedMembers)

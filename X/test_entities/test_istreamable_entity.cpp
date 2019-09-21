@@ -62,28 +62,28 @@ TEST(IStreamableEntity, Construct)
 
 TEST(IStreamableEntity, CopyConstruct)
 {
-	TypeA streamable;
-	EXPECT_NO_THROW(TypeA copy(streamable));
+	TypeA source;
+	EXPECT_NO_THROW(TypeA target(source));
 }
 
 TEST(IStreamableEntity, CopyAssign)
 {
-	TypeA streamable;
-	TypeA copy;
-	EXPECT_NO_THROW(copy = streamable);
+	TypeA source;
+	TypeA target;
+	EXPECT_NO_THROW(target = source);
 }
 
 TEST(IStreamableEntity, MoveConstruct)
 {
-	TypeA streamable;
-	EXPECT_NO_THROW(TypeA copy(std::move(streamable)));
+	TypeA source;
+	EXPECT_NO_THROW(TypeA target(std::move(source)));
 }
 
 TEST(IStreamableEntity, MoveAssign)
 {
-	TypeA streamable;
-	TypeA copy;
-	EXPECT_NO_THROW(copy = std::move(streamable));
+	TypeA source;
+	TypeA target;
+	EXPECT_NO_THROW(target = std::move(source));
 }
 
 TEST(IStreamableEntity, StreamNestedEntities)

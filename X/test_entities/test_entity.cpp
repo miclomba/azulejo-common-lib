@@ -57,55 +57,55 @@ TEST(Entity, Construct)
 
 TEST(Entity, MoveConstruct)
 {
-	TypeA ea(KEY, MEMBER_KEY);
-	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
+	TypeA source(KEY, MEMBER_KEY);
+	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
 
 	// move
-	TypeA eaMoved(std::move(ea));
+	TypeA target(std::move(source));
 
-	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
+	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
 
-	EXPECT_EQ(KEY, eaMoved.GetKey());
+	EXPECT_EQ(KEY, target.GetKey());
 	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
 }
 
 TEST(Entity, MoveAssign)
 {
-	TypeA ea(KEY, MEMBER_KEY);
-	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
+	TypeA source(KEY, MEMBER_KEY);
+	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
 
 	// move assign
-	TypeA eaMoved;
-	EXPECT_NO_THROW(eaMoved = std::move(ea));
+	TypeA target;
+	EXPECT_NO_THROW(target = std::move(source));
 
-	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
+	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
 
-	EXPECT_EQ(KEY, eaMoved.GetKey());
+	EXPECT_EQ(KEY, target.GetKey());
 	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
 }
 
 TEST(Entity, CopyConstruct)
 {
-	TypeA ea(KEY, MEMBER_KEY);
+	TypeA source(KEY, MEMBER_KEY);
 
 	// copy
-	TypeA eaCopied(ea);
-	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
-	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
+	TypeA target(source);
+	EXPECT_EQ(source.GetKey(), target.GetKey());
+	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
 }
 
 TEST(Entity, CopyAssign)
 {
-	TypeA ea(KEY, MEMBER_KEY);
-	TypeA eaCopied;
+	TypeA source(KEY, MEMBER_KEY);
+	TypeA target;
 
 	// copy assign
-	EXPECT_NO_THROW(eaCopied = ea);
+	EXPECT_NO_THROW(target = source);
 
-	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
-	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
+	EXPECT_EQ(source.GetKey(), target.GetKey());
+	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
 }
 
 TEST(Entity, GetKey)

@@ -19,10 +19,10 @@ class Server : public entity::IServerEntity
 public:
 	Server(const int port) : IServerEntity(port) {}
 
-	Server(const Server&) = default;
-	Server& operator=(const Server&) = default;
-	Server(Server&&) = default;
-	Server& operator=(Server&&) = default;
+	Server(const Server&) = delete;
+	Server& operator=(const Server&) = delete;
+	Server(Server&&) = delete;
+	Server& operator=(Server&&) = delete;
 
 protected:
 	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override
