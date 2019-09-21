@@ -21,7 +21,6 @@ const std::string OTHER_NAME = "other_shmem";
 const size_t SIZE = 1024;
 
 struct ShareableCreator : public ISharedMemoryEntity {};
-struct ShareableAccessor : public ISharedMemoryEntity {};
 } // end namespace anonymous
 
 TEST(ISharedMemoryEntity, Construct)
@@ -83,6 +82,19 @@ TEST(ISharedMemoryEntity, OpenThrows)
 
 	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
 	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, Destroy)
+{
+	ShareableCreator shareable;
+	ShareableCreator otherShareable;
+
+	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
+	EXPECT_NO_THROW(otherShareable.Open(NAME));
+	EXPECT_FALSE(otherShareable.IsSharedMemoryOwner());
+
+	EXPECT_EQ(shareable.GetSharedAddress(), otherShareable.GetSharedAddress());
 }
 
 TEST(ISharedMemoryEntity, GetSharedName)
