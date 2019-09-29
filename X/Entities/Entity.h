@@ -1,6 +1,7 @@
 #ifndef entity_h
 #define entity_h
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -42,14 +43,21 @@ protected:
 	std::vector<Key> GetAggregatedMemberKeys() const;
 
 	void AggregateMember(const Key& key);
-	void AggregateMember(SharedEntity sharedObj);
+
+	template<class T>
+	void AggregateMember(std::shared_ptr<T> sharedObj);
 
 	void RemoveMember(const Key& key);
 	void RemoveMember(SharedEntity sharedObj);
 
 private:
+	template<typename T>
+	void RegisterEntityConstructor(const Key& key);
+	std::unique_ptr<Entity> ConstructEntity(const Entity& other) const;
+
 	Key key_;
 	mutable std::map<Key, SharedEntity> membersMap_;
+	mutable std::map<Entity::Key, std::function<std::unique_ptr<Entity>(const Entity&)>> keyToEntityConstructorMap_;
 };
 
 #include "Entity.hpp"

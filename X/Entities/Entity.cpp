@@ -23,7 +23,7 @@ Entity::Entity(const Entity& other) :
 	key_(other.key_)
 {
 	for (const std::pair<Key,SharedEntity>& e : other.membersMap_)
-		membersMap_[e.first] = std::make_shared<Entity>(*e.second);
+		membersMap_[e.first] = other.ConstructEntity(*e.second); 
 }
 
 Entity& Entity::operator=(Entity&&) = default;
@@ -36,7 +36,7 @@ Entity& Entity::operator=(const Entity& other)
 
 	membersMap_.clear();
 	for (const std::pair<Key,SharedEntity>& e : other.membersMap_)
-		membersMap_[e.first] = std::make_shared<Entity>(*e.second);
+		membersMap_[e.first] = other.ConstructEntity(*e.second); 
 }
 
 Entity::~Entity() = default;
@@ -76,20 +76,6 @@ void Entity::AggregateMember(const Key& key)
 	membersMap_[key] = nullptr;
 }
 
-void Entity::AggregateMember(SharedEntity sharedObj)
-{
-	if (!sharedObj)
-		throw std::runtime_error("Entity is nullptr when aggregating entity");
-
-	Key key = sharedObj->GetKey();
-
-	auto found = membersMap_.find(key);
-	if (found != membersMap_.cend())
-		throw std::runtime_error("Cannot aggregate entity using key=" + key + " because this key is already in use.");
-
-	membersMap_[key] = std::move(sharedObj);
-}
-
 void Entity::RemoveMember(const Key& key)
 {
 	auto found = membersMap_.find(key);
@@ -111,6 +97,14 @@ void Entity::RemoveMember(SharedEntity sharedObj)
 		throw std::runtime_error("Cannot remove entity using key=" + key + " because this key is not in use.");
 
 	membersMap_.erase(key);
+}
+
+std::unique_ptr<Entity> Entity::ConstructEntity(const Entity& other) const
+{
+	const Key& key = other.GetKey();
+	std::unique_ptr<Entity> entity = keyToEntityConstructorMap_[key](other);
+
+	return std::move(entity);
 }
 
 } // end namespace entity

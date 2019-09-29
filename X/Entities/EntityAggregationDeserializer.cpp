@@ -154,7 +154,7 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 	{
 		std::string key = child.first;
 		std::unique_ptr<ISerializableEntity> memberEntity = GenerateEntity(key);
-		entity.AggregateMember(std::move(memberEntity));
+		entity.AggregateMember<Entity>(std::move(memberEntity));
 
 		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
 		DeserializeWithParentKey(*childEntity, searchPath);

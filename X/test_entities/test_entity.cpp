@@ -18,6 +18,7 @@ using SharedEntity = Entity::SharedEntity;
 
 namespace
 {
+const int DEFAULT_VALUE = 7;
 const std::string KEY = "key";
 const std::string MEMBER_KEY = "member_key";
 const std::string NEW_KEY = "newKeyB";
@@ -25,6 +26,11 @@ const std::string NEW_KEY = "newKeyB";
 struct TypeB : public Entity 
 {
 	TypeB() {}
+	int GetDefaultValue() const { return DEFAULT_VALUE; }
+	int GetValue() const { return value; }
+	void SetValue(const int val) { value = val; }
+private:
+	int value{ DEFAULT_VALUE };
 };
 
 struct TypeA : public Entity
@@ -34,11 +40,13 @@ struct TypeA : public Entity
 		SetKey(key);
 		auto e = std::make_shared<TypeB>(); 
 		e->SetKey(memberKey); 
+		e->SetValue(DEFAULT_VALUE + 1);
 		AggregateMember(e); 
 	}
 	TypeA() {}
 	
-	void AddProtectedMember(SharedEntity entity) { AggregateMember(std::move(entity)); };
+	template<class T>
+	void AddProtectedMember(std::shared_ptr<T> entity) { AggregateMember(std::move(entity)); };
 	void AddProtectedMember(const Key& key) { AggregateMember(key); };
 	void RemoveProtectedMember(SharedEntity entity) { RemoveMember(std::move(entity)); };
 	void RemoveProtectedMember(const Key& key) { RemoveMember(key); };
@@ -64,54 +72,79 @@ TEST(Entity, Construct)
 TEST(Entity, MoveConstruct)
 {
 	TypeA source(KEY, MEMBER_KEY);
-	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
+	SharedEntity& sharedSourceMember = source.GetProtectedMember(MEMBER_KEY);
+	TypeB* sourceMemberPtr = dynamic_cast<TypeB*>(sharedSourceMember.get());
+	int sourceMemberValue = sourceMemberPtr->GetValue();
+
+	EXPECT_NE(sourceMemberValue, sourceMemberPtr->GetDefaultValue());
 
 	// move
 	TypeA target(std::move(source));
-
-	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
+	SharedEntity& sharedTargetMember = target.GetProtectedMember(MEMBER_KEY);
+	TypeB* targetMemberPtr = dynamic_cast<TypeB*>(sharedTargetMember.get());
+	int targetMemberValue = targetMemberPtr->GetValue();
 
 	EXPECT_EQ(KEY, target.GetKey());
-	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
+	EXPECT_EQ(MEMBER_KEY, sharedTargetMember->GetKey());
+	EXPECT_EQ(sourceMemberPtr, targetMemberPtr);
+	EXPECT_EQ(sourceMemberValue, targetMemberValue);
 }
 
 TEST(Entity, MoveAssign)
 {
 	TypeA source(KEY, MEMBER_KEY);
-	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
+	SharedEntity& sharedSourceMember = source.GetProtectedMember(MEMBER_KEY);
+	TypeB* sourceMemberPtr = dynamic_cast<TypeB*>(sharedSourceMember.get());
+	int sourceMemberValue = sourceMemberPtr->GetValue();
 
 	// move assign
 	TypeA target;
 	EXPECT_NO_THROW(target = std::move(source));
-
-	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
+	SharedEntity& sharedTargetMember = target.GetProtectedMember(MEMBER_KEY);
+	TypeB* targetMemberPtr = dynamic_cast<TypeB*>(sharedTargetMember.get());
+	int targetMemberValue = targetMemberPtr->GetValue();
 
 	EXPECT_EQ(KEY, target.GetKey());
-	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
+	EXPECT_EQ(MEMBER_KEY, sharedTargetMember->GetKey());
+	EXPECT_EQ(sourceMemberPtr, targetMemberPtr);
+	EXPECT_EQ(sourceMemberValue, targetMemberValue);
 }
 
 TEST(Entity, CopyConstruct)
 {
 	TypeA source(KEY, MEMBER_KEY);
+	SharedEntity& sharedSourceMember = source.GetProtectedMember(MEMBER_KEY);
+	TypeB* sourceMemberPtr = dynamic_cast<TypeB*>(sharedSourceMember.get());
+
+	EXPECT_NE(sourceMemberPtr->GetValue(), sourceMemberPtr->GetDefaultValue());
 
 	// copy
 	TypeA target(source);
+	SharedEntity& sharedTargetMember = target.GetProtectedMember(MEMBER_KEY);
+	TypeB* targetMemberPtr = dynamic_cast<TypeB*>(sharedTargetMember.get());
+	
 	EXPECT_EQ(source.GetKey(), target.GetKey());
 	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
+	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue(), 8);
 }
 
 TEST(Entity, CopyAssign)
 {
 	TypeA source(KEY, MEMBER_KEY);
-	TypeA target;
+	SharedEntity& sharedSourceMember = source.GetProtectedMember(MEMBER_KEY);
+	TypeB* sourceMemberPtr = dynamic_cast<TypeB*>(sharedSourceMember.get());
+
+	EXPECT_NE(sourceMemberPtr->GetValue(), sourceMemberPtr->GetDefaultValue());
 
 	// copy assign
+	TypeA target;
 	EXPECT_NO_THROW(target = source);
+	SharedEntity& sharedTargetMember = target.GetProtectedMember(MEMBER_KEY);
+	TypeB* targetMemberPtr = dynamic_cast<TypeB*>(sharedTargetMember.get());
 
 	EXPECT_EQ(source.GetKey(), target.GetKey());
 	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
+	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue(), 8);
 }
 
 TEST(Entity, GetKey)
