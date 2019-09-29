@@ -41,12 +41,17 @@ T& Resource<T>::Data()
 TEMPLATE_T
 void Resource<T>::Assign(const char* buff, const size_t n)
 {
+	if (!buff)
+		throw std::runtime_error("Buffer cannot be NULL during Resource::Assign");
+	if (n < 1)
+		throw std::runtime_error("N cannot be 0 during Resource::Assign");
+
 	T vBuff;
 	vBuff.push_back(0);
-	int size = sizeof(decltype(vBuff[0]));
+	size_t size = sizeof(decltype(vBuff[0]));
 	vBuff.clear();
 
-	for (auto i = 0; i < n/size; ++i)
+	for (size_t i = 0; i < n/size; ++i)
 		vBuff.push_back(buff[i*size]);
 
 	Data().assign(vBuff.begin(), vBuff.end());

@@ -13,12 +13,11 @@ IResource& IResource::operator=(IResource&&) = default;
 bool IResource::IsDirty() const
 {
 	int check = Checksum();
-	if (check != checkSum_)
-	{
-		checkSum_ = check;
-		return true;
-	}
-	return false;
+	if (check == checkSum_)
+		return false;
+
+	checkSum_ = check;
+	return true;
 }
 
 }

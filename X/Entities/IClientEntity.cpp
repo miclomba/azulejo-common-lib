@@ -9,18 +9,8 @@
 
 namespace entity {
 
-IClientEntity::IClientEntity()
-{
-	using boost::asio::ip::tcp;
-	ioService_ = std::make_shared<boost::asio::io_service>();
-}
-
+IClientEntity::IClientEntity() = default;
 IClientEntity::~IClientEntity() = default;
-
-IClientEntity::IClientEntity(const IClientEntity&) = default;
-IClientEntity& IClientEntity::operator=(const IClientEntity&) = default;
-IClientEntity::IClientEntity(IClientEntity&&) = default;
-IClientEntity& IClientEntity::operator=(IClientEntity&&) = default;
 
 void IClientEntity::Run(const std::string& host, const int port)
 {
@@ -48,14 +38,14 @@ std::shared_ptr<boost::asio::ip::tcp::socket> IClientEntity::Connect(const std::
 	using namespace boost::asio;
 	using namespace boost::asio::ip;
 
-	tcp::resolver resolvr(*ioService_);
+	tcp::resolver resolvr(ioService_);
 
 	tcp::resolver::query qry(host, std::to_string(port));
 
 	tcp::resolver::iterator endpoint_iterator = resolvr.resolve(qry);
 	tcp::resolver::iterator end;
 
-	auto mySocket = std::make_shared<tcp::socket>(*ioService_);
+	auto mySocket = std::make_shared<tcp::socket>(ioService_);
 
 	boost::system::error_code error = boost::asio::error::host_not_found;
 	while (error && endpoint_iterator != end)
@@ -67,6 +57,11 @@ std::shared_ptr<boost::asio::ip::tcp::socket> IClientEntity::Connect(const std::
 		throw boost::system::system_error(error);
 
 	return mySocket;
+}
+
+const boost::asio::io_service* IClientEntity::GetIOService() const
+{
+	return &ioService_;
 }
 
 } // namespace entity

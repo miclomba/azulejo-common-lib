@@ -3,6 +3,7 @@
 
 #include <array>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "config.h"
@@ -56,7 +57,7 @@ private:
 };
 
 #include "Resource.hpp"
-}
+} // end resource
 
 #undef ENABLE_IF_CONTAINER_TEMPLATE_DECL
 #endif // end resource_resource_h

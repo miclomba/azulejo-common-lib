@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include "Resource.h"
@@ -46,6 +47,8 @@ std::string ResourceDeserializer::GetSerializationPath() const
 
 void ResourceDeserializer::UnregisterResource(const std::string& key)
 {
+	if (key.empty())
+		throw std::runtime_error("Key (" + key + ") is empty when unregistering resource with ResourceDeserializer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDeserializer");
 
@@ -73,7 +76,7 @@ std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& 
 	auto buff = std::make_unique<char*>(new char[size]);
 	inFile.read(*buff, size);
 
-	auto arithmeticContainer = GenerateResource(key);
+	std::unique_ptr<IResource> arithmeticContainer = GenerateResource(key);
 	arithmeticContainer->Assign(*buff, size);
 	
 	return arithmeticContainer;

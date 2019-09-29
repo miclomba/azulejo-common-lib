@@ -14,6 +14,9 @@ using entity::IOpenMPEntity;
 namespace
 {
 const int EXPECTED_VALUE = 8;
+const int NUM_THREADS = 1;
+const bool SET_DYNAMIC = false;
+const bool SET_NESTED = false;
 
 struct Runnable : public IOpenMPEntity
 {
@@ -23,6 +26,9 @@ struct Runnable : public IOpenMPEntity
 	}
 
 	int GetSharedTotal()  { return sharedTotal_; }
+	int GetNumThreads() { return numThreads_; };
+	bool GetSetDynamic() { return setDynamic_; };
+	bool GetSetNested() { return setNested_; };
 
 protected:
 	void Run() override 
@@ -88,6 +94,55 @@ private:
 	int sharedTotal_{ 0 };
 };
 } // end namespace anonymous
+
+TEST(IOpenMPEntity, Construct)
+{
+	EXPECT_NO_THROW(Runnable(1, false, false));
+}
+
+TEST(IOpenMPEntity, CopyConstruct)
+{
+	Runnable source(1, false, false);
+	Runnable target(source);
+
+	EXPECT_EQ(source.GetNumThreads(), target.GetNumThreads());
+	EXPECT_EQ(source.GetSetDynamic(), target.GetSetDynamic());
+	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
+}
+
+TEST(IOpenMPEntity, CopyAssign)
+{
+	Runnable source(1, false, false);
+	Runnable target(2, true, true);
+
+	target = source;
+
+	EXPECT_EQ(source.GetNumThreads(), target.GetNumThreads());
+	EXPECT_EQ(source.GetSetDynamic(), target.GetSetDynamic());
+	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
+}
+
+TEST(IOpenMPEntity, MoveConstruct)
+{
+	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
+	Runnable target(std::move(source));
+
+	EXPECT_EQ(NUM_THREADS, target.GetNumThreads());
+	EXPECT_EQ(SET_DYNAMIC, target.GetSetDynamic());
+	EXPECT_EQ(SET_NESTED, target.GetSetNested());
+}
+
+TEST(IOpenMPEntity, MoveAssign)
+{
+	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
+	Runnable target(NUM_THREADS + 1, !SET_DYNAMIC, !SET_NESTED);
+
+	target = std::move(source);
+
+	EXPECT_EQ(NUM_THREADS, target.GetNumThreads());
+	EXPECT_EQ(SET_DYNAMIC, target.GetSetDynamic());
+	EXPECT_EQ(SET_NESTED, target.GetSetNested());
+}
 
 TEST(IOpenMPEntity, ConstructorThrows)
 {

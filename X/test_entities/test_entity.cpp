@@ -56,6 +56,64 @@ struct TypeA : public Entity
 };
 } // end namespace anonymous
 
+TEST(Entity, Construct)
+{
+	EXPECT_NO_THROW(TypeB entity);
+}
+
+TEST(Entity, MoveConstruct)
+{
+	TypeA source(KEY, MEMBER_KEY);
+	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
+
+	// move
+	TypeA target(std::move(source));
+
+	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
+
+	EXPECT_EQ(KEY, target.GetKey());
+	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
+}
+
+TEST(Entity, MoveAssign)
+{
+	TypeA source(KEY, MEMBER_KEY);
+	Entity& memberEntity = *source.GetProtectedMember(MEMBER_KEY);
+
+	// move assign
+	TypeA target;
+	EXPECT_NO_THROW(target = std::move(source));
+
+	Entity& entityMoved = *target.GetProtectedMember(MEMBER_KEY);
+	EXPECT_EQ(&memberEntity, &(*target.GetProtectedMember(MEMBER_KEY)));
+
+	EXPECT_EQ(KEY, target.GetKey());
+	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
+}
+
+TEST(Entity, CopyConstruct)
+{
+	TypeA source(KEY, MEMBER_KEY);
+
+	// copy
+	TypeA target(source);
+	EXPECT_EQ(source.GetKey(), target.GetKey());
+	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
+}
+
+TEST(Entity, CopyAssign)
+{
+	TypeA source(KEY, MEMBER_KEY);
+	TypeA target;
+
+	// copy assign
+	EXPECT_NO_THROW(target = source);
+
+	EXPECT_EQ(source.GetKey(), target.GetKey());
+	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
+}
+
 TEST(Entity, GetKey)
 {
 	TypeA obj(KEY, MEMBER_KEY);
@@ -76,59 +134,6 @@ TEST(Entity, SetKey)
 	obj.SetKey(MEMBER_KEY);
 	Key key = obj.GetKey();
 	EXPECT_EQ(key, MEMBER_KEY);
-}
-
-TEST(Entity, MoveConstruct)
-{
-	TypeA ea(KEY, MEMBER_KEY);
-	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
-
-	// move
-	TypeA eaMoved(std::move(ea));
-
-	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
-
-	EXPECT_EQ(KEY, eaMoved.GetKey());
-	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
-}
-
-TEST(Entity, MoveAssign)
-{
-	TypeA ea(KEY, MEMBER_KEY);
-	Entity& memberEntity = *ea.GetProtectedMember(MEMBER_KEY);
-
-	// move assign
-	TypeA eaMoved;
-	EXPECT_NO_THROW(eaMoved = std::move(ea));
-
-	Entity& entityMoved = *eaMoved.GetProtectedMember(MEMBER_KEY);
-	EXPECT_EQ(&memberEntity, &(*eaMoved.GetProtectedMember(MEMBER_KEY)));
-
-	EXPECT_EQ(KEY, eaMoved.GetKey());
-	EXPECT_EQ(MEMBER_KEY, entityMoved.GetKey());
-}
-
-TEST(Entity, CopyConstruct)
-{
-	TypeA ea(KEY, MEMBER_KEY);
-
-	// copy
-	TypeA eaCopied(ea);
-	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
-	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
-}
-
-TEST(Entity, CopyAssign)
-{
-	TypeA ea(KEY, MEMBER_KEY);
-	TypeA eaCopied;
-
-	// copy assign
-	EXPECT_NO_THROW(eaCopied = ea);
-
-	EXPECT_EQ(ea.GetKey(), eaCopied.GetKey());
-	EXPECT_NE(&ea.GetProtectedMember(MEMBER_KEY), &eaCopied.GetProtectedMember(MEMBER_KEY));
 }
 
 TEST(Entity, AggregateMember)

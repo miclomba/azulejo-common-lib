@@ -18,14 +18,15 @@ public:
 	ISharedMemoryEntity();
 	virtual ~ISharedMemoryEntity();
 
-	ISharedMemoryEntity(const ISharedMemoryEntity&);
-	ISharedMemoryEntity& operator=(const ISharedMemoryEntity&);
-	ISharedMemoryEntity(ISharedMemoryEntity&&);
-	ISharedMemoryEntity& operator=(ISharedMemoryEntity&&);
+	ISharedMemoryEntity(const ISharedMemoryEntity&) = delete;
+	ISharedMemoryEntity& operator=(const ISharedMemoryEntity&) = delete;
+	ISharedMemoryEntity(ISharedMemoryEntity&&) = delete;
+	ISharedMemoryEntity& operator=(ISharedMemoryEntity&&) = delete;
 
 	std::string GetSharedName() const;
 	size_t GetSharedSize() const;
 	void* GetSharedAddress() const;
+	bool IsSharedMemoryOwner() const;
 
 	void Create(const std::string& name, const size_t size);
 	void Open(const std::string& name);

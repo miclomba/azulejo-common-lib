@@ -35,9 +35,7 @@ void EventChannel::RegisterEmitter(const std::string& emitterKey, const std::sha
 		const std::pair<std::string, std::string> consumerKey = iter->first;
 		std::weak_ptr<IEventConsumer> consumer = iter->second;
 		if (consumerKey.second == emitterKey && !consumer.expired())
-		{
 			emitter->Connect(consumer.lock());
-		}
 	}
 
 	emitterMap_[emitterKey] = emitter;

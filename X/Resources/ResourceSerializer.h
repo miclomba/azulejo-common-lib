@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <stdexcept>
 #include <string>
 
 #include "config.h"
@@ -36,7 +37,6 @@ private:
 };
 
 #include "ResourceSerializer.hpp"
-
 } // end namespace resource
 
 #endif // resource_resourceserializer_h

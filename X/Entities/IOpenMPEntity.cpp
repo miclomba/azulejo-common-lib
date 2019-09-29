@@ -14,7 +14,7 @@ IOpenMPEntity::IOpenMPEntity(const int numThreads, const bool setDynamic, const 
 		throw std::runtime_error("Cannot start IOpenMPEntity with invalid number of threads: " + std::to_string(numThreads_));
 }
 
-IOpenMPEntity::~IOpenMPEntity() {}
+IOpenMPEntity::~IOpenMPEntity() = default;
 
 IOpenMPEntity::IOpenMPEntity(const IOpenMPEntity&) = default;
 IOpenMPEntity& IOpenMPEntity::operator=(const IOpenMPEntity&) = default;

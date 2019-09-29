@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 
@@ -26,12 +27,11 @@ public:
 	void SetSerializationPath(const std::string& binaryFilePath);
 	std::string GetSerializationPath() const;
 
-	std::unique_ptr<IResource> Deserialize(const std::string& key);
-
 	template<typename T>
 	void RegisterResource(const std::string& key);
 	void UnregisterResource(const std::string& key);
 
+	std::unique_ptr<IResource> Deserialize(const std::string& key);
 	std::unique_ptr<IResource> GenerateResource(const std::string& key) const;
 private:
 	ResourceDeserializer();
@@ -48,7 +48,6 @@ private:
 };
 
 #include "ResourceDeserializer.hpp"
-
 } // end namespace resource
 
 #endif // resource_resourcedeserializer_h

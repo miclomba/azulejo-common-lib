@@ -13,19 +13,14 @@ ISharedMemoryEntity::ISharedMemoryEntity() = default;
 
 ISharedMemoryEntity::~ISharedMemoryEntity()
 {
-	if (shmem_ && isShmemOwner_)
-	{
-		const char* name = shmem_->get_name();
-		bool removed = boost::interprocess::shared_memory_object::remove(name);
-		if (!removed)
-			throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
-	}
-}
+	if (!shmem_ || !isShmemOwner_)
+		return;
 
-ISharedMemoryEntity::ISharedMemoryEntity(const ISharedMemoryEntity&) = default;
-ISharedMemoryEntity& ISharedMemoryEntity::operator=(const ISharedMemoryEntity&) = default;
-ISharedMemoryEntity::ISharedMemoryEntity(ISharedMemoryEntity&&) = default;
-ISharedMemoryEntity& ISharedMemoryEntity::operator=(ISharedMemoryEntity&&) = default;
+	const char* name = shmem_->get_name();
+	bool removed = boost::interprocess::shared_memory_object::remove(name);
+	if (!removed)
+		throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
+}
 
 void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
 {
@@ -100,6 +95,11 @@ void* ISharedMemoryEntity::GetSharedAddress() const
 
 	mapped_region region{ *shmem_, read_write };
 	return static_cast<void*>(region.get_address());
+}
+
+bool ISharedMemoryEntity::IsSharedMemoryOwner() const
+{
+	return isShmemOwner_;
 }
 
 } // end namespace entity

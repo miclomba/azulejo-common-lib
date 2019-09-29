@@ -26,6 +26,7 @@ int SumSquares(const int x)
 class Runnable : public IRunnableEntity
 {
 public:
+	Runnable() = default;
 	Runnable(const int x) : x_(x) { accum_ = 0; };
 	int GetAccum() { return accum_; }
 
@@ -39,6 +40,11 @@ private:
 
 int Runnable::accum_ = 0;
 } // end namespace anonymous
+
+TEST(IRunnableEntity, Construct)
+{
+	EXPECT_NO_THROW(Runnable());
+}
 
 TEST(IRunnableEntity, Start)
 {

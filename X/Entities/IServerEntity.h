@@ -17,10 +17,10 @@ public:
 	IServerEntity(const int port);
 	virtual ~IServerEntity();
 
-	IServerEntity(const IServerEntity&);
-	IServerEntity& operator=(const IServerEntity&);
-	IServerEntity(IServerEntity&&);
-	IServerEntity& operator=(IServerEntity&&);
+	IServerEntity(const IServerEntity&) = delete;
+	IServerEntity& operator=(const IServerEntity&) = delete;
+	IServerEntity(IServerEntity&&) = delete;
+	IServerEntity& operator=(IServerEntity&&) = delete;
 
 	void Run();
 
@@ -30,8 +30,8 @@ protected:
 private:
 	std::shared_ptr<boost::asio::ip::tcp::socket> Accept();
 
-	std::shared_ptr<boost::asio::io_service> ioService_;
-	std::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor_;
+	boost::asio::io_service ioService_;
+	boost::asio::ip::tcp::acceptor acceptor_;
 };
 
 } // end namespace entity

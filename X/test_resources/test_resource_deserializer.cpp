@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include <fstream>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,14 +16,20 @@
 namespace fs = std::filesystem;
 typedef std::vector<int> VecInt;
 
+using resource::IResource;
+using resource::Resource;
+using resource::ResourceDeserializer;
+using resource::ResourceSerializer;
+
 namespace
 {
-const std::string RESOURCE_ROOT = "C:/users/miclomba/Downloads"; 
+const std::string RESOURCE_ROOT = (fs::path(ROOT_FILESYSTEM) / "users" / "miclomba" / "Downloads").string(); 
 const std::string RESOURCE_KEY = "resource";
+const std::string BAD_PATH = "$helloworld$";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
 
-class ContainerResource : public resource::Resource<VecInt>
+class ContainerResource : public Resource<VecInt>
 {
 public:
 	ContainerResource(VecInt&& values) : Resource(std::move(values)) {}
@@ -34,97 +42,134 @@ public:
 
 TEST(ResourceDeserializer, GetInstance)
 {
-	EXPECT_NO_THROW(resource::ResourceDeserializer::GetInstance());
-	auto deserializer = resource::ResourceDeserializer::GetInstance();
+	EXPECT_NO_THROW(ResourceDeserializer::GetInstance());
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 	EXPECT_TRUE(deserializer);
-	EXPECT_NO_THROW(resource::ResourceDeserializer::ResetInstance());
+	EXPECT_NO_THROW(ResourceDeserializer::ResetInstance());
 }
 
 TEST(ResourceDeserializer, ResetInstance)
 {
-	EXPECT_NO_THROW(resource::ResourceDeserializer::ResetInstance());
+	EXPECT_NO_THROW(ResourceDeserializer::ResetInstance());
 }
 
 TEST(ResourceDeserializer, SetSerializationPath)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_NO_THROW(deserializer->SetSerializationPath(RESOURCE_ROOT));
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, GetSerializationPath)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
 	EXPECT_EQ(deserializer->GetSerializationPath(), RESOURCE_ROOT);
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
 }
 
-TEST(ResourceDeserializer, ThrowOnGetSerializationPath)
+TEST(ResourceDeserializer, GetSerializationPathThrows)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_THROW(deserializer->GetSerializationPath(), std::runtime_error);
 
-	resource::ResourceDeserializer::ResetInstance();
-}
-
-TEST(ResourceDeserializer, GenerateResource)
-{
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
-
-	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
-	auto resource = deserializer->GenerateResource(RESOURCE_KEY);
-	EXPECT_TRUE(resource);
-
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, RegisterResource)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_NO_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY));
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
 }
 
-TEST(ResourceDeserializer, ThrowOnRegisterResource)
+TEST(ResourceDeserializer, RegisterResourceThrowsOnEmptyKey)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_THROW(deserializer->RegisterResource<VecInt>(""), std::runtime_error);
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, RegisterResourceThrowsOnExistingKey)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_NO_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY));
+	EXPECT_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, UnregisterResource)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_NO_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY));
 	EXPECT_NO_THROW(deserializer->UnregisterResource(RESOURCE_KEY));
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
 }
 
-TEST(ResourceDeserializer, ThrowOnUnregisterResource)
+TEST(ResourceDeserializer, UnregisterResourceThrowsOnEmptyKey)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->UnregisterResource(""), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, UnregisterResourceThrowsOnUnregisteredKey)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_THROW(deserializer->UnregisterResource(RESOURCE_KEY), std::runtime_error);
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, GenerateResource)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
+	std::unique_ptr<IResource> resource = deserializer->GenerateResource(RESOURCE_KEY);
+	EXPECT_TRUE(resource);
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, GenerateResourceThrowsOnEmptyKey)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->GenerateResource(""), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, GenerateResourceThrowsOnUnregisteredKey)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->GenerateResource(RESOURCE_KEY), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, Deserialize)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
 	serializer->SetSerializationPath(RESOURCE_ROOT);
@@ -136,8 +181,8 @@ TEST(ResourceDeserializer, Deserialize)
 	
 	// deserialize
 	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
-	std::unique_ptr<resource::IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<resource::Resource<VecInt>*>(rsrc.get());
+	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
+	auto vecIntResource = static_cast<Resource<VecInt>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(vecIntResource->Data(), INT_VALUES);
 
@@ -145,17 +190,39 @@ TEST(ResourceDeserializer, Deserialize)
 	fs::remove(RESOURCE_FILE);
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
-	resource::ResourceDeserializer::ResetInstance();
-	resource::ResourceSerializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceDeserializer, ThrowOnDeserializeWithoutSerializationPath)
+TEST(ResourceDeserializer, DeserializeThrowsWithoutSerializationPath)
 {
-	resource::ResourceDeserializer* deserializer = resource::ResourceDeserializer::GetInstance();
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
 	EXPECT_THROW(deserializer->Deserialize(RESOURCE_KEY), std::runtime_error);
 
-	resource::ResourceDeserializer::ResetInstance();
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, DeserializeThrowsWithBadSerializationPath)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	deserializer->SetSerializationPath(BAD_PATH);
+	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
+	EXPECT_THROW(deserializer->Deserialize(RESOURCE_KEY), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, DeserializeThrowsWithEmptyKey)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	deserializer->SetSerializationPath(RESOURCE_ROOT);
+	deserializer->RegisterResource<VecInt>(RESOURCE_KEY);
+	EXPECT_THROW(deserializer->Deserialize(""), std::runtime_error);
+
+	ResourceDeserializer::ResetInstance();
 }
 

@@ -31,7 +31,7 @@ protected:
 private:
 	mutable int checkSum_{ -1 };
 };
-}
 
+} // end resource
 #endif // end resource_iresource_h
 

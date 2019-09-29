@@ -21,8 +21,12 @@ const std::string OTHER_NAME = "other_shmem";
 const size_t SIZE = 1024;
 
 struct ShareableCreator : public ISharedMemoryEntity {};
-struct ShareableAccessor : public ISharedMemoryEntity {};
 } // end namespace anonymous
+
+TEST(ISharedMemoryEntity, Construct)
+{
+	EXPECT_NO_THROW(ShareableCreator shareable());
+}
 
 TEST(ISharedMemoryEntity, Create)
 {
@@ -80,6 +84,19 @@ TEST(ISharedMemoryEntity, OpenThrows)
 	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
 }
 
+TEST(ISharedMemoryEntity, Destroy)
+{
+	ShareableCreator shareable;
+	ShareableCreator otherShareable;
+
+	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
+	EXPECT_NO_THROW(otherShareable.Open(NAME));
+	EXPECT_FALSE(otherShareable.IsSharedMemoryOwner());
+
+	EXPECT_EQ(shareable.GetSharedAddress(), otherShareable.GetSharedAddress());
+}
+
 TEST(ISharedMemoryEntity, GetSharedName)
 {
 	ShareableCreator shareable;
@@ -123,6 +140,15 @@ TEST(ISharedMemoryEntity, ThrowOnGetSharedAddress)
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedAddress(), std::runtime_error);
+}
+
+TEST(ISharedMemoryEntity, IsSharedMemoryOwner)
+{
+	ShareableCreator shareable;
+	EXPECT_FALSE(shareable.IsSharedMemoryOwner());
+
+	shareable.Create(NAME, SIZE);
+	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
 }
 
 /*

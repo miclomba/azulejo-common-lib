@@ -1,7 +1,7 @@
 #include "config.h"
 
 #include <filesystem>
-#include <fstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -12,14 +12,17 @@
 
 namespace fs = std::filesystem;
 
+using resource::Resource;
+using resource::ResourceSerializer;
+
 namespace
 {
-const std::string RESOURCE_ROOT = "C:/users/miclomba/Downloads"; 
+const std::string RESOURCE_ROOT = (fs::path(ROOT_FILESYSTEM) / "users" / "miclomba" / "Downloads").string(); 
 const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
 
-class ContainerResource : public resource::Resource<std::vector<int>>
+class ContainerResource : public Resource<std::vector<int>>
 {
 public:
 	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
@@ -35,39 +38,48 @@ public:
 
 TEST(ResourceSerializer, GetInstance)
 {
-	EXPECT_NO_THROW(resource::ResourceSerializer::GetInstance());
-	auto serializer = resource::ResourceSerializer::GetInstance();
+	EXPECT_NO_THROW(ResourceSerializer::GetInstance());
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 	EXPECT_TRUE(serializer);
-	EXPECT_NO_THROW(resource::ResourceSerializer::ResetInstance());
+	EXPECT_NO_THROW(ResourceSerializer::ResetInstance());
 }
 
 TEST(ResourceSerializer, ResetInstance)
 {
-	EXPECT_NO_THROW(resource::ResourceSerializer::ResetInstance());
+	EXPECT_NO_THROW(ResourceSerializer::ResetInstance());
 }
 
 TEST(ResourceSerializer, SetSerializationPath)
 {
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->SetSerializationPath(RESOURCE_ROOT));
 
-	resource::ResourceSerializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceSerializer, GetSerializationPath)
 {
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
 	serializer->SetSerializationPath(RESOURCE_ROOT);
 	EXPECT_EQ(serializer->GetSerializationPath(), RESOURCE_ROOT);
 
-	resource::ResourceSerializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, GetSerializationPathThrows)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	EXPECT_THROW(serializer->GetSerializationPath(), std::runtime_error);
+
+	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceSerializer, Serialize)
 {
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
 	serializer->SetSerializationPath(RESOURCE_ROOT);
 
@@ -82,16 +94,28 @@ TEST(ResourceSerializer, Serialize)
 	fs::remove(RESOURCE_FILE);
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
-	resource::ResourceSerializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceSerializer, ThrowOnSerializeWithoutSerializationPath)
+TEST(ResourceSerializer, SerializeThrowsUsingEmptyKey)
 {
-	resource::ResourceSerializer* serializer = resource::ResourceSerializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+
+	ContainerResource resource(INT_VALUES);
+	EXPECT_THROW(serializer->Serialize(resource, ""), std::runtime_error);
+
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
 	ContainerResource resource(INT_VALUES);
 	EXPECT_THROW(serializer->Serialize(resource, RESOURCE_KEY), std::runtime_error);
 
-	resource::ResourceSerializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
 }
 
