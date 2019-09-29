@@ -24,7 +24,7 @@ ISerializableEntity& ISerializableEntity::operator=(const ISerializableEntity&) 
 ISerializableEntity::ISerializableEntity(ISerializableEntity&&) = default;
 ISerializableEntity& ISerializableEntity::operator=(ISerializableEntity&&) = default;
 
-SharedEntity ISerializableEntity::GetAggregatedMember(const Key& key) const
+SharedEntity& ISerializableEntity::GetAggregatedMember(const Key& key) const
 {
 	MemberMap& members = Entity::GetAggregatedMembers();
 

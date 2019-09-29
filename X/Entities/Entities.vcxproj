@@ -132,6 +132,7 @@
     <ClCompile Include="IRunnableEntity.cpp" />
     <ClCompile Include="IStreamableEntity.cpp" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityAggregationDeserializer.h" />
     <ClInclude Include="EntityAggregationDeserializer.hpp" />
     <ClInclude Include="EntityAggregationSerializer.h" />

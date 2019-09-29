@@ -31,20 +31,28 @@ public:
 protected:
 	Entity();
 
+	template<class T>
+	SharedEntity& GetAggregatedMember(const Key& key) const;
 	// make virtual so that classes such as ISerializableEntity can override for lazy loading
-	virtual SharedEntity GetAggregatedMember(const Key& key) const;
+	virtual SharedEntity& GetAggregatedMember(const Key& key) const;
 
 	std::map<Key, SharedEntity>& GetAggregatedMembers() const;
 
+	template<class T = Entity>
 	std::vector<Key> GetAggregatedMemberKeys() const;
 
 	void AggregateMember(const Key& key);
 	void AggregateMember(SharedEntity sharedObj);
 
+	void RemoveMember(const Key& key);
+	void RemoveMember(SharedEntity sharedObj);
+
 private:
 	Key key_;
 	mutable std::map<Key, SharedEntity> membersMap_;
 };
+
+#include "Entity.hpp"
 
 } // end namespace entity
 

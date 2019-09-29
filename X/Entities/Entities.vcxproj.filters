@@ -86,5 +86,8 @@
     <ClInclude Include="ISerializableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

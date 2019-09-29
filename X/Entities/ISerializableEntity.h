@@ -38,7 +38,7 @@ public:
 	virtual void Load(boost::property_tree::ptree& tree, const std::string& path) = 0;
 
 protected:
-	SharedEntity GetAggregatedMember(const Key& key) const override;
+	SharedEntity& GetAggregatedMember(const Key& key) const override;
 
 	SerializableMemberMap GetAggregatedMembers() const;
 };
