@@ -25,8 +25,6 @@ using entity::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
-using SharedSerializable = ISerializableEntity::SharedSerializable;
-using SerializationMembersMap = ISerializableEntity::SerializableMemberMap;
 
 namespace
 {
@@ -49,7 +47,20 @@ struct TypeA : public ISerializableEntity
 
 	void AggregateProtectedMember(const Key& key) { AggregateMember(key); };
 
-	const SerializationMembersMap GetAggregatedProtectedMembers() { return GetAggregatedMembers(); };
+	std::map<Key, ISerializableEntity*> GetAggregatedProtectedMembers()
+	{ 
+		std::map<Key, ISerializableEntity*> serializableMemberMap;
+
+		std::vector<std::string> keys = GetAggregatedMemberKeys<ISerializableEntity>();
+		for (const std::string& key : keys)
+		{
+			Entity::SharedEntity& member = GetAggregatedMember(key);
+			auto memberPtr = static_cast<ISerializableEntity*>(member.get());
+			serializableMemberMap.insert(std::make_pair(key,memberPtr));
+		}
+		return serializableMemberMap; 
+	};
+
 	SharedEntity GetAggregatedProtectedMember(const Key& key) { return GetAggregatedMember(key); }
 	SharedEntity GetAggregatedProtectedMemberPtr(const Key& key) { return GetAggregatedMember(key); }
 
@@ -318,7 +329,7 @@ TEST_F(EntityAggregationDeserializerFixture, DeserializeRoot)
 	EXPECT_NO_THROW(deserializer->Deserialize(entity1a));
 
 	// verify
-	SerializationMembersMap membersMap = entity1a.GetAggregatedProtectedMembers();
+	std::map<Key, ISerializableEntity*> membersMap = entity1a.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.size() == size_t(1));
 	auto entity2a = std::static_pointer_cast<TypeA>(entity1a.GetAggregatedProtectedMember(ENTITY_2A));
 	EXPECT_TRUE(entity2a);
@@ -349,7 +360,7 @@ TEST_F(EntityAggregationDeserializerFixture, DeserializeIntermediate)
 	EXPECT_NO_THROW(deserializer->Deserialize(entity2a));
 
 	// verify
-	SerializationMembersMap membersMap = entity2a.GetAggregatedProtectedMembers();
+	std::map<Key, ISerializableEntity*> membersMap = entity2a.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.size() == size_t(1));
 	auto entity1b = std::static_pointer_cast<TypeA>(entity2a.GetAggregatedProtectedMember(ENTITY_1B));
 	EXPECT_TRUE(entity1b);
@@ -374,7 +385,7 @@ TEST_F(EntityAggregationDeserializerFixture, DeserializeLeaf)
 	EXPECT_NO_THROW(deserializer->Deserialize(entity1b));
 
 	// verify
-	SerializationMembersMap membersMap = entity1b.GetAggregatedProtectedMembers();
+	std::map<Key, ISerializableEntity*> membersMap = entity1b.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.empty());
 
 	EntityAggregationDeserializer::ResetInstance();
@@ -414,7 +425,7 @@ TEST_F(EntityAggregationDeserializerFixture, LazyLoadEntity)
 
 	// Create entity with unloaded member
 	std::shared_ptr<TypeA> entity = CreateEntityWithUnloadedMember(ENTITY_1A, ENTITY_2A);
-	SerializationMembersMap members = entity->GetAggregatedProtectedMembers();
+	std::map<Key, ISerializableEntity*> members = entity->GetAggregatedProtectedMembers();
 	EXPECT_TRUE(members.find(ENTITY_2A) == members.cend());
 
 	// try to lazy load the entity

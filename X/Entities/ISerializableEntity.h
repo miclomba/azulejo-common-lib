@@ -19,9 +19,6 @@ class EntityAggregationSerializer;
 class ENTITY_DLL_EXPORT ISerializableEntity : public Entity
 {
 public:
-	using SharedSerializable = std::shared_ptr<ISerializableEntity>;
-	using SerializableMemberMap = std::map<Key, SharedSerializable>;
-
 	friend class EntityAggregationSerializer;
 	friend class EntityAggregationDeserializer;
 
@@ -39,8 +36,6 @@ public:
 
 protected:
 	SharedEntity& GetAggregatedMember(const Key& key) const override;
-
-	SerializableMemberMap GetAggregatedMembers() const;
 };
 
 } // end namespace entity

@@ -12,7 +12,6 @@ using entity::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
-using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
 
 namespace entity {
 
@@ -45,18 +44,4 @@ SharedEntity& ISerializableEntity::GetAggregatedMember(const Key& key) const
 	}
 	return members[key];
 }
-
-SerializableMemberMap ISerializableEntity::GetAggregatedMembers() const
-{
-	SerializableMemberMap members;
-
-	const MemberMap& allMembers = Entity::GetAggregatedMembers();
-	for (const std::pair<Key, SharedEntity>& member : allMembers)
-	{
-		if (member.second && std::dynamic_pointer_cast<ISerializableEntity>(member.second))
-			members.insert(std::make_pair(member.first, std::static_pointer_cast<ISerializableEntity>(member.second)));
-	}
-	return members;
-}
-
 } // end namespace entity

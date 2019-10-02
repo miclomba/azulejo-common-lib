@@ -24,7 +24,6 @@ using entity::EntityAggregationSerializer;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
-using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
 
 namespace
 {

@@ -16,8 +16,6 @@ using entity::Entity;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
-using SerializableMemberMap = ISerializableEntity::SerializableMemberMap;
-using SharedSerializable = ISerializableEntity::SharedSerializable;
 
 namespace entity {
 
@@ -60,9 +58,13 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 
 	entity.Save(tree, absolutePath);
 
-	SerializableMemberMap members = entity.GetAggregatedMembers();
-	for (const std::pair<Key,SharedSerializable>& m : members)
-		SerializeWithParentKey(*m.second,searchPath);
+	std::vector<std::string> keys = entity.GetAggregatedMemberKeys<ISerializableEntity>();
+	for (const std::string& key : keys)
+	{
+		Entity::SharedEntity& member = entity.GetAggregatedMember(key);
+		auto memberPtr = static_cast<ISerializableEntity*>(member.get());
+		SerializeWithParentKey(*memberPtr,searchPath);
+	}
 
 	if (parentKey.empty())
 		boost::property_tree::json_parser::write_json(serializationPath_.string(), serializationStructure_);
