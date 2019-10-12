@@ -33,6 +33,7 @@ const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";
 const std::string ENTITY_1B = "entity_1b";
+const std::string NON_ENTITY = "not_an_entity";
 const std::string BAD_KEY = "bad_key";
 const std::string VALUE = "value";
 
@@ -75,6 +76,16 @@ struct TypeA : public ISerializableEntity
 		EXPECT_TRUE(fs::exists(path));
 	}
 
+	std::string GetPath() const
+	{
+		return path_;
+	}
+
+	void SetPath(const std::string& p)
+	{
+		path_ = p;
+	}
+
 private:
 	mutable std::string path_;
 };
@@ -93,6 +104,8 @@ std::vector<std::string> CreateEntityFile(const std::string& filePath)
 
 	pt::ptree& child2 = child.get_child(ENTITY_2A);
 	child2.add_child(ENTITY_1B, pt::ptree(VALUE));
+	// add a child that won't have a corressponding entity
+	child2.add_child(NON_ENTITY, pt::ptree(VALUE));
 	directories.push_back((fs::path(ENTITY_1A) / ENTITY_2A / ENTITY_1B).string());
 
 	pt::json_parser::write_json(filePath, root);
@@ -391,16 +404,22 @@ TEST_F(EntityAggregationDeserializerFixture, DeserializeLeaf)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST(EntityAggregationDeserializer, DeserializeThrowsWithoutSerializationStructure)
+TEST(EntityAggregationDeserializer, DeserializeReturnsWithoutSerializationStructure)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_THROW(deserializer->Deserialize(TypeA()), std::runtime_error);
+	TypeA typeA;
+	typeA.SetKey(BAD_KEY);
+	typeA.SetPath(VALUE);
+
+	EXPECT_NO_THROW(deserializer->Deserialize(typeA));
+	EXPECT_EQ(typeA.GetPath(), VALUE);
+	EXPECT_EQ(typeA.GetKey(), BAD_KEY);
 
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDeserializerFixture, DeserializeThrowsWithBadKey)
+TEST_F(EntityAggregationDeserializerFixture, DeserializeReturnsWithBadKey)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
@@ -408,7 +427,11 @@ TEST_F(EntityAggregationDeserializerFixture, DeserializeThrowsWithBadKey)
 
 	TypeA badEntity;
 	badEntity.SetKey(BAD_KEY);
-	EXPECT_THROW(deserializer->Deserialize(badEntity), std::runtime_error);
+	badEntity.SetPath(VALUE);
+
+	EXPECT_NO_THROW(deserializer->Deserialize(badEntity));
+	EXPECT_EQ(badEntity.GetPath(), VALUE);
+	EXPECT_EQ(badEntity.GetKey(), BAD_KEY);
 
 	EntityAggregationDeserializer::ResetInstance();
 }

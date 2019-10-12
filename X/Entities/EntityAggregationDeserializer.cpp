@@ -122,11 +122,11 @@ std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEnti
 void EntityAggregationDeserializer::Deserialize(ISerializableEntity& entity)
 {
 	if (!HasSerializationStructure())
-		throw std::runtime_error("Cannot deserialize entity because no serialization structure has been loaded");
+		return;
 
 	std::string keyPath = GetKeyPath(entity.GetKey(), serializationStructure_);
 	if (keyPath.empty())
-		throw std::runtime_error("Cannot deserialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
+		return;
 
 	DeserializeWithParentKey(entity, GetParentKeyPath(keyPath));
 }
@@ -153,6 +153,9 @@ void EntityAggregationDeserializer::DeserializeWithParentKey(ISerializableEntity
 	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{
 		std::string key = child.first;
+		if (!HasSerializationKey(key))
+			continue;
+
 		std::unique_ptr<ISerializableEntity> memberEntity = GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
