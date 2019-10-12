@@ -230,6 +230,31 @@ TEST(EntityAggregationDeserializer, HasSerializationStructure)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
+TEST(EntityAggregationDeserializer, GetSerializationStructure)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	std::string jsonFile = CreateJSONFile();
+	EXPECT_NO_THROW(deserializer->LoadSerializationStructure(jsonFile));
+
+	EXPECT_NO_THROW(deserializer->GetSerializationStructure());
+	pt::ptree structure = deserializer->GetSerializationStructure();
+	EXPECT_TRUE(!structure.empty());
+
+	RemoveJSONFile(jsonFile);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
+TEST(EntityAggregationDeserializer, GetSerializationStructureThrows)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_THROW(deserializer->GetSerializationStructure(), std::runtime_error);
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
 TEST(EntityAggregationDeserializer, HasSerializationKeyFalse)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();

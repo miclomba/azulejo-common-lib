@@ -95,6 +95,13 @@ bool EntityAggregationDeserializer::HasSerializationStructure() const
 	return !serializationPath_.empty() && !serializationStructure_.empty();
 }
 
+pt::ptree EntityAggregationDeserializer::GetSerializationStructure() const
+{
+	if (HasSerializationStructure())
+		return serializationStructure_;
+	throw std::runtime_error("EntityAggregationDeserializer has no serialization structure");
+}
+
 bool EntityAggregationDeserializer::HasSerializationKey(const Key& key) const
 {
 	return keyToEntityMap_.find(key) != keyToEntityMap_.cend();

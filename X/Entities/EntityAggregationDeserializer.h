@@ -27,6 +27,7 @@ public:
 	// structure
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
+	boost::property_tree::ptree GetSerializationStructure() const;
 
 	// registration
 	template<typename T>
