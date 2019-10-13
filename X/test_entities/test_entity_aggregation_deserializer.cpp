@@ -329,6 +329,19 @@ TEST(EntityAggregationDeserializer, UnregisterEntityThrows)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
+TEST(EntityAggregationDeserializer, UnregisterAll)
+{
+	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_NO_THROW(deserializer->UnregisterAll());
+	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+
+	EntityAggregationDeserializer::ResetInstance();
+}
+
 TEST(EntityAggregationDeserializer, GenerateEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();

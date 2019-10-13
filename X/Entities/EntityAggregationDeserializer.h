@@ -33,6 +33,7 @@ public:
 	template<typename T>
 	void RegisterEntity(const Entity::Key& key);
 	void UnregisterEntity(const Entity::Key& key);
+	void UnregisterAll();
 	bool HasSerializationKey(const Entity::Key& key) const;
 
 	// deserialization & generation

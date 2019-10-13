@@ -115,6 +115,11 @@ void EntityAggregationDeserializer::UnregisterEntity(const Key& key)
 	keyToEntityMap_.erase(key);
 }
 
+void EntityAggregationDeserializer::UnregisterAll()
+{
+	keyToEntityMap_.clear();
+}
+
 std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const Key& key) const
 {
 	if (!HasSerializationKey(key))
