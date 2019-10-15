@@ -7,10 +7,10 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 
 	const std::string RESOURCE_EXT = ".bin";
 
-	auto serializationPath = fs::path(GetSerializationPath());
+	auto serializationPath = std::filesystem::path(GetSerializationPath());
 
-	if (! fs::exists(serializationPath))
-		fs::create_directories(serializationPath);
+	if (! std::filesystem::exists(serializationPath))
+		std::filesystem::create_directories(serializationPath);
 
 	if (!resource.IsDirty())
 		return;

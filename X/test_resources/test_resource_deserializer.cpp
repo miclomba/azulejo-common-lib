@@ -137,6 +137,38 @@ TEST(ResourceDeserializer, UnregisterResourceThrowsOnUnregisteredKey)
 	ResourceDeserializer::ResetInstance();
 }
 
+TEST(ResourceDeserializer, UnregisterAll)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY));
+	EXPECT_TRUE(deserializer->HasSerializationKey(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->UnregisterAll());
+	EXPECT_FALSE(deserializer->HasSerializationKey(RESOURCE_KEY));
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, HasSerializationKeyFalse)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_FALSE(deserializer->HasSerializationKey(RESOURCE_KEY));
+
+	ResourceDeserializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, HasSerializationKeyTrue)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+
+	EXPECT_NO_THROW(deserializer->RegisterResource<VecInt>(RESOURCE_KEY));
+	EXPECT_TRUE(deserializer->HasSerializationKey(RESOURCE_KEY));
+
+	ResourceDeserializer::ResetInstance();
+}
+
 TEST(ResourceDeserializer, GenerateResource)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();

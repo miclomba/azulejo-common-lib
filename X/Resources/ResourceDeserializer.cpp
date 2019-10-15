@@ -55,6 +55,16 @@ void ResourceDeserializer::UnregisterResource(const std::string& key)
 	keyToResourceMap_.erase(key);
 }
 
+bool ResourceDeserializer::HasSerializationKey(const std::string& key) const
+{
+	return keyToResourceMap_.find(key) != keyToResourceMap_.cend();
+}
+
+void ResourceDeserializer::UnregisterAll()
+{
+	keyToResourceMap_.clear();
+}
+
 std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& key)
 {
 	if (key.empty())

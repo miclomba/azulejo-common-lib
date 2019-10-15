@@ -30,6 +30,8 @@ public:
 	template<typename T>
 	void RegisterResource(const std::string& key);
 	void UnregisterResource(const std::string& key);
+	void UnregisterAll();
+	bool HasSerializationKey(const std::string& key) const;
 
 	std::unique_ptr<IResource> Deserialize(const std::string& key);
 	std::unique_ptr<IResource> GenerateResource(const std::string& key) const;
