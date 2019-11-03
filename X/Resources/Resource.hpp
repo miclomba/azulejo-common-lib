@@ -1,7 +1,7 @@
 #define TEMPLATE_T template<typename T>
 #define ENABLE_IF_CONTAINER_TEMPLATE_DEF \
 TEMPLATE_T \
-template<typename U, typename std::enable_if_t<is_arithmetic_container<U>::value, int>> 
+template<typename U, typename std::enable_if_t<std::is_arithmetic<U>::value, int>> 
 
 ENABLE_IF_CONTAINER_TEMPLATE_DEF
 Resource<T>::Resource() 
@@ -9,12 +9,12 @@ Resource<T>::Resource()
 }
 
 ENABLE_IF_CONTAINER_TEMPLATE_DEF
-Resource<T>::Resource(const T& data) : data_(data)
+Resource<T>::Resource(const std::vector<T>& data) : data_(data)
 {
 }
 
 ENABLE_IF_CONTAINER_TEMPLATE_DEF
-Resource<T>::Resource(T&& data) : data_(std::move(data))
+Resource<T>::Resource(std::vector<T>&& data) : data_(std::move(data))
 {
 }
 
@@ -27,13 +27,13 @@ TEMPLATE_T
 Resource<T>::~Resource() = default;
 
 TEMPLATE_T
-const T& Resource<T>::Data() const
+const std::vector<T>& Resource<T>::Data() const
 {
 	return data_;
 }
 
 TEMPLATE_T
-T& Resource<T>::Data()
+std::vector<T>& Resource<T>::Data()
 {
 	return data_;
 }
@@ -46,7 +46,7 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 	if (n < 1)
 		throw std::runtime_error("N cannot be 0 during Resource::Assign");
 
-	T vBuff;
+	std::vector<T> vBuff;
 	vBuff.push_back(0);
 	size_t size = sizeof(decltype(vBuff[0]));
 	vBuff.clear();

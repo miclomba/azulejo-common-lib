@@ -8,19 +8,17 @@
 #include "Resources/IResource.h"
 #include "Resources/Resource.h"
 
-typedef int Int;
-
 namespace
 {
 const std::vector<int> INT_VALUES(1,1);
 const std::vector<int> EMPTY_INT_VALUES;
 
-class ContainerResource : public resource::Resource<std::vector<Int>>
+class ContainerResource : public resource::Resource<int>
 {
 public:
 	ContainerResource() = default;
-	ContainerResource(std::vector<Int>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<Int>& values) : Resource(values) {}
+	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
+	ContainerResource(const std::vector<int>& values) : Resource(values) {}
 	bool IsDirtyProtected() { return IsDirty(); }
 	int ChecksumProtected() { return Checksum(); }
 };

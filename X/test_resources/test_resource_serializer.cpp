@@ -22,15 +22,11 @@ const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<int> INT_VALUES(1, 1);
 
-class ContainerResource : public Resource<std::vector<int>>
+class ContainerResource : public Resource<int>
 {
 public:
 	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
 	ContainerResource(const std::vector<int>& values) : Resource(values) {}
-	std::vector<int> GetData() const { return Data(); }
-	void SetData(const std::vector<int>& values) { Data() = values; }
-	bool IsDirtyProtected() { return IsDirty(); }
-	int ChecksumProtected() { return Checksum(); }
 };
 } // end namespace 
 

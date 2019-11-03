@@ -15,7 +15,7 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	if (!resource.IsDirty())
 		return;
 
-	const T& data = resource.Data();
+	const std::vector<T>& data = resource.Data();
 	const char* buff = reinterpret_cast<const char*>(data.data());
 	int size = sizeof(data[0]) * data.size();
 
