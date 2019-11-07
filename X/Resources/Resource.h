@@ -49,7 +49,7 @@ public:
 	void Assign(const char* buff, const size_t n) override;
 
 protected:
-	int Checksum() const override;
+	std::vector<int> Checksum() const override;
 
 private:
 	std::vector<T> data_;

@@ -58,12 +58,16 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 }
 
 TEMPLATE_T
-int Resource<T>::Checksum() const
+std::vector<int> Resource<T>::Checksum() const
 {
-	boost::crc_32_type result;
-	size_t size = sizeof(*data_.data()) * data_.size();
-	result.process_bytes(data_.data(), size);
-	return result.checksum();
+	std::vector<int> results;
+
+	boost::crc_32_type crc;
+	size_t size = sizeof(T) * data_.size();
+	crc.process_bytes(data_.data(), size);
+	results.push_back(crc.checksum());
+
+	return results;
 }
 
 #undef ENABLE_IF_CONTAINER_TEMPLATE_DEF

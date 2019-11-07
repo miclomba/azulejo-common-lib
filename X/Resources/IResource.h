@@ -1,6 +1,8 @@
 #ifndef resource_iresource_h
 #define resource_iresource_h
 
+#include <vector>
+
 #include "config.h"
 
 namespace resource
@@ -26,10 +28,10 @@ public:
 
 protected:
 	bool IsDirty() const;
-	virtual int Checksum() const = 0;
+	virtual std::vector<int> Checksum() const = 0;
 
 private:
-	mutable int checkSum_{ -1 };
+	mutable std::vector<int> checkSum_;
 };
 
 } // end resource

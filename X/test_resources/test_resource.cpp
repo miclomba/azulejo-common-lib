@@ -20,9 +20,9 @@ public:
 	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
 	ContainerResource(const std::vector<int>& values) : Resource(values) {}
 	bool IsDirtyProtected() { return IsDirty(); }
-	int ChecksumProtected() { return Checksum(); }
+	std::vector<int> ChecksumProtected() { return Checksum(); }
 };
-}
+} // end namespace
 
 TEST(Resource, Construct)
 {
@@ -32,7 +32,7 @@ TEST(Resource, Construct)
 TEST(Resource, MoveConstruct)
 {
 	ContainerResource source(INT_VALUES);
-	int sourceChecksum = source.ChecksumProtected();
+	std::vector<int> sourceChecksum = source.ChecksumProtected();
 
 	// move
 	ContainerResource target(std::move(source));
@@ -44,7 +44,7 @@ TEST(Resource, MoveConstruct)
 TEST(Resource, MoveAssign)
 {
 	ContainerResource source(INT_VALUES);
-	int sourceChecksum = source.ChecksumProtected();
+	std::vector<int> sourceChecksum = source.ChecksumProtected();
 	ContainerResource target(EMPTY_INT_VALUES);
 
 	// move assign
@@ -104,7 +104,7 @@ TEST(Resource, Checksum)
 {
 	ContainerResource ir(EMPTY_INT_VALUES);
 
-	int checksum = ir.ChecksumProtected();
+	std::vector<int> checksum = ir.ChecksumProtected();
 	EXPECT_EQ(ir.ChecksumProtected(), checksum);
 
 	ir.Data() = INT_VALUES;
