@@ -10,15 +10,15 @@
 
 namespace
 {
-const std::vector<int> INT_VALUES(1,1);
-const std::vector<int> EMPTY_INT_VALUES;
+const std::vector<std::vector<int>> INT_VALUES(1,std::vector<int>(1,1));
+const std::vector<std::vector<int>> EMPTY_INT_VALUES;
 
 class ContainerResource : public resource::Resource<int>
 {
 public:
 	ContainerResource() = default;
-	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<int>& values) : Resource(values) {}
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
 	bool IsDirtyProtected() { return IsDirty(); }
 	std::vector<int> ChecksumProtected() { return Checksum(); }
 };
@@ -115,7 +115,7 @@ TEST(Resource, Assign)
 {
 	ContainerResource ir;
 
-	ir.Assign(reinterpret_cast<const char*>(INT_VALUES.data()), INT_VALUES.size() * sizeof(int));
+	ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int));
 	EXPECT_EQ(ir.Data(), INT_VALUES);
 }
 
@@ -123,6 +123,7 @@ TEST(Resource, AssignThrows)
 {
 	ContainerResource ir;
 
-	EXPECT_THROW(ir.Assign(nullptr, INT_VALUES.size() * sizeof(int)), std::runtime_error);
-	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES.data()), 0), std::runtime_error);
+	EXPECT_THROW(ir.Assign(nullptr, INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int)), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), 0), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), sizeof(int)-1), std::runtime_error);
 }

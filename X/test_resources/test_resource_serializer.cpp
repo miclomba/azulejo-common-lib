@@ -20,13 +20,13 @@ namespace
 const std::string RESOURCE_ROOT = (fs::path(ROOT_FILESYSTEM) / "users" / "miclomba" / "Downloads").string(); 
 const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
-const std::vector<int> INT_VALUES(1, 1);
+const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 
 class ContainerResource : public Resource<int>
 {
 public:
-	ContainerResource(std::vector<int>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<int>& values) : Resource(values) {}
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
 };
 } // end namespace 
 

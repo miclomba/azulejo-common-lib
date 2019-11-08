@@ -14,39 +14,51 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 using namespace boost::python;
+using MatrixDouble = std::vector<std::vector<double>>;
+using MatrixFloat = std::vector<std::vector<float>>;
+using MatrixInt = std::vector<std::vector<int>>;
+using MatrixUInt = std::vector<std::vector<unsigned int>>;
+using VecDouble = std::vector<double>;
+using VecFloat = std::vector<float>;
+using VecInt = std::vector<int>;
+using VecUInt = std::vector<unsigned int>;
 
 namespace
 {
-std::vector<double>& (resource::Resource<double>::*f_ptr_vec_d)() = &resource::Resource<double>::Data;
-std::vector<float>& (resource::Resource<float>::*f_ptr_vec_f)() = &resource::Resource<float>::Data;
-std::vector<int>& (resource::Resource<int>::*f_ptr_vec_i)() = &resource::Resource<int>::Data;
-std::vector<unsigned int>& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() = &resource::Resource<unsigned int>::Data;
+MatrixDouble& (resource::Resource<double>::*f_ptr_vec_d)() = &resource::Resource<double>::Data;
+MatrixFloat& (resource::Resource<float>::*f_ptr_vec_f)() = &resource::Resource<float>::Data;
+MatrixInt& (resource::Resource<int>::*f_ptr_vec_i)() = &resource::Resource<int>::Data;
+MatrixUInt& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() = &resource::Resource<unsigned int>::Data;
 }
 
 BOOST_PYTHON_MODULE(ResourcesModule)
 {
-	class_<std::vector<double>>("VecDouble").def(vector_indexing_suite<std::vector<double>>());
-	class_<std::vector<float>>("VecFloat").def(vector_indexing_suite<std::vector<float>>());
-	class_<std::vector<int>>("VecInt").def(vector_indexing_suite<std::vector<int>>());
-	class_<std::vector<unsigned int>>("VecUInt").def(vector_indexing_suite<std::vector<unsigned int>>());
+	class_<MatrixDouble>("MatrixDouble").def(vector_indexing_suite<MatrixDouble>());
+	class_<MatrixFloat>("MatrixFloat").def(vector_indexing_suite<MatrixFloat>());
+	class_<MatrixInt>("MatrixInt").def(vector_indexing_suite<MatrixInt>());
+	class_<MatrixUInt>("MatrixUInt").def(vector_indexing_suite<MatrixUInt>());
+	class_<VecDouble>("VecDouble").def(vector_indexing_suite<VecDouble>());
+	class_<VecFloat>("VecFloat").def(vector_indexing_suite<VecFloat>());
+	class_<VecInt>("VecInt").def(vector_indexing_suite<VecInt>());
+	class_<VecUInt>("VecUInt").def(vector_indexing_suite<VecUInt>());
 	
-	class_<resource::Resource<double>>("ResourceVecDouble")
-		.def(init<const std::vector<double>&>())
+	class_<resource::Resource<double>>("ResourceDouble")
+		.def(init<const MatrixDouble&>())
 		.def("data", f_ptr_vec_d, return_value_policy<reference_existing_object>())
 	;
 
-	class_<resource::Resource<float>>("ResourceVecFloat")
-		.def(init<const std::vector<float>&>())
+	class_<resource::Resource<float>>("ResourceFloat")
+		.def(init<const MatrixFloat&>())
 		.def("data", f_ptr_vec_f, return_value_policy<reference_existing_object>())
 	;
 
-	class_<resource::Resource<int>>("ResourceVecInt")
-		.def(init<const std::vector<int>&>())
+	class_<resource::Resource<int>>("ResourceInt")
+		.def(init<const MatrixInt&>())
 		.def("data", f_ptr_vec_i, return_value_policy<reference_existing_object>())
 	;
 
-	class_<resource::Resource<unsigned int>>("ResourceVecUInt")
-		.def(init<const std::vector<unsigned int>&>())
+	class_<resource::Resource<unsigned int>>("ResourceUInt")
+		.def(init<const MatrixUInt&>())
 		.def("data", f_ptr_vec_ui, return_value_policy<reference_existing_object>())
 	;
 }

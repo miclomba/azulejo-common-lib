@@ -1,6 +1,7 @@
 #ifndef resource_resource_h
 #define resource_resource_h
 
+#include <cmath>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -32,9 +33,9 @@ public:
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	Resource();
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
-	Resource(const std::vector<T>& data);
+	Resource(const std::vector<std::vector<T>>& data);
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
-	Resource(std::vector<T>&& data);
+	Resource(std::vector<std::vector<T>>&& data);
 
 	Resource(const Resource&);
 	Resource& operator=(const Resource&);
@@ -43,8 +44,8 @@ public:
 
 	virtual ~Resource();
 
-	const std::vector<T>& Data() const;
-	std::vector<T>& Data();
+	const std::vector<std::vector<T>>& Data() const;
+	std::vector<std::vector<T>>& Data();
 
 	void Assign(const char* buff, const size_t n) override;
 
@@ -52,7 +53,9 @@ protected:
 	std::vector<int> Checksum() const override;
 
 private:
-	std::vector<T> data_;
+	void ValidateInput();
+
+	std::vector<std::vector<T>> data_;
 };
 
 #include "Resource.hpp"

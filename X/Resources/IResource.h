@@ -31,7 +31,7 @@ protected:
 	virtual std::vector<int> Checksum() const = 0;
 
 private:
-	mutable std::vector<int> checkSum_;
+	mutable std::vector<int> checkSum_{-1};
 };
 
 } // end resource

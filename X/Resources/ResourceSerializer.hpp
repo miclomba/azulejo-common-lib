@@ -15,15 +15,18 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	if (!resource.IsDirty())
 		return;
 
-	const std::vector<T>& data = resource.Data();
-	const char* buff = reinterpret_cast<const char*>(data.data());
-	int size = sizeof(data[0]) * data.size();
+	const std::vector<std::vector<T>>& data = resource.Data();
+	for (const std::vector<int>& row : data)
+	{
+		const char* buff = reinterpret_cast<const char*>(row.data());
+		int size = sizeof(T) * row.size();
 
-	const std::string fileName = key + RESOURCE_EXT;
-	std::ofstream outfile(serializationPath / fileName, std::ios::binary);
-	if (!outfile)
-		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+		const std::string fileName = key + RESOURCE_EXT;
+		std::ofstream outfile(serializationPath / fileName, std::ios::binary);
+		if (!outfile)
+			throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
 
-	outfile.write(buff, sizeof(data[0]) * data.size());
+		outfile.write(buff, size);
+	}
 }
 
