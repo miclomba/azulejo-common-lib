@@ -31,6 +31,7 @@ const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 class ContainerResource : public Resource<int>
 {
 public:
+	ContainerResource() : Resource() {};
 	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
 	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
 };
@@ -204,7 +205,8 @@ TEST(ResourceDeserializer, Deserialize)
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
-	serializer->Serialize(ContainerResource(INT_VALUES), RESOURCE_KEY);
+	ContainerResource resource(INT_VALUES);
+	serializer->Serialize(resource, RESOURCE_KEY);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 	
 	// deserialize
@@ -212,7 +214,40 @@ TEST(ResourceDeserializer, Deserialize)
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
 	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
-	EXPECT_EQ(vecIntResource->Data(), INT_VALUES);
+	EXPECT_EQ(vecIntResource->Data(), resource.Data());
+	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
+	EXPECT_EQ(vecIntResource->GetRowSize(), resource.GetRowSize());
+
+	// clean up
+	fs::remove(RESOURCE_FILE);
+	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+
+	ResourceDeserializer::ResetInstance();
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceDeserializer, DeserializeEmptyResource)
+{
+	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	deserializer->SetSerializationPath(RESOURCE_ROOT);
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+
+	// serialize
+	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+	ContainerResource resource;
+	serializer->Serialize(resource, RESOURCE_KEY);
+	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
+
+	// deserialize
+	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
+	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
+	EXPECT_TRUE(vecIntResource);
+	EXPECT_EQ(vecIntResource->Data(), resource.Data());
+	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
+	EXPECT_EQ(vecIntResource->GetRowSize(), resource.GetRowSize());
 
 	// clean up
 	fs::remove(RESOURCE_FILE);

@@ -83,11 +83,23 @@ std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& 
 	const int size = inFile.tellg();
 	inFile.seekg(0, std::ios::beg);
 
+	size_t colSizeOffset = 0;
+	size_t rowSizeOffset = sizeof(size_t);
+	size_t dataOffset = 2*sizeof(size_t);
+
 	auto buff = std::make_unique<char*>(new char[size]);
-	inFile.read(*buff, size);
+
+	inFile.read(*buff + colSizeOffset, sizeof(size_t));
+	inFile.read(*buff + rowSizeOffset, sizeof(size_t));
+	if (size > dataOffset)
+		inFile.read(*buff + dataOffset, size - dataOffset);
 
 	std::unique_ptr<IResource> arithmeticContainer = GenerateResource(key);
-	arithmeticContainer->Assign(*buff, size);
+
+	arithmeticContainer->SetColumnSize(*(*buff + colSizeOffset));
+	arithmeticContainer->SetRowSize(*(*buff + rowSizeOffset));
+	if (size > dataOffset)
+		arithmeticContainer->Assign(*buff + dataOffset, size - dataOffset);
 	
 	return arithmeticContainer;
 }

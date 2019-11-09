@@ -1,6 +1,7 @@
 
 #include "config.h"
 
+#include <iostream>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -17,8 +18,14 @@ class ContainerResource : public resource::Resource<int>
 {
 public:
 	ContainerResource() = default;
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) 
+	{
+		std::cout << "hello world" << std::endl;
+	}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values)
+	{
+		std::cout << "hello world" << std::endl;
+	}
 	bool IsDirtyProtected() { return IsDirty(); }
 	std::vector<int> ChecksumProtected() { return Checksum(); }
 };
@@ -27,6 +34,39 @@ public:
 TEST(Resource, Construct)
 {
 	EXPECT_NO_THROW(ContainerResource());
+}
+
+TEST(Resource, LValueParameterConstruct)
+{
+	EXPECT_NO_THROW(ContainerResource(INT_VALUES));
+	ContainerResource resource(INT_VALUES);
+
+	EXPECT_EQ(resource.GetColumnSize(), INT_VALUES.size());
+	EXPECT_GT(INT_VALUES.size(), 0);
+	EXPECT_EQ(resource.GetRowSize(), INT_VALUES[0].size());
+}
+
+TEST(Resource, RValueParameterConstruct)
+{
+	std::vector<std::vector<int>> moveable = INT_VALUES;
+	EXPECT_NO_THROW(ContainerResource(std::move(moveable)));
+	std::vector<std::vector<int>> otherMoveable = INT_VALUES;
+	ContainerResource resource(std::move(otherMoveable));
+
+	EXPECT_EQ(resource.GetColumnSize(), INT_VALUES.size());
+	EXPECT_GT(INT_VALUES.size(), 0);
+	EXPECT_EQ(resource.GetRowSize(), INT_VALUES[0].size());
+}
+
+TEST(Resource, ConstructThrows)
+{
+	const int rowSize = 1;
+
+	std::vector<std::vector<int>> variableRowsInput;
+	variableRowsInput.push_back(std::vector<int>(rowSize));
+	variableRowsInput.push_back(std::vector<int>(rowSize+1));
+
+	EXPECT_THROW(ContainerResource resource(variableRowsInput), std::invalid_argument);
 }
 
 TEST(Resource, MoveConstruct)
@@ -114,6 +154,9 @@ TEST(Resource, Checksum)
 TEST(Resource, Assign)
 {
 	ContainerResource ir;
+	ir.SetColumnSize(INT_VALUES.size());
+	EXPECT_GT(INT_VALUES.size(), 0);
+	ir.SetRowSize(INT_VALUES[0].size());
 
 	ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int));
 	EXPECT_EQ(ir.Data(), INT_VALUES);
@@ -123,7 +166,71 @@ TEST(Resource, AssignThrows)
 {
 	ContainerResource ir;
 
+	// resource dimensions not set
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int)), std::runtime_error);
+
+	ir.SetColumnSize(INT_VALUES.size());
+	EXPECT_GT(INT_VALUES.size(), 0);
+	ir.SetRowSize(INT_VALUES[0].size());
+
+	// resource buffer not set
 	EXPECT_THROW(ir.Assign(nullptr, INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int)), std::runtime_error);
+	// resource length is 0 
 	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), 0), std::runtime_error);
+	// resource length not congruent with sizeof(T) 
 	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), sizeof(int)-1), std::runtime_error);
+}
+
+TEST(Resource, SetColumnSize)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_EQ(ir.GetColumnSize(), 0);
+	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_EQ(ir.GetColumnSize(), size);
+}
+
+TEST(Resource, SetColumnSizeThrowsWhenChangingDimension)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_THROW(ir.SetColumnSize(size + 1), std::runtime_error);
+}
+
+TEST(Resource, SetRowSize)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_EQ(ir.GetRowSize(), 0);
+	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_EQ(ir.GetRowSize(), size);
+}
+
+TEST(Resource, SetRowSizeThrowsWhenChangingDimension)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_THROW(ir.SetRowSize(size + 1), std::runtime_error);
+}
+
+TEST(Resource, GetColumnSize)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_EQ(ir.GetColumnSize(), 0);
+	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_EQ(ir.GetColumnSize(), size);
+}
+
+TEST(Resource, GetRowSize)
+{
+	const size_t size = 1;
+	ContainerResource ir;
+	EXPECT_EQ(ir.GetRowSize(), 0);
+	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_EQ(ir.GetRowSize(), size);
 }

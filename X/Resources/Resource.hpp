@@ -6,10 +6,13 @@ template<typename U, typename std::enable_if_t<std::is_arithmetic<U>::value, int
 TEMPLATE_T
 void Resource<T>::ValidateInput()
 {
-	size_t m = data_.size();
+	SetColumnSize(data_.size());
+	if (!data_.empty())
+		SetRowSize(data_[0].size());
+
 	for (const std::vector<T>& row : data_)
 	{
-		if (m != row.size())
+		if (GetRowSize() != row.size())
 			throw std::invalid_argument("Non-square matrix provided as input during Resource construction");
 	}
 }
@@ -63,15 +66,17 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 	if (n % size != 0)
 		throw std::runtime_error("n is not a multiple of sizeof(T) during Resource<T>::Assign");
 
-	int N = std::sqrt(n/size);
+	if (GetColumnSize() == 0 || GetRowSize() == 0)
+		throw std::runtime_error("Resource data row/column dimensions are not set during Resource<T>::Assign");
+
 	std::vector<std::vector<T>>& data = Data(); 
-	data.resize(N, std::vector<T>(N));
+	data.resize(GetColumnSize(), std::vector<T>(GetRowSize()));
 
 	int x = 0;
 	int y = -1;
 	for (size_t i = 0; i < n / size; ++i)
 	{
-		if (i % N == 0) ++y;
+		if (i % GetRowSize() == 0) ++y;
 		data[y][x++] = buff[i*size];
 	}
 }
@@ -83,10 +88,11 @@ std::vector<int> Resource<T>::Checksum() const
 	std::vector<int> results;
 	results.resize(data_.size());
 
+	size_t size = sizeof(T) * GetRowSize();
+
 	boost::crc_32_type crc;
 	for (const std::vector<T>& row : data_)
 	{
-		size_t size = sizeof(T) * row.size();
 		crc.process_bytes(row.data(), size);
 		results[i++] = crc.checksum();
 	}

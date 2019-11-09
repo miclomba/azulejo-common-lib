@@ -1,7 +1,6 @@
 #ifndef resource_resource_h
 #define resource_resource_h
 
-#include <cmath>
 #include <string>
 #include <type_traits>
 #include <vector>

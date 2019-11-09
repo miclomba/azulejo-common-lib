@@ -15,17 +15,25 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	if (!resource.IsDirty())
 		return;
 
+	const std::string fileName = key + RESOURCE_EXT;
+	std::ofstream outfile(serializationPath / fileName, std::ios::binary);
+	if (!outfile)
+		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+
 	const std::vector<std::vector<T>>& data = resource.Data();
+
+	const size_t M = resource.GetColumnSize();
+	const char* MBuff = reinterpret_cast<const char*>(&M);
+	outfile.write(MBuff, sizeof(size_t));
+
+	const size_t N = resource.GetRowSize();
+	const char* NBuff = reinterpret_cast<const char*>(&N);
+	outfile.write(NBuff, sizeof(size_t));
+
 	for (const std::vector<int>& row : data)
 	{
 		const char* buff = reinterpret_cast<const char*>(row.data());
 		int size = sizeof(T) * row.size();
-
-		const std::string fileName = key + RESOURCE_EXT;
-		std::ofstream outfile(serializationPath / fileName, std::ios::binary);
-		if (!outfile)
-			throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
-
 		outfile.write(buff, size);
 	}
 }
