@@ -44,7 +44,7 @@ public:
 	virtual ~Resource();
 
 	const std::vector<std::vector<T>>& Data() const;
-	std::vector<std::vector<T>>& Data();
+	T& Data(const size_t i, const size_t j);
 
 	void Assign(const char* buff, const size_t n) override;
 

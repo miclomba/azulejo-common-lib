@@ -25,10 +25,10 @@ using VecUInt = std::vector<unsigned int>;
 
 namespace
 {
-MatrixDouble& (resource::Resource<double>::*f_ptr_vec_d)() = &resource::Resource<double>::Data;
-MatrixFloat& (resource::Resource<float>::*f_ptr_vec_f)() = &resource::Resource<float>::Data;
-MatrixInt& (resource::Resource<int>::*f_ptr_vec_i)() = &resource::Resource<int>::Data;
-MatrixUInt& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() = &resource::Resource<unsigned int>::Data;
+const MatrixDouble& (resource::Resource<double>::*f_ptr_vec_d)() const = &resource::Resource<double>::Data;
+const MatrixFloat& (resource::Resource<float>::*f_ptr_vec_f)() const = &resource::Resource<float>::Data;
+const MatrixInt& (resource::Resource<int>::*f_ptr_vec_i)() const = &resource::Resource<int>::Data;
+const MatrixUInt& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() const = &resource::Resource<unsigned int>::Data;
 }
 
 BOOST_PYTHON_MODULE(ResourcesModule)

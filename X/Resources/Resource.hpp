@@ -49,9 +49,11 @@ const std::vector<std::vector<T>>& Resource<T>::Data() const
 }
 
 TEMPLATE_T
-std::vector<std::vector<T>>& Resource<T>::Data()
+T& Resource<T>::Data(const size_t i, const size_t j)
 {
-	return data_;
+	if (i < 0 || i >= GetColumnSize() || j < 0 || j >= GetRowSize())
+		throw std::invalid_argument("Resource indices " + std::to_string(i) + "," + std::to_string(j) + " are out of bounds");
+	return data_[i][j];
 }
 
 TEMPLATE_T
@@ -69,15 +71,14 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 	if (GetColumnSize() == 0 || GetRowSize() == 0)
 		throw std::runtime_error("Resource data row/column dimensions are not set during Resource<T>::Assign");
 
-	std::vector<std::vector<T>>& data = Data(); 
-	data.resize(GetColumnSize(), std::vector<T>(GetRowSize()));
+	data_.resize(GetColumnSize(), std::vector<T>(GetRowSize()));
 
 	int x = 0;
 	int y = -1;
 	for (size_t i = 0; i < n / size; ++i)
 	{
 		if (i % GetRowSize() == 0) ++y;
-		data[y][x++] = buff[i*size];
+		data_[y][x++] = buff[i*size];
 	}
 }
 

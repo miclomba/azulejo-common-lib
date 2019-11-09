@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-#include <iostream>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -11,6 +10,7 @@
 
 namespace
 {
+const int VAL = 7;
 const std::vector<std::vector<int>> INT_VALUES(1,std::vector<int>(1,1));
 const std::vector<std::vector<int>> EMPTY_INT_VALUES;
 
@@ -18,14 +18,8 @@ class ContainerResource : public resource::Resource<int>
 {
 public:
 	ContainerResource() = default;
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) 
-	{
-		std::cout << "hello world" << std::endl;
-	}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values)
-	{
-		std::cout << "hello world" << std::endl;
-	}
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
 	bool IsDirtyProtected() { return IsDirty(); }
 	std::vector<int> ChecksumProtected() { return Checksum(); }
 };
@@ -118,36 +112,51 @@ TEST(Resource, CopyAssign)
 
 TEST(Resource, SetData)
 {
-	ContainerResource ir(EMPTY_INT_VALUES);
-	EXPECT_NO_THROW(ir.Data() = INT_VALUES);
-	EXPECT_EQ(ir.Data(), INT_VALUES);
+	std::vector<std::vector<int>> values = INT_VALUES;
+	ContainerResource ir(values);
+
+	EXPECT_NO_THROW(ir.Data(0,0) = VAL);
+	values[0][0] = VAL;
+
+	EXPECT_EQ(ir.Data(), values);
+}
+
+TEST(Resource, SetDataThrows)
+{
+	ContainerResource ir(INT_VALUES);
+	EXPECT_NO_THROW(ir.Data(0, 0));
+	EXPECT_THROW(ir.Data(-1, 0), std::invalid_argument);
+	EXPECT_THROW(ir.Data(0, -1), std::invalid_argument);
+	EXPECT_THROW(ir.Data(1, 0), std::invalid_argument);
+	EXPECT_THROW(ir.Data(0, 1), std::invalid_argument);
 }
 
 TEST(Resource, GetData)
 {
-	ContainerResource ir(EMPTY_INT_VALUES);
-	EXPECT_NO_THROW(ir.Data() = INT_VALUES);
+	ContainerResource ir(INT_VALUES);
 	EXPECT_EQ(ir.Data(), INT_VALUES);
 }
 
 TEST(Resource, IsDirty)
 {
-	ContainerResource ir(EMPTY_INT_VALUES);
+	std::vector<std::vector<int>> values = INT_VALUES;
+	ContainerResource ir(INT_VALUES);
+
 	EXPECT_TRUE(ir.IsDirtyProtected());
 	EXPECT_FALSE(ir.IsDirtyProtected());
 
-	ir.Data() = INT_VALUES;
+	ir.Data(0,0) = VAL;
 	EXPECT_TRUE(ir.IsDirtyProtected());
 }
 
 TEST(Resource, Checksum)
 {
-	ContainerResource ir(EMPTY_INT_VALUES);
+	ContainerResource ir(INT_VALUES);
 
 	std::vector<int> checksum = ir.ChecksumProtected();
 	EXPECT_EQ(ir.ChecksumProtected(), checksum);
 
-	ir.Data() = INT_VALUES;
+	ir.Data(0,0) = VAL;
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
 
