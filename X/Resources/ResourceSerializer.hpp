@@ -30,7 +30,7 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	const char* NBuff = reinterpret_cast<const char*>(&N);
 	outfile.write(NBuff, sizeof(size_t));
 
-	for (const std::vector<int>& row : data)
+	for (const std::vector<T>& row : data)
 	{
 		const char* buff = reinterpret_cast<const char*>(row.data());
 		int size = sizeof(T) * row.size();
