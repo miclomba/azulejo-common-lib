@@ -12,6 +12,8 @@ namespace
 {
 const int VAL = 7;
 const std::vector<std::vector<int>> INT_VALUES(1,std::vector<int>(1,1));
+const std::vector<std::vector<int>> INT_VALUES_2X2(2,std::vector<int>(2,1));
+const std::vector<int> BUFFER_2X2(4,1);
 const std::vector<std::vector<int>> EMPTY_INT_VALUES;
 
 class ContainerResource : public resource::Resource<int>
@@ -160,15 +162,27 @@ TEST(Resource, Checksum)
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
 
-TEST(Resource, Assign)
+TEST(Resource, AssignArray)
 {
 	ContainerResource ir;
-	ir.SetColumnSize(INT_VALUES.size());
-	EXPECT_GT(INT_VALUES.size(), 0);
+	EXPECT_EQ(INT_VALUES.size(), 1);
+
+	ir.SetColumnSize(1);
 	ir.SetRowSize(INT_VALUES[0].size());
 
-	ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int));
+	ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES[0].size() * sizeof(int));
 	EXPECT_EQ(ir.Data(), INT_VALUES);
+}
+
+TEST(Resource, AssignMatrix)
+{
+	ContainerResource ir;
+	EXPECT_EQ(BUFFER_2X2.size(), 4);
+	ir.SetColumnSize(2);
+	ir.SetRowSize(2);
+
+	ir.Assign(reinterpret_cast<const char*>(BUFFER_2X2.data()), BUFFER_2X2.size() * sizeof(int));
+	EXPECT_EQ(ir.Data(), INT_VALUES_2X2);
 }
 
 TEST(Resource, AssignThrows)

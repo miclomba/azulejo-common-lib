@@ -77,7 +77,11 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 	int y = -1;
 	for (size_t i = 0; i < n / size; ++i)
 	{
-		if (i % GetRowSize() == 0) ++y;
+		if (i % GetRowSize() == 0)
+		{
+			x = 0;
+			++y;
+		}
 		data_[y][x++] = buff[i*size];
 	}
 }
