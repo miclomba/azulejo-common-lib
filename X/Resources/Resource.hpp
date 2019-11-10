@@ -82,7 +82,7 @@ void Resource<T>::Assign(const char* buff, const size_t n)
 			x = 0;
 			++y;
 		}
-		data_[y][x++] = buff[i*size];
+		data_[y][x++] = *reinterpret_cast<const T*>(buff + i*size);
 	}
 }
 

@@ -1,6 +1,7 @@
 
 #include "config.h"
 
+#include <limits>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -11,9 +12,10 @@
 namespace
 {
 const int VAL = 7;
+const int GT_BYTE_SIZE = 257;
 const std::vector<std::vector<int>> INT_VALUES(1,std::vector<int>(1,1));
-const std::vector<std::vector<int>> INT_VALUES_2X2(2,std::vector<int>(2,1));
-const std::vector<int> BUFFER_2X2(4,1);
+const std::vector<std::vector<int>> INT_VALUES_2X2(2,std::vector<int>(2,GT_BYTE_SIZE));
+const std::vector<int> BUFFER_2X2(4,GT_BYTE_SIZE);
 const std::vector<std::vector<int>> EMPTY_INT_VALUES;
 
 class ContainerResource : public resource::Resource<int>
