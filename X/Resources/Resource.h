@@ -45,6 +45,7 @@ public:
 
 	const T* Data() const;
 	T* Data();
+	const T& Data(const size_t i, const size_t j) const;
 	T& Data(const size_t i, const size_t j);
 
 	void Assign(const char* buff, const size_t n) override;

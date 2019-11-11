@@ -67,6 +67,14 @@ T& Resource<T>::Data(const size_t i, const size_t j)
 }
 
 TEMPLATE_T
+const T& Resource<T>::Data(const size_t i, const size_t j) const
+{
+	if (i < 0 || i >= GetColumnSize() || j < 0 || j >= GetRowSize())
+		throw std::invalid_argument("Resource indices " + std::to_string(i) + "," + std::to_string(j) + " are out of bounds");
+	return data_[i*GetRowSize() + j];
+}
+
+TEMPLATE_T
 void Resource<T>::Assign(const char* buff, const size_t n)
 {
 	if (!buff)

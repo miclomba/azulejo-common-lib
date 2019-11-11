@@ -113,7 +113,7 @@ TEST(Resource, CopyAssign)
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
-TEST(Resource, SetData)
+TEST(Resource, GetDataIJ)
 {
 	std::vector<std::vector<int>> values = MATRIX_1X1;
 	ContainerResource ir(values);
@@ -124,7 +124,18 @@ TEST(Resource, SetData)
 	EXPECT_EQ(*ir.Data(), values[0][0]);
 }
 
-TEST(Resource, SetDataThrows)
+TEST(Resource, GetDataIJConst)
+{
+	std::vector<std::vector<int>> values = MATRIX_1X1;
+	const ContainerResource ir(values);
+
+	EXPECT_NO_THROW(ir.Data(0, 0));
+	const int& val = ir.Data(0,0);
+
+	EXPECT_EQ(*ir.Data(), val);
+}
+
+TEST(Resource, GetDataIJThrows)
 {
 	ContainerResource ir(MATRIX_1X1);
 	EXPECT_NO_THROW(ir.Data(0, 0));
