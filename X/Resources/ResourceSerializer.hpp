@@ -20,7 +20,7 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	if (!outfile)
 		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
 
-	const std::vector<std::vector<T>>& data = resource.Data();
+	const T* data = resource.Data();
 
 	const size_t M = resource.GetColumnSize();
 	const char* MBuff = reinterpret_cast<const char*>(&M);
@@ -30,11 +30,8 @@ void ResourceSerializer::Serialize(const Resource<T>& resource, const std::strin
 	const char* NBuff = reinterpret_cast<const char*>(&N);
 	outfile.write(NBuff, sizeof(size_t));
 
-	for (const std::vector<T>& row : data)
-	{
-		const char* buff = reinterpret_cast<const char*>(row.data());
-		int size = sizeof(T) * row.size();
-		outfile.write(buff, size);
-	}
+	const char* buff = reinterpret_cast<const char*>(data);
+	size_t size = sizeof(T) * resource.GetColumnSize() * resource.GetRowSize();
+	outfile.write(buff, size);
 }
 

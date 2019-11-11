@@ -13,10 +13,9 @@ namespace
 {
 const int VAL = 7;
 const int GT_BYTE_SIZE = 257;
-const std::vector<std::vector<int>> INT_VALUES(1,std::vector<int>(1,1));
-const std::vector<std::vector<int>> INT_VALUES_2X2(2,std::vector<int>(2,GT_BYTE_SIZE));
+const std::vector<std::vector<int>> MATRIX_1X1(1,std::vector<int>(1,1));
 const std::vector<int> BUFFER_2X2(4,GT_BYTE_SIZE);
-const std::vector<std::vector<int>> EMPTY_INT_VALUES;
+const std::vector<std::vector<int>> EMPTY_MATRIX_1X1;
 
 class ContainerResource : public resource::Resource<int>
 {
@@ -25,7 +24,7 @@ public:
 	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
 	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
 	bool IsDirtyProtected() { return IsDirty(); }
-	std::vector<int> ChecksumProtected() { return Checksum(); }
+	int ChecksumProtected() { return Checksum(); }
 };
 } // end namespace
 
@@ -36,24 +35,24 @@ TEST(Resource, Construct)
 
 TEST(Resource, LValueParameterConstruct)
 {
-	EXPECT_NO_THROW(ContainerResource(INT_VALUES));
-	ContainerResource resource(INT_VALUES);
+	EXPECT_NO_THROW(ContainerResource(MATRIX_1X1));
+	ContainerResource resource(MATRIX_1X1);
 
-	EXPECT_EQ(resource.GetColumnSize(), INT_VALUES.size());
-	EXPECT_GT(INT_VALUES.size(), 0);
-	EXPECT_EQ(resource.GetRowSize(), INT_VALUES[0].size());
+	EXPECT_EQ(resource.GetColumnSize(), MATRIX_1X1.size());
+	EXPECT_GT(MATRIX_1X1.size(), 0);
+	EXPECT_EQ(resource.GetRowSize(), MATRIX_1X1[0].size());
 }
 
 TEST(Resource, RValueParameterConstruct)
 {
-	std::vector<std::vector<int>> moveable = INT_VALUES;
+	std::vector<std::vector<int>> moveable = MATRIX_1X1;
 	EXPECT_NO_THROW(ContainerResource(std::move(moveable)));
-	std::vector<std::vector<int>> otherMoveable = INT_VALUES;
+	std::vector<std::vector<int>> otherMoveable = MATRIX_1X1;
 	ContainerResource resource(std::move(otherMoveable));
 
-	EXPECT_EQ(resource.GetColumnSize(), INT_VALUES.size());
-	EXPECT_GT(INT_VALUES.size(), 0);
-	EXPECT_EQ(resource.GetRowSize(), INT_VALUES[0].size());
+	EXPECT_EQ(resource.GetColumnSize(), MATRIX_1X1.size());
+	EXPECT_GT(MATRIX_1X1.size(), 0);
+	EXPECT_EQ(resource.GetRowSize(), MATRIX_1X1[0].size());
 }
 
 TEST(Resource, ConstructThrows)
@@ -69,65 +68,65 @@ TEST(Resource, ConstructThrows)
 
 TEST(Resource, MoveConstruct)
 {
-	ContainerResource source(INT_VALUES);
-	std::vector<int> sourceChecksum = source.ChecksumProtected();
+	ContainerResource source(MATRIX_1X1);
+	int sourceChecksum = source.ChecksumProtected();
 
 	// move
 	ContainerResource target(std::move(source));
 
-	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
 TEST(Resource, MoveAssign)
 {
-	ContainerResource source(INT_VALUES);
-	std::vector<int> sourceChecksum = source.ChecksumProtected();
-	ContainerResource target(EMPTY_INT_VALUES);
+	ContainerResource source(MATRIX_1X1);
+	int sourceChecksum = source.ChecksumProtected();
+	ContainerResource target(EMPTY_MATRIX_1X1);
 
 	// move assign
 	EXPECT_NO_THROW(target = std::move(source));
 
-	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
 TEST(Resource, CopyConstruct)
 {
-	ContainerResource source(INT_VALUES);
+	ContainerResource source(MATRIX_1X1);
 
 	// copy
 	ContainerResource target(source);
-	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource, CopyAssign)
 {
-	ContainerResource source(INT_VALUES);
-	ContainerResource target(EMPTY_INT_VALUES);
+	ContainerResource source(MATRIX_1X1);
+	ContainerResource target(EMPTY_MATRIX_1X1);
 
 	// copy assign
 	EXPECT_NO_THROW(target = source);
 
-	EXPECT_EQ(target.Data(), INT_VALUES);
+	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource, SetData)
 {
-	std::vector<std::vector<int>> values = INT_VALUES;
+	std::vector<std::vector<int>> values = MATRIX_1X1;
 	ContainerResource ir(values);
 
 	EXPECT_NO_THROW(ir.Data(0,0) = VAL);
 	values[0][0] = VAL;
 
-	EXPECT_EQ(ir.Data(), values);
+	EXPECT_EQ(*ir.Data(), values[0][0]);
 }
 
 TEST(Resource, SetDataThrows)
 {
-	ContainerResource ir(INT_VALUES);
+	ContainerResource ir(MATRIX_1X1);
 	EXPECT_NO_THROW(ir.Data(0, 0));
 	EXPECT_THROW(ir.Data(-1, 0), std::invalid_argument);
 	EXPECT_THROW(ir.Data(0, -1), std::invalid_argument);
@@ -137,14 +136,20 @@ TEST(Resource, SetDataThrows)
 
 TEST(Resource, GetData)
 {
-	ContainerResource ir(INT_VALUES);
-	EXPECT_EQ(ir.Data(), INT_VALUES);
+	ContainerResource ir(MATRIX_1X1);
+	EXPECT_EQ(*ir.Data(), MATRIX_1X1[0][0]);
+}
+
+TEST(Resource, GetDataConst)
+{
+	const ContainerResource ir(MATRIX_1X1);
+	EXPECT_EQ(*ir.Data(), MATRIX_1X1[0][0]);
 }
 
 TEST(Resource, IsDirty)
 {
-	std::vector<std::vector<int>> values = INT_VALUES;
-	ContainerResource ir(INT_VALUES);
+	std::vector<std::vector<int>> values = MATRIX_1X1;
+	ContainerResource ir(MATRIX_1X1);
 
 	EXPECT_TRUE(ir.IsDirtyProtected());
 	EXPECT_FALSE(ir.IsDirtyProtected());
@@ -155,9 +160,9 @@ TEST(Resource, IsDirty)
 
 TEST(Resource, Checksum)
 {
-	ContainerResource ir(INT_VALUES);
+	ContainerResource ir(MATRIX_1X1);
 
-	std::vector<int> checksum = ir.ChecksumProtected();
+	int checksum = ir.ChecksumProtected();
 	EXPECT_EQ(ir.ChecksumProtected(), checksum);
 
 	ir.Data(0,0) = VAL;
@@ -167,13 +172,13 @@ TEST(Resource, Checksum)
 TEST(Resource, AssignArray)
 {
 	ContainerResource ir;
-	EXPECT_EQ(INT_VALUES.size(), 1);
+	EXPECT_EQ(MATRIX_1X1.size(), 1);
 
 	ir.SetColumnSize(1);
-	ir.SetRowSize(INT_VALUES[0].size());
+	ir.SetRowSize(MATRIX_1X1[0].size());
 
-	ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES[0].size() * sizeof(int));
-	EXPECT_EQ(ir.Data(), INT_VALUES);
+	ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1[0].size() * sizeof(int));
+	EXPECT_EQ(*ir.Data(), MATRIX_1X1[0][0]);
 }
 
 TEST(Resource, AssignMatrix)
@@ -184,7 +189,8 @@ TEST(Resource, AssignMatrix)
 	ir.SetRowSize(2);
 
 	ir.Assign(reinterpret_cast<const char*>(BUFFER_2X2.data()), BUFFER_2X2.size() * sizeof(int));
-	EXPECT_EQ(ir.Data(), INT_VALUES_2X2);
+	for (int i = 0; i < 4; ++i)
+		EXPECT_EQ(*(ir.Data() + i), *(BUFFER_2X2.data() + i));
 }
 
 TEST(Resource, AssignThrows)
@@ -192,18 +198,18 @@ TEST(Resource, AssignThrows)
 	ContainerResource ir;
 
 	// resource dimensions not set
-	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int)), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1.size() * MATRIX_1X1[0].size() * sizeof(int)), std::runtime_error);
 
-	ir.SetColumnSize(INT_VALUES.size());
-	EXPECT_GT(INT_VALUES.size(), 0);
-	ir.SetRowSize(INT_VALUES[0].size());
+	ir.SetColumnSize(MATRIX_1X1.size());
+	EXPECT_GT(MATRIX_1X1.size(), 0);
+	ir.SetRowSize(MATRIX_1X1[0].size());
 
 	// resource buffer not set
-	EXPECT_THROW(ir.Assign(nullptr, INT_VALUES.size() * INT_VALUES[0].size() * sizeof(int)), std::runtime_error);
+	EXPECT_THROW(ir.Assign(nullptr, MATRIX_1X1.size() * MATRIX_1X1[0].size() * sizeof(int)), std::runtime_error);
 	// resource length is 0 
-	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), 0), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), 0), std::runtime_error);
 	// resource length not congruent with sizeof(T) 
-	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(INT_VALUES[0].data()), sizeof(int)-1), std::runtime_error);
+	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), sizeof(int)-1), std::runtime_error);
 }
 
 TEST(Resource, SetColumnSize)

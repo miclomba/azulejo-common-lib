@@ -12,7 +12,7 @@ IResource& IResource::operator=(IResource&&) = default;
 
 bool IResource::IsDirty() const
 {
-	std::vector<int> check = Checksum();
+	int check = Checksum();
 	if (check == checkSum_)
 		return false;
 

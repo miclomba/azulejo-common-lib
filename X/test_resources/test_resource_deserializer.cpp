@@ -214,7 +214,7 @@ TEST(ResourceDeserializer, Deserialize)
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
 	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
-	EXPECT_EQ(vecIntResource->Data(), resource.Data());
+	EXPECT_EQ(*vecIntResource->Data(), *resource.Data());
 	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
 	EXPECT_EQ(vecIntResource->GetRowSize(), resource.GetRowSize());
 
@@ -246,6 +246,7 @@ TEST(ResourceDeserializer, DeserializeEmptyResource)
 	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(vecIntResource->Data(), resource.Data());
+	EXPECT_EQ(vecIntResource->Data(), static_cast<int*>(nullptr));
 	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
 	EXPECT_EQ(vecIntResource->GetRowSize(), resource.GetRowSize());
 

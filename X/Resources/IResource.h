@@ -33,14 +33,14 @@ public:
 
 protected:
 	bool IsDirty() const;
-	virtual std::vector<int> Checksum() const = 0;
+	virtual int Checksum() const = 0;
 
 private:
 
 	size_t M_{ 0 };
 	size_t N_{ 0 };
 
-	mutable std::vector<int> checkSum_{-1};
+	mutable int checkSum_{-1};
 };
 
 } // end resource

@@ -43,18 +43,19 @@ public:
 
 	virtual ~Resource();
 
-	const std::vector<std::vector<T>>& Data() const;
+	const T* Data() const;
+	T* Data();
 	T& Data(const size_t i, const size_t j);
 
 	void Assign(const char* buff, const size_t n) override;
 
 protected:
-	std::vector<int> Checksum() const override;
+	int Checksum() const override;
 
 private:
-	void ValidateInput();
+	void LoadInput(const std::vector<std::vector<T>>& data);
 
-	std::vector<std::vector<T>> data_;
+	std::vector<T> data_;
 };
 
 #include "Resource.hpp"

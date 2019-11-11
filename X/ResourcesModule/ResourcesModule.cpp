@@ -25,10 +25,10 @@ using VecUInt = std::vector<unsigned int>;
 
 namespace
 {
-const MatrixDouble& (resource::Resource<double>::*f_ptr_vec_d)() const = &resource::Resource<double>::Data;
-const MatrixFloat& (resource::Resource<float>::*f_ptr_vec_f)() const = &resource::Resource<float>::Data;
-const MatrixInt& (resource::Resource<int>::*f_ptr_vec_i)() const = &resource::Resource<int>::Data;
-const MatrixUInt& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() const = &resource::Resource<unsigned int>::Data;
+//double& (resource::Resource<double>::*f_ptr_vec_d)() = &resource::Resource<double>::Data;
+//float& (resource::Resource<float>::*f_ptr_vec_f)() = &resource::Resource<float>::Data;
+//int& (resource::Resource<int>::*f_ptr_vec_i)() = &resource::Resource<int>::Data;
+//unsigned int& (resource::Resource<unsigned int>::*f_ptr_vec_ui)() = &resource::Resource<unsigned int>::Data;
 }
 
 BOOST_PYTHON_MODULE(ResourcesModule)
@@ -44,21 +44,21 @@ BOOST_PYTHON_MODULE(ResourcesModule)
 	
 	class_<resource::Resource<double>>("ResourceDouble")
 		.def(init<const MatrixDouble&>())
-		.def("data", f_ptr_vec_d, return_value_policy<reference_existing_object>())
+		//.def("data", f_ptr_vec_d, return_value_policy<reference_existing_object>())
 	;
 
 	class_<resource::Resource<float>>("ResourceFloat")
 		.def(init<const MatrixFloat&>())
-		.def("data", f_ptr_vec_f, return_value_policy<reference_existing_object>())
+		//.def("data", f_ptr_vec_f, return_value_policy<reference_existing_object>())
 	;
 
 	class_<resource::Resource<int>>("ResourceInt")
 		.def(init<const MatrixInt&>())
-		.def("data", f_ptr_vec_i, return_value_policy<reference_existing_object>())
+		//.def("data", f_ptr_vec_i, return_value_policy<reference_existing_object>())
 	;
 
 	class_<resource::Resource<unsigned int>>("ResourceUInt")
 		.def(init<const MatrixUInt&>())
-		.def("data", f_ptr_vec_ui, return_value_policy<reference_existing_object>())
+		//.def("data", f_ptr_vec_ui, return_value_policy<reference_existing_object>())
 	;
 }
