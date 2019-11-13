@@ -23,12 +23,20 @@ const std::string RESOURCE_ROOT = (fs::path(ROOT_FILESYSTEM) / "users" / "miclom
 const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
+const std::vector<int> INT_VALUES_ARRAY(1,1);
 
 class ContainerResource : public Resource2D<int>
 {
 public:
 	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
 	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
+};
+
+class ContainerResourceArray : public Resource<int>
+{
+public:
+	ContainerResourceArray(std::vector<int>&& values) : Resource(std::move(values)) {}
+	ContainerResourceArray(const std::vector<int>& values) : Resource(values) {}
 };
 } // end namespace 
 
@@ -75,7 +83,27 @@ TEST(ResourceSerializer, GetSerializationPathThrows)
 	ResourceSerializer::ResetInstance();
 }
 
-TEST(ResourceSerializer, Serialize)
+TEST(ResourceSerializer, SerializeArray)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+
+	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+
+	// serialize
+	ContainerResourceArray resource(INT_VALUES_ARRAY);
+	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY));
+
+	// verify serialization and clean up
+	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
+	fs::remove(RESOURCE_FILE);
+	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, SerializeMatrix)
 {
 	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 

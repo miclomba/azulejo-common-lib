@@ -13,6 +13,7 @@ Resource<T>::Resource(const std::vector<T>& data) :
 	data_(data)
 {
 	SetRowSize(data_.size());
+	SetColumnSize(1);
 }
 
 ENABLE_IF_CONTAINER_TEMPLATE_DEF
@@ -20,6 +21,7 @@ Resource<T>::Resource(std::vector<T>&& data) :
 	data_(std::move(data))
 {
 	SetRowSize(data_.size());
+	SetColumnSize(1);
 }
 
 TEMPLATE_T Resource<T>::Resource(const Resource<T>&) = default;
