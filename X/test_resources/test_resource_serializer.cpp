@@ -8,11 +8,13 @@
 #include <gtest/gtest.h>
 
 #include "Resources/Resource.h"
+#include "Resources/Resource2D.h"
 #include "Resources/ResourceSerializer.h"
 
 namespace fs = std::filesystem;
 
 using resource::Resource;
+using resource::Resource2D;
 using resource::ResourceSerializer;
 
 namespace
@@ -22,11 +24,11 @@ const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 
-class ContainerResource : public Resource<int>
+class ContainerResource : public Resource2D<int>
 {
 public:
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
 };
 } // end namespace 
 

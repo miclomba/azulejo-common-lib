@@ -23,6 +23,8 @@
     <ClInclude Include="IResource.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Resource.hpp" />
+    <ClInclude Include="Resource2D.h" />
+    <ClInclude Include="Resource2D.hpp" />
     <ClInclude Include="ResourceDeserializer.h" />
     <ClInclude Include="ResourceDeserializer.hpp" />
     <ClInclude Include="ResourceSerializer.h" />

@@ -18,23 +18,17 @@ template<typename U = T, typename std::enable_if_t<std::is_arithmetic<U>::value,
 
 namespace resource
 {
-class ResourceSerializer;
-class ResourceDeserializer;
 
 template<typename T>
 class RESOURCE_DLL_EXPORT Resource : public IResource
 {
 public:
-	friend class ResourceSerializer;
-	friend class ResourceDeserializer;
-
-public:
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
 	Resource();
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
-	Resource(const std::vector<std::vector<T>>& data);
+	Resource(const std::vector<T>& data);
 	ENABLE_IF_CONTAINER_TEMPLATE_DECL
-	Resource(std::vector<std::vector<T>>&& data);
+	Resource(std::vector<T>&& data);
 
 	Resource(const Resource&);
 	Resource& operator=(const Resource&);
@@ -45,16 +39,11 @@ public:
 
 	const T* Data() const;
 	T* Data();
-	const T& Data(const size_t i, const size_t j) const;
-	T& Data(const size_t i, const size_t j);
 
 	void Assign(const char* buff, const size_t n) override;
 
 protected:
 	int Checksum() const override;
-
-private:
-	void LoadInput(const std::vector<std::vector<T>>& data);
 
 	std::vector<T> data_;
 };

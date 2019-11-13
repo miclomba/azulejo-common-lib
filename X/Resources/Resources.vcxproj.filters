@@ -45,6 +45,12 @@
     <ClInclude Include="Resource.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
+    <ClInclude Include="Resource2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource2D.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceSerializer.cpp">

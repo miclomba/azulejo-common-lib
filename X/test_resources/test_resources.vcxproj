@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_resource.cpp" />
+    <ClCompile Include="test_resource2d.cpp" />
     <ClCompile Include="test_resource_deserializer.cpp" />
     <ClCompile Include="test_resource_serializer.cpp" />
   </ItemGroup>

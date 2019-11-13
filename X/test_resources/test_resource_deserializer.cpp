@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "Resources/Resource.h"
+#include "Resources/Resource2D.h"
 #include "Resources/ResourceDeserializer.h"
 #include "Resources/ResourceSerializer.h"
 
@@ -17,6 +18,7 @@ namespace fs = std::filesystem;
 
 using resource::IResource;
 using resource::Resource;
+using resource::Resource2D;
 using resource::ResourceDeserializer;
 using resource::ResourceSerializer;
 
@@ -28,12 +30,12 @@ const std::string BAD_PATH = "$helloworld$";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 
-class ContainerResource : public Resource<int>
+class ContainerResource : public Resource2D<int>
 {
 public:
-	ContainerResource() : Resource() {};
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource(values) {}
+	ContainerResource() : Resource2D() {};
+	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
+	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
 };
 } // end namespace 
 
@@ -212,7 +214,7 @@ TEST(ResourceDeserializer, Deserialize)
 	// deserialize
 	deserializer->RegisterResource<int>(RESOURCE_KEY);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource2D<int>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(*vecIntResource->Data(), *resource.Data());
 	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
@@ -243,7 +245,7 @@ TEST(ResourceDeserializer, DeserializeEmptyResource)
 	// deserialize
 	deserializer->RegisterResource<int>(RESOURCE_KEY);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource2D<int>*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(vecIntResource->Data(), resource.Data());
 	EXPECT_EQ(vecIntResource->Data(), static_cast<int*>(nullptr));
