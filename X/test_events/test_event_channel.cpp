@@ -46,27 +46,75 @@ TEST(EventChannel, Construct)
 TEST(EventChannel, CopyConstruct)
 {
 	Channel source;
-	EXPECT_NO_THROW(Channel target(source));
+
+	auto emitter = std::make_shared<EventEmitter<void()>>();
+	source.RegisterEmitter(EMITTER_KEY, emitter);
+	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
+	source.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
+
+	EXPECT_TRUE(source.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(source.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+
+	Channel target(source);
+
+	EXPECT_TRUE(target.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(target.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
 
 TEST(EventChannel, CopyAssign)
 {
 	Channel source;
+
+	auto emitter = std::make_shared<EventEmitter<void()>>();
+	source.RegisterEmitter(EMITTER_KEY, emitter);
+	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
+	source.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
+
+	EXPECT_TRUE(source.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(source.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+
 	Channel target;
 	EXPECT_NO_THROW(target = source);
+
+	EXPECT_TRUE(target.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(target.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
 
 TEST(EventChannel, MoveConstruct)
 {
 	Channel source;
-	EXPECT_NO_THROW(Channel target(std::move(source)));
+
+	auto emitter = std::make_shared<EventEmitter<void()>>();
+	source.RegisterEmitter(EMITTER_KEY, emitter);
+	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
+	source.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
+
+	EXPECT_TRUE(source.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(source.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+
+	Channel target(std::move(source));
+
+	EXPECT_TRUE(target.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(target.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
 
 TEST(EventChannel, MoveAssign)
 {
 	Channel source;
+
+	auto emitter = std::make_shared<EventEmitter<void()>>();
+	source.RegisterEmitter(EMITTER_KEY, emitter);
+	auto consumer = std::make_shared<EventConsumer<void()>>([]() {});
+	source.RegisterConsumer(CONSUMER_KEY, EMITTER_KEY, consumer);
+
+	EXPECT_TRUE(source.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(source.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
+
 	Channel target;
 	EXPECT_NO_THROW(target = std::move(source));
+
+	EXPECT_TRUE(target.IsEmitterRegistered(EMITTER_KEY));
+	EXPECT_TRUE(target.IsConsumerRegistered(CONSUMER_KEY, EMITTER_KEY));
 }
 
 TEST(EventChannel, RegisterEmitter) {

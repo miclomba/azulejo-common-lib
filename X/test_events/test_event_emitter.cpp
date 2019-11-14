@@ -38,11 +38,13 @@ TEST(EventEmitter, MoveConstruct)
 	int arity = source.Signal().arity;
 	size_t numSlots = source.Signal().num_slots();
 	bool isEmpty = source.Signal().empty();
+	std::string subscriberType = source.GetSubscriberType();
 
 	EventEmitter<void(void)> target(std::move(source));
 	EXPECT_EQ(arity, target.Signal().arity);
 	EXPECT_EQ(numSlots, target.Signal().num_slots());
 	EXPECT_EQ(isEmpty, target.Signal().empty());
+	EXPECT_EQ(subscriberType, target.GetSubscriberType());
 }
 
 TEST(EventEmitter, MoveAssign)
@@ -51,12 +53,14 @@ TEST(EventEmitter, MoveAssign)
 	int arity = source.Signal().arity;
 	size_t numSlots = source.Signal().num_slots();
 	bool isEmpty = source.Signal().empty();
+	std::string subscriberType = source.GetSubscriberType();
 
 	EventEmitter<void(void)> target;
 	EXPECT_NO_THROW(target = std::move(source));
 	EXPECT_EQ(arity, target.Signal().arity);
 	EXPECT_EQ(numSlots, target.Signal().num_slots());
 	EXPECT_EQ(isEmpty, target.Signal().empty());
+	EXPECT_EQ(subscriberType, target.GetSubscriberType());
 }
 
 TEST(EventEmitter, Connect) 

@@ -28,6 +28,7 @@ TEST(EventConsumer, CopyConstruct)
 
 	EventConsumer<int(void)> target(source);
 	EXPECT_EQ(source.GetSubscriber().target<int(void)>(), target.GetSubscriber().target<int(void)>());
+	EXPECT_EQ(source.GetSubscriberType(), target.GetSubscriberType());
 }
 
 TEST(EventConsumer, CopyAssign)
@@ -36,23 +37,28 @@ TEST(EventConsumer, CopyAssign)
 	EventConsumer<int(void)> target(SUBSCRIBER);
 	EXPECT_NO_THROW(target = source);
 	EXPECT_EQ(source.GetSubscriber().target<int(void)>(), target.GetSubscriber().target<int(void)>());
+	EXPECT_EQ(source.GetSubscriberType(), target.GetSubscriberType());
 }
 
 TEST(EventConsumer, MoveConstruct)
 {
 	EventConsumer<int(void)> source(SUBSCRIBER);
 	auto sourceFunction = source.GetSubscriber().target<int(void)>();
+	std::string sourceFunctionType = source.GetSubscriberType();
 	EventConsumer<int(void)> target(std::move(source));
 	EXPECT_EQ(sourceFunction, target.GetSubscriber().target<int(void)>());
+	EXPECT_EQ(sourceFunctionType, target.GetSubscriberType());
 }
 
 TEST(EventConsumer, MoveAssign)
 {
 	EventConsumer<int(void)> source(SUBSCRIBER);
 	auto sourceFunction = source.GetSubscriber().target<int(void)>();
+	std::string sourceFunctionType = source.GetSubscriberType();
 	EventConsumer<int(void)> target(SUBSCRIBER);
 	EXPECT_NO_THROW(target = std::move(source));
 	EXPECT_EQ(sourceFunction, target.GetSubscriber().target<int(void)>());
+	EXPECT_EQ(sourceFunctionType, target.GetSubscriberType());
 }
 
 TEST(EventConsumer, GetSubscriber) 
