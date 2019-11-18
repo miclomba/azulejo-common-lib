@@ -10,8 +10,9 @@
 #include "IEventEmitter.h"
 #include "EventConsumer.h"
 
-namespace events
-{
+using events::EventChannel;
+using events::IEventConsumer;
+using events::IEventEmitter;
 
 EventChannel::EventChannel() = default;
 EventChannel::~EventChannel() = default;
@@ -98,4 +99,3 @@ bool EventChannel::IsConsumerRegistered(const std::string& consumerKey, const st
 	return consumerMap_.find(key) != consumerMap_.cend() ? true : false;
 }
 
-} // end namespace events
