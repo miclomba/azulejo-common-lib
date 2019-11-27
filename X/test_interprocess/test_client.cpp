@@ -19,31 +19,31 @@ const int PORT = 13;
 const std::string HOST = "localhost";
 } // end namespace
 
-TEST(IClientEntity, Construct)
+TEST(IClient, Construct)
 {
 	EXPECT_NO_THROW(Client client());
 }
 
-TEST(IClientEntity, RunThrowsWhenHostIsEmpty)
+TEST(IClient, RunThrowsWhenHostIsEmpty)
 {
 	Client client;
 	EXPECT_THROW(client.Run("", PORT), std::runtime_error);
 }
 
-TEST(IClientEntity, RunThrowsWhenPortIsNegative)
+TEST(IClient, RunThrowsWhenPortIsNegative)
 {
 	Client client;
 	EXPECT_THROW(client.Run(HOST,-1), std::runtime_error);
 }
 
-TEST(IClientEntity, RunThrowsWhenPortIsTooLarge)
+TEST(IClient, RunThrowsWhenPortIsTooLarge)
 {
 	Client client;
 	int port = std::numeric_limits<unsigned short>::max() + 1;
 	EXPECT_THROW(client.Run(HOST,port), std::runtime_error);
 }
 
-TEST(IClientEntity, GetIOService)
+TEST(IClient, GetIOService)
 {
 	Client client;
 	const io_service* ioService = client.GetIOServiceProtected();

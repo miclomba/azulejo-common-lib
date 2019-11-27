@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3d017588-8579-4c78-b56c-d8750d15f75d}</ProjectGuid>
+    <ProjectGuid>{63ff1ef5-303c-4cf2-8895-8ef48796665f}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -36,14 +36,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_entity.cpp" />
-    <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
-    <ClCompile Include="test_entity_aggregation_serializer.cpp" />
-    <ClCompile Include="test_iserializable_entity.cpp" />
-    <ClCompile Include="test_istreamable_entity.cpp" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="Server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h" />
+    <ClCompile Include="test_client.cpp" />
+    <ClCompile Include="test_server.cpp" />
+    <ClCompile Include="test_shared_memory.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -83,7 +83,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutDir)/Interprocess.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

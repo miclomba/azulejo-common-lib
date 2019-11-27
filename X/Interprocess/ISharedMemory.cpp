@@ -1,4 +1,4 @@
-#include "ISharedMemoryEntity.h"
+#include "ISharedMemory.h"
 
 #include <memory>
 #include <stdexcept>
@@ -7,11 +7,11 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
-namespace entity {
+using interprocess::ISharedMemory;
 
-ISharedMemoryEntity::ISharedMemoryEntity() = default;
+ISharedMemory::ISharedMemory() = default;
 
-ISharedMemoryEntity::~ISharedMemoryEntity()
+ISharedMemory::~ISharedMemory()
 {
 	if (!shmem_ || !isShmemOwner_)
 		return;
@@ -22,7 +22,7 @@ ISharedMemoryEntity::~ISharedMemoryEntity()
 		throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
 }
 
-void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
+void ISharedMemory::Create(const std::string& name, const size_t size)
 {
 	using namespace boost::interprocess;
 
@@ -51,7 +51,7 @@ void ISharedMemoryEntity::Create(const std::string& name, const size_t size)
 	isShmemOwner_ = true;
 }
 
-void ISharedMemoryEntity::Open(const std::string& name)
+void ISharedMemory::Open(const std::string& name)
 {
 	using namespace boost::interprocess;
 
@@ -68,14 +68,14 @@ void ISharedMemoryEntity::Open(const std::string& name)
 	}
 }
 
-std::string ISharedMemoryEntity::GetSharedName() const
+std::string ISharedMemory::GetSharedName() const
 {
 	if (!shmem_)
 		throw std::runtime_error("Cannot get shared memory name because shared memory is not allocated.");
 	return shmem_->get_name();
 }
 
-size_t ISharedMemoryEntity::GetSharedSize() const
+size_t ISharedMemory::GetSharedSize() const
 {
 	if (!shmem_)
 		throw std::runtime_error("Cannot get shared memory size because shared memory is not allocated.");
@@ -86,7 +86,7 @@ size_t ISharedMemoryEntity::GetSharedSize() const
 	return static_cast<size_t>(size);
 }
 
-void* ISharedMemoryEntity::GetSharedAddress() const
+void* ISharedMemory::GetSharedAddress() const
 {
 	using namespace boost::interprocess;
 
@@ -97,9 +97,7 @@ void* ISharedMemoryEntity::GetSharedAddress() const
 	return static_cast<void*>(region.get_address());
 }
 
-bool ISharedMemoryEntity::IsSharedMemoryOwner() const
+bool ISharedMemory::IsSharedMemoryOwner() const
 {
 	return isShmemOwner_;
 }
-
-} // end namespace entity

@@ -10,9 +10,9 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/thread.hpp> 
 
-#include "Entities/ISharedMemoryEntity.h"
+#include "Interprocess/ISharedMemory.h"
 
-using entity::ISharedMemoryEntity;
+using interprocess::ISharedMemory;
 
 namespace
 {
@@ -20,22 +20,22 @@ const std::string NAME = "shmem";
 const std::string OTHER_NAME = "other_shmem";
 const size_t SIZE = 1024;
 
-struct ShareableCreator : public ISharedMemoryEntity {};
+struct ShareableCreator : public ISharedMemory {};
 } // end namespace anonymous
 
-TEST(ISharedMemoryEntity, Construct)
+TEST(ISharedMemory, Construct)
 {
 	EXPECT_NO_THROW(ShareableCreator shareable());
 }
 
-TEST(ISharedMemoryEntity, Create)
+TEST(ISharedMemory, Create)
 {
 	ShareableCreator shareable;
 
 	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
 }
 
-TEST(ISharedMemoryEntity, CreateThrowsWhenSharedMemoryAlreadyExists)
+TEST(ISharedMemory, CreateThrowsWhenSharedMemoryAlreadyExists)
 {
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
@@ -44,7 +44,7 @@ TEST(ISharedMemoryEntity, CreateThrowsWhenSharedMemoryAlreadyExists)
 	EXPECT_THROW(otherShareable.Create(NAME, SIZE), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, CreateWhenAlreadyCreatedThrows)
+TEST(ISharedMemory, CreateWhenAlreadyCreatedThrows)
 {
 	ShareableCreator shareable;
 
@@ -52,21 +52,21 @@ TEST(ISharedMemoryEntity, CreateWhenAlreadyCreatedThrows)
 	EXPECT_THROW(shareable.Create(OTHER_NAME, SIZE), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, CreateUsingEmptyNameThrows)
+TEST(ISharedMemory, CreateUsingEmptyNameThrows)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.Create("", SIZE), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, CreateUsingInvalidSizeThrows)
+TEST(ISharedMemory, CreateUsingInvalidSizeThrows)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.Create(NAME, 0), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, Open)
+TEST(ISharedMemory, Open)
 {
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
@@ -75,7 +75,7 @@ TEST(ISharedMemoryEntity, Open)
 	EXPECT_NO_THROW(otherShareable.Open(NAME));
 }
 
-TEST(ISharedMemoryEntity, OpenThrows)
+TEST(ISharedMemory, OpenThrows)
 {
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
@@ -84,7 +84,7 @@ TEST(ISharedMemoryEntity, OpenThrows)
 	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, Destroy)
+TEST(ISharedMemory, Destroy)
 {
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
@@ -97,7 +97,7 @@ TEST(ISharedMemoryEntity, Destroy)
 	EXPECT_EQ(shareable.GetSharedAddress(), otherShareable.GetSharedAddress());
 }
 
-TEST(ISharedMemoryEntity, GetSharedName)
+TEST(ISharedMemory, GetSharedName)
 {
 	ShareableCreator shareable;
 
@@ -105,14 +105,14 @@ TEST(ISharedMemoryEntity, GetSharedName)
 	EXPECT_EQ(NAME,shareable.GetSharedName());
 }
 
-TEST(ISharedMemoryEntity, ThrowOnGetSharedName)
+TEST(ISharedMemory, ThrowOnGetSharedName)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedName(), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, GetSharedSize)
+TEST(ISharedMemory, GetSharedSize)
 {
 	ShareableCreator shareable;
 
@@ -120,14 +120,14 @@ TEST(ISharedMemoryEntity, GetSharedSize)
 	EXPECT_EQ(SIZE, shareable.GetSharedSize());
 }
 
-TEST(ISharedMemoryEntity, ThrowOnGetSharedSize)
+TEST(ISharedMemory, ThrowOnGetSharedSize)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedSize(), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, GetSharedAddress)
+TEST(ISharedMemory, GetSharedAddress)
 {
 	ShareableCreator shareable;
 
@@ -135,14 +135,14 @@ TEST(ISharedMemoryEntity, GetSharedAddress)
 	EXPECT_NO_THROW(shareable.GetSharedAddress());
 }
 
-TEST(ISharedMemoryEntity, ThrowOnGetSharedAddress)
+TEST(ISharedMemory, ThrowOnGetSharedAddress)
 {
 	ShareableCreator shareable;
 
 	EXPECT_THROW(shareable.GetSharedAddress(), std::runtime_error);
 }
 
-TEST(ISharedMemoryEntity, IsSharedMemoryOwner)
+TEST(ISharedMemory, IsSharedMemoryOwner)
 {
 	ShareableCreator shareable;
 	EXPECT_FALSE(shareable.IsSharedMemoryOwner());
@@ -157,7 +157,7 @@ int main(int argc, const char** argv)
 	// sleep some
 	boost::this_thread::sleep_for(boost::chrono::milliseconds(15000));
 
-	std::shared_ptr<entity::ISharedMemoryEntity> sable;
+	std::shared_ptr<interprocess::ISharedMemory> sable;
 
 	// if parent
 	if (argc == 1)

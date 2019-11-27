@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "Entities/IRunnableEntity.h"
+#include "Intraprocess/IRunnable.h"
 
-using entity::IRunnableEntity;
+using intraprocess::IRunnable;
 
 namespace
 {
@@ -23,7 +23,7 @@ int SumSquares(const int x)
 	return accum;
 }
 
-class Runnable : public IRunnableEntity
+class Runnable : public IRunnable
 {
 public:
 	Runnable() = default;
@@ -41,12 +41,12 @@ private:
 int Runnable::accum_ = 0;
 } // end namespace anonymous
 
-TEST(IRunnableEntity, Construct)
+TEST(IRunnable, Construct)
 {
 	EXPECT_NO_THROW(Runnable());
 }
 
-TEST(IRunnableEntity, Start)
+TEST(IRunnable, Start)
 {
 	const int x = 3;
 	Runnable runn(x);
@@ -56,7 +56,7 @@ TEST(IRunnableEntity, Start)
 	EXPECT_EQ(runn.GetAccum(), x*x);
 }
 
-TEST(IRunnableEntity, StartThrows)
+TEST(IRunnable, StartThrows)
 {
 	const int x = 3;
 	Runnable runn(x);
@@ -65,7 +65,7 @@ TEST(IRunnableEntity, StartThrows)
 	EXPECT_THROW(runn.Start(), std::runtime_error);
 }
 
-TEST(IRunnableEntity, Join)
+TEST(IRunnable, Join)
 {
 	std::vector<std::shared_ptr<Runnable>> runnables;
 
@@ -81,7 +81,7 @@ TEST(IRunnableEntity, Join)
 	EXPECT_EQ(runnables[0]->GetAccum(), SumSquares(LARGE_INT));
 }
 
-TEST(IRunnableEntity, JoinThrows)
+TEST(IRunnable, JoinThrows)
 {
 	const int x = 3;
 	Runnable runn(x);

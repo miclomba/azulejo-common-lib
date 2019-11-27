@@ -10,19 +10,24 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Entities/IServerEntity.h"
+#include "Interprocess/IServer.h"
 
 namespace networking {
 
-class Server : public entity::IServerEntity
+class Server : public interprocess::IServer
 {
 public:
-	Server(const int port) : IServerEntity(port) {}
+	Server(const int port) : IServer(port) {}
 
 	Server(const Server&) = delete;
 	Server& operator=(const Server&) = delete;
 	Server(Server&&) = delete;
 	Server& operator=(Server&&) = delete;
+
+	const boost::asio::io_service* GetIOServiceProtected() const
+	{
+		return GetIOService();
+	}
 
 protected:
 	bool Work(std::shared_ptr<boost::asio::ip::tcp::socket> mySocket) override

@@ -7,9 +7,9 @@
 
 #include <omp.h>
 
-#include "Entities/IOpenMPEntity.h"
+#include "Intraprocess/IOpenMP.h"
 
-using entity::IOpenMPEntity;
+using intraprocess::IOpenMP;
 
 namespace
 {
@@ -18,10 +18,10 @@ const int NUM_THREADS = 1;
 const bool SET_DYNAMIC = false;
 const bool SET_NESTED = false;
 
-struct Runnable : public IOpenMPEntity
+struct Runnable : public IOpenMP
 {
 	Runnable(const int numThreads, const bool setDynamic, const bool setNested) :
-		IOpenMPEntity(numThreads,setDynamic,setNested) 
+		IOpenMP(numThreads,setDynamic,setNested) 
 	{
 	}
 
@@ -95,12 +95,12 @@ private:
 };
 } // end namespace anonymous
 
-TEST(IOpenMPEntity, Construct)
+TEST(IOpenMP, Construct)
 {
 	EXPECT_NO_THROW(Runnable(1, false, false));
 }
 
-TEST(IOpenMPEntity, CopyConstruct)
+TEST(IOpenMP, CopyConstruct)
 {
 	Runnable source(1, false, false);
 	Runnable target(source);
@@ -110,7 +110,7 @@ TEST(IOpenMPEntity, CopyConstruct)
 	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
-TEST(IOpenMPEntity, CopyAssign)
+TEST(IOpenMP, CopyAssign)
 {
 	Runnable source(1, false, false);
 	Runnable target(2, true, true);
@@ -122,7 +122,7 @@ TEST(IOpenMPEntity, CopyAssign)
 	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
-TEST(IOpenMPEntity, MoveConstruct)
+TEST(IOpenMP, MoveConstruct)
 {
 	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
 	Runnable target(std::move(source));
@@ -132,7 +132,7 @@ TEST(IOpenMPEntity, MoveConstruct)
 	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
-TEST(IOpenMPEntity, MoveAssign)
+TEST(IOpenMP, MoveAssign)
 {
 	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
 	Runnable target(NUM_THREADS + 1, !SET_DYNAMIC, !SET_NESTED);
@@ -144,12 +144,12 @@ TEST(IOpenMPEntity, MoveAssign)
 	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
-TEST(IOpenMPEntity, ConstructorThrows)
+TEST(IOpenMP, ConstructorThrows)
 {
 	EXPECT_THROW(Runnable(-4, false, false), std::runtime_error);
 }
 
-TEST(IOpenMPEntity, Start)
+TEST(IOpenMP, Start)
 {
 	Runnable openmp(4,false,false);
 	EXPECT_NO_THROW(openmp.Start());

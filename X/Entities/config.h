@@ -5,4 +5,4 @@
 
 #define ENTITY_DLL_EXPORT __declspec(dllexport)
 
-#endif
+#endif // entity_config_h

@@ -21,21 +21,6 @@
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IRunnableEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IServerEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IClientEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ISharedMemoryEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IOpenMPEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EntityAggregationSerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,25 +41,7 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IRunnableEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IServerEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IClientEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ISharedMemoryEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IOpenMPEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EntityAggregationSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IStreamableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityAggregationDeserializer.h">
@@ -88,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="Entity.hpp">
       <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="IStreamableEntity.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,11 +9,11 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Entities/IClientEntity.h"
+#include "Interprocess/IClient.h"
 
 namespace networking {
 
-class Client : public entity::IClientEntity
+class Client : public interprocess::IClient
 {
 public:
 	Client() = default;
