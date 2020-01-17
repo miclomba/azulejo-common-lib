@@ -41,6 +41,7 @@
   <ItemGroup>
     <ClCompile Include="test_openmp.cpp" />
     <ClCompile Include="test_runnable.cpp" />
+    <ClCompile Include="test_thread_pool.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
