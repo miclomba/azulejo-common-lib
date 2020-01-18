@@ -1,6 +1,7 @@
 #ifndef intraprocess_thread_pool_h
 #define intraprocess_thread_pool_h
 
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <future>
@@ -39,8 +40,8 @@ private:
 	bool HasWork() const;
 	bool ThreadsShouldProceed() const;
 
-	size_t numThreads_{ 0 };
-	bool stayAlive_{ true };
+	std::atomic<size_t> numThreads_{ 0 };
+	std::atomic<bool> stayAlive_{ true };
 	std::mutex lock_;
 	std::condition_variable threadNotifier_;
 	std::queue<std::packaged_task<int()>> workQueue_;
