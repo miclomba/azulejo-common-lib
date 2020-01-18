@@ -17,6 +17,7 @@ namespace
 const int FUTURE_VALUE = 7;
 const size_t ONE_THREAD = 1;
 const size_t TWO_THREADS = 2;
+const size_t EIGHT_THREADS = 8;
 const size_t INVALID_THREAD_COUNT = 0;
 
 struct ThreadPoolTester : public ThreadPool
@@ -62,7 +63,7 @@ TEST(ThreadPool, PostOneTaskUsingOneThread)
 
 TEST(ThreadPool, PostOneTaskUsingTwoThreads)
 {
-	ThreadPoolTester pool(TWO_THREADS);
+	ThreadPoolTester pool(EIGHT_THREADS);
 
 	auto lambda = []() { return FUTURE_VALUE; };
 	std::future<int> futuro = pool.PostTask(std::packaged_task<int()>(lambda));

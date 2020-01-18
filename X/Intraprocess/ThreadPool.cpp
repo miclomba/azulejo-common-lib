@@ -8,6 +8,17 @@
 
 using intraprocess::ThreadPool;
 
+namespace
+{
+std::packaged_task<int()> PopWorkQueue(std::queue<std::packaged_task<int()>>& workQueue)
+{
+	std::packaged_task<int()> task;
+	task = std::move(workQueue.front());
+	workQueue.pop();
+	return task;
+}
+}
+
 ThreadPool::ThreadPool(const size_t numThreads) :
 	numThreads_(numThreads)
 {
@@ -26,6 +37,7 @@ ThreadPool::~ThreadPool()
 void ThreadPool::Shutdown()
 {
 	stayAlive_ = false;
+	threadNotifier_.notify_all();
 	for (std::thread& th : workerThreads_)
 	{
 		if (th.joinable())
@@ -41,9 +53,27 @@ size_t ThreadPool::GetThreadCount() const
 
 std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
 {
-	std::unique_lock<std::mutex> lock(lock_);
-	workQueue_.push(std::move(task));
+	{
+		std::unique_lock<std::mutex> lock(lock_);
+		workQueue_.push(std::move(task));
+		threadNotifier_.notify_one();
+	}
 	return workQueue_.back().get_future();
+}
+
+bool ThreadPool::StayAlive() const
+{
+	return stayAlive_;
+}
+
+bool ThreadPool::HasWork() const
+{
+	return !workQueue_.empty();
+}
+
+bool ThreadPool::ThreadsShouldProceed() const
+{
+	return !StayAlive() || HasWork();
 }
 
 void ThreadPool::RunTask(ThreadPool* pool)
@@ -51,17 +81,15 @@ void ThreadPool::RunTask(ThreadPool* pool)
 	if (!pool)
 		throw std::runtime_error("ThreadPool::Work was given a nullptr value");
 
-	while (pool->stayAlive_ || !pool->workQueue_.empty())
+	while (pool->StayAlive() || pool->HasWork())
 	{
 		std::packaged_task<int()> task;
 		{
 			std::unique_lock<std::mutex> lock(pool->lock_);
+			pool->threadNotifier_.wait(lock, [pool]() { return pool->ThreadsShouldProceed(); });
 
-			if (!pool->workQueue_.empty())
-			{
-				task = std::move(pool->workQueue_.front());
-				pool->workQueue_.pop();
-			}
+			if (pool->HasWork())
+				task = PopWorkQueue(pool->workQueue_);
 		}
 
 		if (task.valid())

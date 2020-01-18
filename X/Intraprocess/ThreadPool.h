@@ -1,6 +1,7 @@
 #ifndef intraprocess_thread_pool_h
 #define intraprocess_thread_pool_h
 
+#include <condition_variable>
 #include <functional>
 #include <future>
 #include <mutex>
@@ -36,9 +37,14 @@ private:
 
 	static void RunTask(ThreadPool* pool);
 
+	bool StayAlive() const;
+	bool HasWork() const;
+	bool ThreadsShouldProceed() const;
+
 	size_t numThreads_{ 0 };
 	bool stayAlive_{ true };
 	std::mutex lock_;
+	std::condition_variable threadNotifier_;
 	std::queue<std::packaged_task<int()>> workQueue_;
 	std::vector<std::thread> workerThreads_;
 };
