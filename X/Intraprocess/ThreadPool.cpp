@@ -53,6 +53,9 @@ size_t ThreadPool::GetThreadCount() const
 
 std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
 {
+	if (!StayAlive())
+		throw std::runtime_error("Cannot post tasks on ThreadPool because it has been shutdown");
+
 	{
 		std::unique_lock<std::mutex> lock(lock_);
 		workQueue_.push(std::move(task));
