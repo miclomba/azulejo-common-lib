@@ -27,6 +27,7 @@ public:
 	virtual ~ThreadPool();
 
 	size_t GetThreadCount() const;
+	size_t GetTaskCount();
 
 	std::future<int> PostTask(std::packaged_task<int()>&& task);
 
@@ -38,8 +39,10 @@ private:
 	static void RunTask(ThreadPool* pool);
 
 	bool StayAlive() const;
-	bool HasWork() const;
-	bool ThreadsShouldProceed() const;
+	bool HasWorkThreadSafe();
+	bool HasWorkThreadUnsafe() const;
+	bool ThreadsShouldProceed();
+	void AddToThreadCounter(const size_t val);
 
 	std::atomic<size_t> numThreads_{ 0 };
 	std::atomic<bool> stayAlive_{ true };

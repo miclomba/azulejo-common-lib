@@ -17,16 +17,22 @@ std::packaged_task<int()> PopWorkQueue(std::queue<std::packaged_task<int()>>& wo
 	workQueue.pop();
 	return task;
 }
-}
+} // end namespace
 
-ThreadPool::ThreadPool(const size_t numThreads) :
-	numThreads_(numThreads)
+ThreadPool::ThreadPool(const size_t numThreads) 
 {
 	if (numThreads == 0)
 		throw std::runtime_error("Cannot construct ThreadPool with 0 threads");
 
 	for (size_t i = 0; i < numThreads; ++i)
 		workerThreads_.emplace_back(RunTask, this);
+
+	while (GetThreadCount() != numThreads)
+		continue;
+
+	// allow time for all threads to enter waiting
+	std::chrono::milliseconds HUNDRED_MSEC(100);
+	std::this_thread::sleep_for(HUNDRED_MSEC);
 }
 
 ThreadPool::~ThreadPool()
@@ -41,6 +47,10 @@ void ThreadPool::Stop()
 		stayAlive_.store(false);
 		threadNotifier_.notify_all();
 	}
+
+	while (GetThreadCount() > 0)
+		continue;
+
 	Join();
 }
 
@@ -58,19 +68,39 @@ size_t ThreadPool::GetThreadCount() const
 	return numThreads_.load();
 }
 
+size_t ThreadPool::GetTaskCount()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	size_t count = workQueue_.size();
+	threadNotifier_.notify_one();
+	return count;
+}
+
 bool ThreadPool::StayAlive() const
 {
 	return stayAlive_.load();
 }
 
-bool ThreadPool::HasWork() const
+bool ThreadPool::HasWorkThreadSafe()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	return HasWorkThreadUnsafe();
+}
+
+bool ThreadPool::HasWorkThreadUnsafe() const
 {
 	return !workQueue_.empty();
 }
 
-bool ThreadPool::ThreadsShouldProceed() const
+bool ThreadPool::ThreadsShouldProceed()
 {
-	return !StayAlive() || HasWork();
+	return !StayAlive() || HasWorkThreadUnsafe();
+}
+
+void ThreadPool::AddToThreadCounter(const size_t val)
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	numThreads_.store(numThreads_.load() + val);
 }
 
 std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
@@ -89,14 +119,17 @@ void ThreadPool::RunTask(ThreadPool* pool)
 	if (!pool)
 		throw std::runtime_error("ThreadPool::Work was given a nullptr value");
 
-	while (pool->StayAlive() || pool->HasWork())
+	pool->AddToThreadCounter(1);
+
+	while (pool->StayAlive() || pool->HasWorkThreadSafe())
 	{
 		std::packaged_task<int()> task;
 		{
 			std::unique_lock<std::mutex> lock(pool->lock_);
 			pool->threadNotifier_.wait(lock, [pool]() { return pool->ThreadsShouldProceed(); });
 
-			if (pool->HasWork())
+			// check because the wake operation can wake up spuriously due to non-safe predicate
+			if (pool->HasWorkThreadUnsafe())
 				task = PopWorkQueue(pool->workQueue_);
 		}
 
@@ -104,6 +137,6 @@ void ThreadPool::RunTask(ThreadPool* pool)
 			task();
 	}
 
-	pool->numThreads_.store(pool->numThreads_ - 1);
+	pool->AddToThreadCounter(-1);
 }
 
