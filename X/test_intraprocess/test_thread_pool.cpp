@@ -13,9 +13,13 @@
 
 using intraprocess::ThreadPool;
 
+#define REPEAT_BEGIN for (size_t i = 0; i < REPEAT; ++i) {
+#define REPEAT_END }
+
 namespace
 {
 const int FUTURE_VALUE = 7;
+const size_t REPEAT = 10;
 const size_t ONE_THREAD = 1;
 const size_t TWO_THREADS = 2;
 const size_t EIGHT_THREADS = 8;
@@ -25,41 +29,50 @@ std::chrono::seconds TWO_SEC(2);
 
 TEST(ThreadPool, Construct)
 {
+	REPEAT_BEGIN
 	EXPECT_NO_THROW(ThreadPool pool(TWO_THREADS));
+	REPEAT_END
 }
 
 TEST(ThreadPool, ConstructThrows)
 {
+	REPEAT_BEGIN
 	EXPECT_THROW(ThreadPool pool(INVALID_THREAD_COUNT), std::runtime_error);
+	REPEAT_END
 }
 
 TEST(ThreadPool, Destruct)
 {
+	REPEAT_BEGIN
 	std::future<int> futuro;
 
 	{
 		ThreadPool pool(ONE_THREAD);
 
-		auto lambda = []() 
+		auto lambda = []()
 		{
 			std::this_thread::sleep_for(TWO_SEC);
-			return FUTURE_VALUE; 
+			return FUTURE_VALUE;
 		};
 		futuro = pool.PostTask(std::packaged_task<int()>(lambda));
 	}
 
 	EXPECT_TRUE(futuro.valid());
 	EXPECT_EQ(futuro.get(), FUTURE_VALUE);
+	REPEAT_END
 }
 
 TEST(ThreadPool, GetThreadCount)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(TWO_THREADS);
 	EXPECT_EQ(pool.GetThreadCount(), TWO_THREADS);
+	REPEAT_END
 }
 
-TEST(ThreadPool, Shutdown)
+TEST(ThreadPool, Stop)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(TWO_THREADS);
 	EXPECT_EQ(pool.GetThreadCount(), TWO_THREADS);
 
@@ -70,34 +83,40 @@ TEST(ThreadPool, Shutdown)
 	};
 	std::future<int> futuro = pool.PostTask(std::packaged_task<int()>(lambda));
 
-	EXPECT_NO_THROW(pool.Shutdown());
+	EXPECT_NO_THROW(pool.Stop());
 	EXPECT_EQ(pool.GetThreadCount(), INVALID_THREAD_COUNT);
 	EXPECT_TRUE(futuro.valid());
 	EXPECT_EQ(futuro.get(), FUTURE_VALUE);
+	REPEAT_END
 }
 
 TEST(ThreadPool, PostOneTaskUsingOneThread)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(ONE_THREAD);
 
 	auto lambda = []() { return FUTURE_VALUE; };
 	std::future<int> futuro = pool.PostTask(std::packaged_task<int()>(lambda));
 	EXPECT_TRUE(futuro.valid());
 	EXPECT_EQ(futuro.get(), FUTURE_VALUE);
+	REPEAT_END
 }
 
 TEST(ThreadPool, PostOneTaskUsingTwoThreads)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(EIGHT_THREADS);
 
 	auto lambda = []() { return FUTURE_VALUE; };
 	std::future<int> futuro = pool.PostTask(std::packaged_task<int()>(lambda));
 	EXPECT_TRUE(futuro.valid());
 	EXPECT_EQ(futuro.get(), FUTURE_VALUE);
+	REPEAT_END
 }
 
 TEST(ThreadPool, PostEightTaskUsingOneThreads)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(ONE_THREAD);
 
 	auto lambda = []() { return FUTURE_VALUE; };
@@ -135,15 +154,20 @@ TEST(ThreadPool, PostEightTaskUsingOneThreads)
 	EXPECT_EQ(futuro6.get(), FUTURE_VALUE);
 	EXPECT_EQ(futuro7.get(), FUTURE_VALUE);
 	EXPECT_EQ(futuro8.get(), FUTURE_VALUE);
+	REPEAT_END
 }
 
 TEST(ThreadPool, PostTaskThrows)
 {
+	REPEAT_BEGIN
 	ThreadPool pool(EIGHT_THREADS);
-	pool.Shutdown();
+	pool.Stop();
 
 	auto lambda = []() { return FUTURE_VALUE; };
 	EXPECT_THROW(pool.PostTask(std::packaged_task<int()>(lambda)), std::runtime_error);
+	REPEAT_END
 }
 
+#undef REPEAT_BEGIN 
+#undef REPEAT_END
 

@@ -30,7 +30,8 @@ public:
 
 	std::future<int> PostTask(std::packaged_task<int()>&& task);
 
-	void Shutdown();
+	void Stop();
+	void Join();
 
 private:
 

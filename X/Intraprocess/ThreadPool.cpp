@@ -31,42 +31,36 @@ ThreadPool::ThreadPool(const size_t numThreads) :
 
 ThreadPool::~ThreadPool()
 {
-	Shutdown();
+	Stop();
 }
 
-void ThreadPool::Shutdown()
+void ThreadPool::Stop()
 {
-	stayAlive_ = false;
-	threadNotifier_.notify_all();
+	{
+		std::unique_lock<std::mutex> lock(lock_);
+		stayAlive_.store(false);
+		threadNotifier_.notify_all();
+	}
+	Join();
+}
+
+void ThreadPool::Join()
+{
 	for (std::thread& th : workerThreads_)
 	{
 		if (th.joinable())
 			th.join();
 	}
-	workerThreads_.clear();
 }
 
 size_t ThreadPool::GetThreadCount() const
 {
-	return workerThreads_.size();
-}
-
-std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
-{
-	if (!StayAlive())
-		throw std::runtime_error("Cannot post tasks on ThreadPool because it has been shutdown");
-
-	{
-		std::unique_lock<std::mutex> lock(lock_);
-		workQueue_.push(std::move(task));
-		threadNotifier_.notify_one();
-	}
-	return workQueue_.back().get_future();
+	return numThreads_.load();
 }
 
 bool ThreadPool::StayAlive() const
 {
-	return stayAlive_;
+	return stayAlive_.load();
 }
 
 bool ThreadPool::HasWork() const
@@ -77,6 +71,17 @@ bool ThreadPool::HasWork() const
 bool ThreadPool::ThreadsShouldProceed() const
 {
 	return !StayAlive() || HasWork();
+}
+
+std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
+{
+	if (!StayAlive())
+		throw std::runtime_error("Cannot post tasks on ThreadPool because it has been stopped");
+
+	std::unique_lock<std::mutex> lock(lock_);
+	workQueue_.push(std::move(task));
+	threadNotifier_.notify_one();
+	return workQueue_.back().get_future();
 }
 
 void ThreadPool::RunTask(ThreadPool* pool)
@@ -99,6 +104,6 @@ void ThreadPool::RunTask(ThreadPool* pool)
 			task();
 	}
 
-	--(pool->numThreads_);
+	pool->numThreads_.store(pool->numThreads_ - 1);
 }
 
