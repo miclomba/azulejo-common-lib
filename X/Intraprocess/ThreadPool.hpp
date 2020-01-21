@@ -1,25 +1,21 @@
-#include "ThreadPool.h"
 
-#include <functional>
-#include <future>
-#include <mutex>
-#include <stdexcept>
-#include <thread>
-
-using intraprocess::ThreadPool;
+#define TEMPLATE_T template<typename T>
+#define ThreadPool_t ThreadPool<T>
 
 namespace
 {
-std::packaged_task<int()> PopWorkQueue(std::queue<std::packaged_task<int()>>& workQueue)
+TEMPLATE_T
+std::packaged_task<T()> PopWorkQueue(std::queue<std::packaged_task<T()>>& workQueue)
 {
-	std::packaged_task<int()> task;
+	std::packaged_task<T()> task;
 	task = std::move(workQueue.front());
 	workQueue.pop();
 	return task;
 }
 } // end namespace
 
-ThreadPool::ThreadPool(const size_t numThreads) 
+TEMPLATE_T
+ThreadPool_t::ThreadPool(const size_t numThreads)
 {
 	if (numThreads == 0)
 		throw std::runtime_error("Cannot construct ThreadPool with 0 threads");
@@ -35,12 +31,14 @@ ThreadPool::ThreadPool(const size_t numThreads)
 	std::this_thread::sleep_for(HUNDRED_MSEC);
 }
 
-ThreadPool::~ThreadPool()
+TEMPLATE_T
+ThreadPool_t::~ThreadPool()
 {
 	Stop();
 }
 
-void ThreadPool::Stop()
+TEMPLATE_T
+void ThreadPool_t::Stop()
 {
 	{
 		std::unique_lock<std::mutex> lock(lock_);
@@ -54,7 +52,8 @@ void ThreadPool::Stop()
 	Join();
 }
 
-void ThreadPool::Join()
+TEMPLATE_T
+void ThreadPool_t::Join()
 {
 	for (std::thread& th : workerThreads_)
 	{
@@ -63,12 +62,14 @@ void ThreadPool::Join()
 	}
 }
 
-size_t ThreadPool::GetThreadCount() const
+TEMPLATE_T
+size_t ThreadPool_t::GetThreadCount() const
 {
 	return numThreads_.load();
 }
 
-size_t ThreadPool::GetTaskCount()
+TEMPLATE_T
+size_t ThreadPool_t::GetTaskCount()
 {
 	std::unique_lock<std::mutex> lock(lock_);
 	size_t count = workQueue_.size();
@@ -76,45 +77,40 @@ size_t ThreadPool::GetTaskCount()
 	return count;
 }
 
-bool ThreadPool::StayAlive() const
+TEMPLATE_T
+bool ThreadPool_t::StayAlive() const
 {
 	return stayAlive_.load();
 }
 
-bool ThreadPool::HasWorkThreadSafe()
+TEMPLATE_T
+bool ThreadPool_t::HasWorkThreadSafe()
 {
 	std::unique_lock<std::mutex> lock(lock_);
 	return HasWorkThreadUnsafe();
 }
 
-bool ThreadPool::HasWorkThreadUnsafe() const
+TEMPLATE_T
+bool ThreadPool_t::HasWorkThreadUnsafe() const
 {
 	return !workQueue_.empty();
 }
 
-bool ThreadPool::ThreadsShouldProceed()
+TEMPLATE_T
+bool ThreadPool_t::ThreadsShouldProceed()
 {
 	return !StayAlive() || HasWorkThreadUnsafe();
 }
 
-void ThreadPool::AddToThreadCounter(const size_t val)
+TEMPLATE_T
+void ThreadPool_t::AddToThreadCounter(const size_t val)
 {
 	std::unique_lock<std::mutex> lock(lock_);
 	numThreads_.store(numThreads_.load() + val);
 }
 
-std::future<int> ThreadPool::PostTask(std::packaged_task<int()>&& task)
-{
-	if (!StayAlive())
-		throw std::runtime_error("Cannot post tasks on ThreadPool because it has been stopped");
-
-	std::unique_lock<std::mutex> lock(lock_);
-	workQueue_.push(std::move(task));
-	threadNotifier_.notify_one();
-	return workQueue_.back().get_future();
-}
-
-void ThreadPool::RunTask(ThreadPool* pool)
+TEMPLATE_T
+void ThreadPool_t::RunTask(ThreadPool* pool)
 {
 	if (!pool)
 		throw std::runtime_error("ThreadPool::Work was given a nullptr value");
@@ -123,7 +119,7 @@ void ThreadPool::RunTask(ThreadPool* pool)
 
 	while (pool->StayAlive() || pool->HasWorkThreadSafe())
 	{
-		std::packaged_task<int()> task;
+		std::packaged_task<T()> task;
 		{
 			std::unique_lock<std::mutex> lock(pool->lock_);
 			pool->threadNotifier_.wait(lock, [pool]() { return pool->ThreadsShouldProceed(); });
@@ -140,3 +136,16 @@ void ThreadPool::RunTask(ThreadPool* pool)
 	pool->AddToThreadCounter(-1);
 }
 
+TEMPLATE_T
+std::future<T> ThreadPool_t::PostTask(std::packaged_task<T()>&& task)
+{
+	if (!StayAlive())
+		throw std::runtime_error("Cannot post tasks on ThreadPool because it has been stopped");
+
+	std::unique_lock<std::mutex> lock(lock_);
+	workQueue_.push(std::move(task));
+	threadNotifier_.notify_one();
+	return workQueue_.back().get_future();
+}
+
+#undef TEMPLATE_T

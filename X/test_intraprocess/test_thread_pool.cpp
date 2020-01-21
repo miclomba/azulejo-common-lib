@@ -9,9 +9,12 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/asio.hpp>
+#include <boost/thread.hpp>
+
 #include "Intraprocess/ThreadPool.h"
 
-using intraprocess::ThreadPool;
+using Pool = intraprocess::ThreadPool<int>;
 
 #define REPEAT_BEGIN for (size_t i = 0; i < REPEAT; ++i) {
 #define REPEAT_END }
@@ -32,14 +35,14 @@ std::chrono::milliseconds HUNDRED_MSEC(100);
 TEST(ThreadPool, Construct)
 {
 	REPEAT_BEGIN
-	EXPECT_NO_THROW(ThreadPool pool(TWO_THREADS));
+	EXPECT_NO_THROW(Pool pool(TWO_THREADS));
 	REPEAT_END
 }
 
 TEST(ThreadPool, ConstructThrows)
 {
 	REPEAT_BEGIN
-	EXPECT_THROW(ThreadPool pool(ZERO_THREADS), std::runtime_error);
+	EXPECT_THROW(Pool pool(ZERO_THREADS), std::runtime_error);
 	REPEAT_END
 }
 
@@ -48,7 +51,7 @@ TEST(ThreadPool, Destruct)
 	REPEAT_BEGIN
 	std::future<int> futuro;
 	{
-		ThreadPool pool(ONE_THREAD);
+		Pool pool(ONE_THREAD);
 		EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 		EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
@@ -69,7 +72,7 @@ TEST(ThreadPool, Destruct)
 TEST(ThreadPool, GetTaskCount)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(ONE_THREAD);
+	Pool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 	REPEAT_END
 }
@@ -78,11 +81,11 @@ TEST(ThreadPool, GetThreadCount)
 {
 	REPEAT_BEGIN
 	{
-		ThreadPool pool(ONE_THREAD);
+		Pool pool(ONE_THREAD);
 		EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 	}
 	{
-		ThreadPool pool(EIGHT_THREADS);
+		Pool pool(EIGHT_THREADS);
 		EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
 	}
 	REPEAT_END
@@ -91,7 +94,7 @@ TEST(ThreadPool, GetThreadCount)
 TEST(ThreadPool, Stop)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(TWO_THREADS);
+	Pool pool(TWO_THREADS);
 	EXPECT_EQ(pool.GetThreadCount(), TWO_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
@@ -114,7 +117,7 @@ TEST(ThreadPool, Stop)
 TEST(ThreadPool, PostOneTaskUsingOneThread)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(ONE_THREAD);
+	Pool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
@@ -131,7 +134,7 @@ TEST(ThreadPool, PostOneTaskUsingOneThread)
 TEST(ThreadPool, PostOneTaskUsingEightThreads)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(EIGHT_THREADS);
+	Pool pool(EIGHT_THREADS);
 	EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
@@ -148,7 +151,7 @@ TEST(ThreadPool, PostOneTaskUsingEightThreads)
 TEST(ThreadPool, PostEightTaskUsingOneThreads)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(ONE_THREAD);
+	Pool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
@@ -197,7 +200,7 @@ TEST(ThreadPool, PostEightTaskUsingOneThreads)
 TEST(ThreadPool, PostTaskThrows)
 {
 	REPEAT_BEGIN
-	ThreadPool pool(EIGHT_THREADS);
+	Pool pool(EIGHT_THREADS);
 	EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 	pool.Stop();
