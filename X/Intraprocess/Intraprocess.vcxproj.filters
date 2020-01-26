@@ -24,9 +24,6 @@
     <ClInclude Include="IOpenMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IRunnable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,9 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IOpenMP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IRunnable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThreadPool.cpp">

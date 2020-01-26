@@ -17,9 +17,6 @@
     <ClCompile Include="test_openmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_runnable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_thread_pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
