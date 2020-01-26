@@ -30,8 +30,8 @@ public:
 	size_t GetThreadCount() const;
 	size_t GetTaskCount();
 
-	template<typename T, typename... Args>
-	void Post(std::function<T(Args&...)> task, Args&... args);
+	template<typename T, typename... Params, typename... Args>
+	void Post(std::function<T(Params&...)> task, Args&&... args);
 
 	void Stop();
 	void Join();

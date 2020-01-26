@@ -45,7 +45,7 @@ struct ThreadPoolF : public testing::Test
 	int GetResourceValue() { return value_; }
 	void SetResourceValue(const int val) { value_ = val; }
 
-	int VALID_VAL_PARAM{ VALID_VAL };
+	int VALID_VAL_PARAM{VALID_VAL};
 private:
 	int value_{ 0 };
 };
