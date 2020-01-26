@@ -31,7 +31,7 @@ public:
 	size_t GetTaskCount();
 
 	template<typename T, typename... Args>
-	void Post(std::function<T(Args...)> task, Args... args);
+	void Post(std::function<T(Args&...)> task, Args&... args);
 
 	void Stop();
 	void Join();

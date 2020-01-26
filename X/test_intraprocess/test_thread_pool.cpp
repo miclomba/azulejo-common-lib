@@ -36,7 +36,7 @@ std::chrono::milliseconds HUNDRED_MSEC(100);
 
 struct ThreadPoolF : public testing::Test
 {
-	std::function<void(int)> SleepAndSetResourceValue = [this](int val)
+	std::function<void(int&)> SleepAndSetResourceValue = [this](int& val)
 	{
 		std::this_thread::sleep_for(HUNDRED_MSEC);
 		value_ += val;
@@ -45,6 +45,7 @@ struct ThreadPoolF : public testing::Test
 	int GetResourceValue() { return value_; }
 	void SetResourceValue(const int val) { value_ = val; }
 
+	int VALID_VAL_PARAM{ VALID_VAL };
 private:
 	int value_{ 0 };
 };
@@ -73,7 +74,7 @@ TEST_F(ThreadPoolF, Destruct)
 		EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 		EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
-		pool.Post(SleepAndSetResourceValue, VALID_VAL);
+		pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	}
 	EXPECT_EQ(GetResourceValue(), VALID_VAL);
 
@@ -113,7 +114,7 @@ TEST_F(ThreadPoolF, Join)
 	EXPECT_EQ(pool.GetThreadCount(), TWO_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	if (pool.GetTaskCount() > ZERO_TASKS)
 		hasTasksAfterPost = true;
 
@@ -133,8 +134,8 @@ TEST_F(ThreadPoolF, Stop)
 	REPEAT_BEGIN
 	ThreadPool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	pool.Stop();
 	EXPECT_EQ(pool.GetThreadCount(), ZERO_THREADS);
 	if (pool.GetTaskCount() > ZERO_TASKS)
@@ -156,7 +157,7 @@ TEST_F(ThreadPoolF, Post)
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	if (pool.GetTaskCount() > ZERO_TASKS)
 		hasTasksAfterPost = true;
 
@@ -180,7 +181,7 @@ TEST_F(ThreadPoolF, PostOneTaskUsingEightThreads)
 	EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
 
 	pool.Join();
@@ -201,7 +202,7 @@ TEST_F(ThreadPoolF, PostEightTaskUsingOneThreads)
 
 	const size_t EIGHT_TASKS = 8;
 	for (size_t i = 0; i < EIGHT_TASKS; ++i)
-		pool.Post(SleepAndSetResourceValue, VALID_VAL);
+		pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 
@@ -220,14 +221,14 @@ TEST_F(ThreadPoolF, PostAfterStopThrows)
 	REPEAT_BEGIN
 	ThreadPool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 	pool.Stop();
 	EXPECT_EQ(pool.GetThreadCount(), ZERO_THREADS);
 	if (pool.GetTaskCount() > ZERO_TASKS)
 		hasTasksAfterStop = true;
 
-	EXPECT_THROW(pool.Post(SleepAndSetResourceValue, VALID_VAL), std::runtime_error);
+	EXPECT_THROW(pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM), std::runtime_error);
 	REPEAT_END
 
 	EXPECT_TRUE(hasTasksAfterStop);
@@ -240,8 +241,8 @@ TEST_F(ThreadPoolF, PostAfterJoinThrows)
 	REPEAT_BEGIN
 	ThreadPool pool(ONE_THREAD);
 	EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
-	pool.Post(SleepAndSetResourceValue, VALID_VAL);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
+	pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM);
 
 	if (pool.GetTaskCount() > ZERO_TASKS)
 		hasTasksAfterPost = true;
@@ -250,7 +251,7 @@ TEST_F(ThreadPoolF, PostAfterJoinThrows)
 	EXPECT_EQ(pool.GetThreadCount(), ZERO_THREADS);
 	EXPECT_EQ(pool.GetTaskCount(), ZERO_TASKS);
 
-	EXPECT_THROW(pool.Post(SleepAndSetResourceValue, VALID_VAL), std::runtime_error);
+	EXPECT_THROW(pool.Post(SleepAndSetResourceValue, VALID_VAL_PARAM), std::runtime_error);
 	REPEAT_END
 
 	EXPECT_TRUE(hasTasksAfterPost);
