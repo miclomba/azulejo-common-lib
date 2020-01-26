@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="IOpenMP.cpp" />
     <ClCompile Include="IRunnable.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

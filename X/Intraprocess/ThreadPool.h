@@ -15,7 +15,6 @@
 
 namespace intraprocess {
 
-template<typename T>
 class INTRAPROCESS_DLL_EXPORT ThreadPool
 {
 public:
@@ -31,7 +30,8 @@ public:
 	size_t GetThreadCount() const;
 	size_t GetTaskCount();
 
-	std::future<T> PostTask(std::packaged_task<T()>&& task);
+	template<typename T, typename... Args>
+	void Post(std::function<T(Args...)> task, Args... args);
 
 	void Stop();
 	void Join();
@@ -40,17 +40,19 @@ private:
 
 	static void RunTask(ThreadPool* pool);
 
-	bool StayAlive() const;
+	bool KeepRunning() const;
+	bool Die() const;
 	bool HasWorkThreadSafe();
 	bool HasWorkThreadUnsafe() const;
 	bool ThreadsShouldProceed();
 	void AddToThreadCounter(const size_t val);
 
 	std::atomic<size_t> numThreads_{ 0 };
-	std::atomic<bool> stayAlive_{ true };
+	std::atomic<bool> keepRunning_{ true };
+	std::atomic<bool> die_{ false };
 	std::mutex lock_;
 	std::condition_variable threadNotifier_;
-	std::queue<std::packaged_task<T()>> workQueue_;
+	std::queue<std::packaged_task<void()>> workQueue_;
 	std::vector<std::thread> workerThreads_;
 };
 
