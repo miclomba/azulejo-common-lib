@@ -39,7 +39,7 @@
     <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_openmp.cpp" />
+    <ClCompile Include="test_iomp_runnable.cpp" />
     <ClCompile Include="test_thread_pool.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup />

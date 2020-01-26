@@ -7,9 +7,9 @@
 
 #include <omp.h>
 
-#include "Intraprocess/IOpenMP.h"
+#include "Intraprocess/IOMPRunnable.h"
 
-using intraprocess::IOpenMP;
+using intraprocess::IOMPRunnable;
 
 namespace
 {
@@ -18,10 +18,20 @@ const int NUM_THREADS = 1;
 const bool SET_DYNAMIC = false;
 const bool SET_NESTED = false;
 
-struct Runnable : public IOpenMP
+struct Runnable : public IOMPRunnable
 {
-	Runnable(const int numThreads, const bool setDynamic, const bool setNested) :
-		IOpenMP(numThreads,setDynamic,setNested) 
+	Runnable(const size_t numThreads, const bool setDynamic, const bool setNested) :
+		IOMPRunnable(numThreads,setDynamic,setNested) 
+	{
+	}
+
+	Runnable(const size_t numThreads, const bool setDynamic) :
+		IOMPRunnable(numThreads,setDynamic) 
+	{
+	}
+
+	Runnable(const size_t numThreads) :
+		IOMPRunnable(numThreads) 
 	{
 	}
 
@@ -95,14 +105,16 @@ private:
 };
 } // end namespace anonymous
 
-TEST(IOpenMP, Construct)
+TEST(IOMPRunnable, Construct)
 {
-	EXPECT_NO_THROW(Runnable(1, false, false));
+	EXPECT_NO_THROW(Runnable(1, SET_DYNAMIC, SET_NESTED));
+	EXPECT_NO_THROW(Runnable(1, SET_DYNAMIC));
+	EXPECT_NO_THROW(Runnable(1));
 }
 
-TEST(IOpenMP, CopyConstruct)
+TEST(IOMPRunnable, CopyConstruct)
 {
-	Runnable source(1, false, false);
+	Runnable source(1, SET_DYNAMIC, SET_NESTED);
 	Runnable target(source);
 
 	EXPECT_EQ(source.GetNumThreads(), target.GetNumThreads());
@@ -110,10 +122,10 @@ TEST(IOpenMP, CopyConstruct)
 	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
-TEST(IOpenMP, CopyAssign)
+TEST(IOMPRunnable, CopyAssign)
 {
-	Runnable source(1, false, false);
-	Runnable target(2, true, true);
+	Runnable source(1, SET_DYNAMIC, SET_NESTED);
+	Runnable target(2, !SET_DYNAMIC, !SET_NESTED);
 
 	target = source;
 
@@ -122,7 +134,7 @@ TEST(IOpenMP, CopyAssign)
 	EXPECT_EQ(source.GetSetNested(), target.GetSetNested());
 }
 
-TEST(IOpenMP, MoveConstruct)
+TEST(IOMPRunnable, MoveConstruct)
 {
 	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
 	Runnable target(std::move(source));
@@ -132,7 +144,7 @@ TEST(IOpenMP, MoveConstruct)
 	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
-TEST(IOpenMP, MoveAssign)
+TEST(IOMPRunnable, MoveAssign)
 {
 	Runnable source(NUM_THREADS, SET_DYNAMIC, SET_NESTED);
 	Runnable target(NUM_THREADS + 1, !SET_DYNAMIC, !SET_NESTED);
@@ -144,14 +156,44 @@ TEST(IOpenMP, MoveAssign)
 	EXPECT_EQ(SET_NESTED, target.GetSetNested());
 }
 
-TEST(IOpenMP, ConstructorThrows)
+TEST(IOMPRunnable, ConstructorThrows)
 {
-	EXPECT_THROW(Runnable(-4, false, false), std::runtime_error);
+	EXPECT_THROW(Runnable(0, SET_DYNAMIC, SET_NESTED), std::runtime_error);
 }
 
-TEST(IOpenMP, Start)
+TEST(IOMPRunnable, Start)
 {
-	Runnable openmp(4,false,false);
+	Runnable openmp(4,SET_DYNAMIC,SET_NESTED);
 	EXPECT_NO_THROW(openmp.Start());
 	EXPECT_EQ(openmp.GetSharedTotal(), EXPECTED_VALUE);
+}
+
+TEST(IOMPRunnable, GetNumThreads)
+{
+	Runnable openmp(4, SET_DYNAMIC, SET_NESTED);
+	EXPECT_EQ(openmp.GetNumThreads(), 4);
+	Runnable openmp2(4, SET_DYNAMIC);
+	EXPECT_EQ(openmp2.GetNumThreads(), 4);
+	Runnable openmp3(4);
+	EXPECT_EQ(openmp3.GetNumThreads(), 4);
+}
+
+TEST(IOMPRunnable, GetDynamicState)
+{
+	Runnable openmp(4, SET_DYNAMIC, SET_NESTED);
+	EXPECT_EQ(openmp.GetDynamicState(), SET_DYNAMIC);
+	Runnable openmp2(4, SET_DYNAMIC);
+	EXPECT_EQ(openmp2.GetDynamicState(), SET_DYNAMIC);
+	Runnable openmp3(4);
+	EXPECT_EQ(openmp3.GetDynamicState(), !SET_DYNAMIC);
+}
+
+TEST(IOMPRunnable, GetNestedState)
+{
+	Runnable openmp(4, SET_DYNAMIC, SET_NESTED);
+	EXPECT_EQ(openmp.GetNestedState(), SET_NESTED);
+	Runnable openmp2(4, SET_DYNAMIC);
+	EXPECT_EQ(openmp2.GetNestedState(), !SET_NESTED);
+	Runnable openmp3(4);
+	EXPECT_EQ(openmp3.GetNestedState(), !SET_NESTED);
 }
