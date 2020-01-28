@@ -1,10 +1,7 @@
 #include "AsyncServer.h"
 
-#include <iostream>
-#include <limits>
 #include <memory>
 #include <stdexcept>
-#include <string>
 #include <thread>
 #include <vector>
 
@@ -22,8 +19,6 @@ AsyncServer::AsyncServer(const size_t numThreads) :
 {
 	if (numThreads_ == 0)
 		throw std::runtime_error("Cannot construct AsyncServer because number of threads is invalid");
-
-	// initialize threads here
 }
 
 AsyncServer::~AsyncServer() = default;
