@@ -24,7 +24,7 @@ namespace
 {
 const int INVALID_VAL = 0;
 const int VALID_VAL = 7;
-const size_t REPEAT = 30;
+const size_t REPEAT = 10;
 const size_t ONE_THREAD = 1;
 const size_t TWO_THREADS = 2;
 const size_t EIGHT_THREADS = 8;
@@ -55,6 +55,13 @@ TEST(ThreadPool, Construct)
 {
 	REPEAT_BEGIN
 	EXPECT_NO_THROW(ThreadPool pool(TWO_THREADS));
+	REPEAT_END
+}
+
+TEST(ThreadPool, DefaultConstruct)
+{
+	REPEAT_BEGIN
+	EXPECT_NO_THROW(ThreadPool pool);
 	REPEAT_END
 }
 
@@ -99,6 +106,10 @@ TEST(ThreadPool, GetThreadCount)
 	{
 		ThreadPool pool(EIGHT_THREADS);
 		EXPECT_EQ(pool.GetThreadCount(), EIGHT_THREADS);
+	}
+	{
+		ThreadPool pool;
+		EXPECT_EQ(pool.GetThreadCount(), ONE_THREAD);
 	}
 	REPEAT_END
 }

@@ -18,7 +18,7 @@ namespace intraprocess {
 class INTRAPROCESS_DLL_EXPORT ThreadPool
 {
 public:
-	ThreadPool(const size_t numThreads);
+	ThreadPool(const size_t numThreads = 1);
 
 	ThreadPool(const ThreadPool&) = delete;
 	ThreadPool& operator=(const ThreadPool&) = delete;
