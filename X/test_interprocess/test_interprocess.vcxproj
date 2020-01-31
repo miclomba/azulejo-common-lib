@@ -36,9 +36,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChatHandler.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="DerivedConnectionHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_async_server.cpp" />

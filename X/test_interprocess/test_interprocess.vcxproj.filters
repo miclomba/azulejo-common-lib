@@ -15,7 +15,7 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DerivedConnectionHandler.h">
+    <ClInclude Include="ChatHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

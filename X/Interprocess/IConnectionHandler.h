@@ -26,7 +26,7 @@ public:
 
 	boost::asio::ip::tcp::socket& Socket();
 
-private:
+protected:
 	boost::asio::io_context& ioServiceRef_;
 	boost::asio::ip::tcp::socket socket_;
 	boost::asio::io_context::strand writeStrand_;
