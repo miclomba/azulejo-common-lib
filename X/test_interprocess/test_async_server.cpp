@@ -5,8 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "interprocess/AsyncServer.h"
+#include "interprocess/ConnectionHandler.h"
 
 using interprocess::AsyncServer;
+using interprocess::ConnectionHandler;
 
 namespace
 {
@@ -17,23 +19,23 @@ const uint16_t PORT = 1500;
 
 TEST(AsyncServer, Construct)
 {
-	EXPECT_NO_THROW(AsyncServer server(TWO_THREADS));
+	EXPECT_NO_THROW(AsyncServer<ConnectionHandler> server(TWO_THREADS));
 }
 
 TEST(AsyncServer, ConstructThrows)
 {
-	EXPECT_THROW(AsyncServer server(ZERO_THREADS), std::runtime_error);
+	EXPECT_THROW(AsyncServer<ConnectionHandler> server(ZERO_THREADS), std::runtime_error);
 }
 
 TEST(AsyncServer, GetNumThreads)
 {
-	AsyncServer server(TWO_THREADS);
+	AsyncServer<ConnectionHandler> server(TWO_THREADS);
 	const size_t numThreads = server.GetNumThreads();
 	EXPECT_EQ(numThreads, TWO_THREADS);
 }
 
 TEST(AsyncServer, Start)
 {
-	AsyncServer server(TWO_THREADS);
+	AsyncServer<ConnectionHandler> server(TWO_THREADS);
 	//EXPECT_NO_THROW(server.Start(PORT));
 }

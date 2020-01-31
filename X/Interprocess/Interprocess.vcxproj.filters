@@ -33,15 +33,15 @@
     <ClInclude Include="ConnectionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AsyncServer.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ISharedMemory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AsyncServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionHandler.cpp">

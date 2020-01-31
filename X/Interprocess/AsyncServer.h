@@ -2,22 +2,23 @@
 #define interprocess_async_server_h
 
 #include <memory>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 
 #include "config.h"
 
+#include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace interprocess {
 
-class ConnectionHandler;
-
+template<typename ConnHandlerT>
 class INTERPROCESS_DLL_EXPORT AsyncServer 
 {
-	using shared_conn_handler_t = std::shared_ptr<ConnectionHandler>;
+	using shared_conn_handler_t = std::shared_ptr<ConnHandlerT>;
 
 public:
 	AsyncServer(const size_t numThreads = 1);
@@ -41,6 +42,8 @@ private:
 	boost::asio::io_context ioService_;
 	boost::asio::ip::tcp::acceptor acceptor_;
 };
+
+#include "AsyncServer.hpp"
 
 } // end namespace interprocess
 #endif // interprocess_async_server_h
