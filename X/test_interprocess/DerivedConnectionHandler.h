@@ -10,11 +10,11 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Interprocess/ConnectionHandler.h"
+#include "Interprocess/IConnectionHandler.h"
 
 namespace networking {
 
-struct DerivedConnectionHanlder : interprocess::ConnectionHandler
+struct DerivedConnectionHandler : interprocess::IConnectionHandler
 {
 	void Start() override
 	{

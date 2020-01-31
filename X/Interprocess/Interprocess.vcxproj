@@ -124,13 +124,13 @@
     <ClInclude Include="AsyncServer.h" />
     <ClInclude Include="AsyncServer.hpp" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="ConnectionHandler.h" />
     <ClInclude Include="IClient.h" />
+    <ClInclude Include="IConnectionHandler.h" />
     <ClInclude Include="ISharedMemory.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConnectionHandler.cpp" />
     <ClCompile Include="IClient.cpp" />
+    <ClCompile Include="IConnectionHandler.cpp" />
     <ClCompile Include="ISharedMemory.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

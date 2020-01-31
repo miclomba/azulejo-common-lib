@@ -30,11 +30,11 @@
     <ClInclude Include="AsyncServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AsyncServer.hpp">
       <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="IConnectionHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +44,7 @@
     <ClCompile Include="ISharedMemory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionHandler.cpp">
+    <ClCompile Include="IConnectionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
