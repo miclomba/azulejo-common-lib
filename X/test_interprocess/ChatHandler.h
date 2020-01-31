@@ -1,12 +1,10 @@
 #ifndef chat_handler_h
 #define chat_handler_h
 
-#include <ctime>
 #include <deque>
 #include <iostream>
 #include <istream>
 #include <memory>
-#include <stdexcept>
 #include <string>
 
 #include <boost/asio.hpp>
@@ -26,9 +24,7 @@ public:
 		ReceivePacket();
 	}
 
-private:
-
-	void SendPacket(std::string message)
+	void SendChatMessage(std::string message)
 	{
 		ioServiceRef_.post(writeStrand_.wrap(
 			[me=shared_from_this(), message]() 
@@ -37,6 +33,8 @@ private:
 			meDerived->QueueMessage(message);
 		}));
 	}
+
+private:
 
 	void QueueMessage(std::string message)
 	{
@@ -86,7 +84,7 @@ private:
 		std::string packetString;
 		stream >> packetString;
 
-		// do something with the read packet
+		std::cout << packetString << std::endl;
 
 		ReceivePacket();
 	}
