@@ -16,9 +16,12 @@
 
 namespace networking {
 
-class ChatHandler : interprocess::IConnectionHandler
+class ChatHandler : public interprocess::IConnectionHandler
 {
 public:
+	ChatHandler(boost::asio::io_context& context) : IConnectionHandler(context) {};
+	~ChatHandler() = default;
+
 	void Start() override
 	{
 		ReceivePacket();
