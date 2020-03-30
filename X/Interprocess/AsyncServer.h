@@ -6,8 +6,6 @@
 #include <thread>
 #include <vector>
 
-#include "config.h"
-
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -15,13 +13,13 @@
 
 namespace interprocess {
 
-template<typename ConnHandlerT>
-class INTERPROCESS_DLL_EXPORT AsyncServer 
+template<typename ConnHandlerT, typename ConnAcceptorT = boost::asio::ip::tcp::acceptor>
+class AsyncServer 
 {
 	using shared_conn_handler_t = std::shared_ptr<ConnHandlerT>;
 
 public:
-	AsyncServer(const size_t numThreads = 1);
+	AsyncServer(std::shared_ptr<ConnAcceptorT> acceptor, const size_t numThreads = 1);
 	virtual ~AsyncServer();
 
 	AsyncServer(const AsyncServer&) = delete;
@@ -30,6 +28,7 @@ public:
 	AsyncServer& operator=(AsyncServer&&) = delete;
 
 	void Start(const uint16_t port);
+	void Join();
 
 	size_t GetNumThreads() const;
 
@@ -39,8 +38,8 @@ private:
 	const size_t numThreads_;
 
 	std::vector<std::thread> threadPool_;
-	boost::asio::io_context ioService_;
-	boost::asio::ip::tcp::acceptor acceptor_;
+	boost::asio::io_context* ioService_;
+	std::shared_ptr<ConnAcceptorT> acceptor_;
 };
 
 #include "AsyncServer.hpp"

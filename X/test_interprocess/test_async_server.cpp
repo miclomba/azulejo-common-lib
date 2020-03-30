@@ -1,18 +1,6 @@
 #include "config.h"
 
-#include <fstream>
 #include <stdexcept>
-
-#ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-// this header must always follow the include of <winsock2.h>
-#include <iphlpapi.h>
-#endif
 
 /*
 	This test project uses gmock google project. To install gmock:
@@ -27,42 +15,116 @@
 #include <gtest/gtest.h>
 
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/system/error_code.hpp>
 
-#include "ChatHandler.h"
-#include "interprocess/AsyncServer.h"
+#include "Interprocess/AsyncServer.h"
+#include "Interprocess/IConnectionHandler.h"
 
+using boost::asio::io_context;
+using boost::asio::ip::tcp;
+using boost::system::error_code;
+using ::testing::_;
+using ::testing::Invoke;
 using ::testing::Return;
+
 using interprocess::AsyncServer;
-using networking::ChatHandler;
+using interprocess::IConnectionHandler;
 
 namespace
 {
-WSADATA wsaData;
-
-const int TWO_THREADS = 2;
-const int ZERO_THREADS = 0;
+const size_t TWO_THREADS = 2;
+const size_t ZERO_THREADS = 0;
 const uint16_t PORT = 1500;
+
+struct MockHandler : public IConnectionHandler {
+	MockHandler(io_context& context) : IConnectionHandler(context) {}
+	void Start() override {}
+};
+
+struct MockAcceptor : public tcp::acceptor
+{
+	MOCK_METHOD2(async_accept, void(boost::asio::ip::tcp::socket&, std::function<void(error_code)>));
+
+	MockAcceptor(io_context& context) : tcp::acceptor(context), context_(context) {}
+
+	void AsyncAcceptImpl(boost::asio::ip::tcp::socket& socket, std::function<void(error_code)> ec)
+	{
+		context_.post([this]() { this->Accept(); });
+	}
+
+	size_t GetAcceptCount() { return acceptCount_; }
+
+private:
+	void Accept() { ++acceptCount_; }
+	size_t acceptCount_{ 0 };
+	io_context& context_;
+};
+
 } // end namespace
 
 TEST(AsyncServer, Construct)
 {
-	EXPECT_NO_THROW(AsyncServer<ChatHandler> server(TWO_THREADS));
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	EXPECT_NO_THROW(AsyncServer<MockHandler> server(acceptor, TWO_THREADS));
 }
 
-TEST(AsyncServer, ConstructThrows)
+TEST(AsyncServer, ConstructThrowsWhenGivenZeroThreadCount)
 {
-	EXPECT_THROW(AsyncServer<ChatHandler> server(ZERO_THREADS), std::runtime_error);
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	EXPECT_THROW(AsyncServer<MockHandler> server(acceptor, ZERO_THREADS), std::runtime_error);
+}
+
+TEST(AsyncServer, ConstructThrowsWhenGivenNullAcceptor)
+{
+	EXPECT_THROW(AsyncServer<MockHandler> server(nullptr, TWO_THREADS), std::runtime_error);
+}
+
+TEST(AsyncServer, Join)
+{
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
+	EXPECT_NO_THROW(server.Join());
+}
+
+TEST(AsyncServer, JoinAfterStarting)
+{
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
+	server.Start(PORT);
+	EXPECT_NO_THROW(server.Join());
 }
 
 TEST(AsyncServer, GetNumThreads)
 {
-	AsyncServer<ChatHandler> server(TWO_THREADS);
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	const size_t numThreads = server.GetNumThreads();
 	EXPECT_EQ(numThreads, TWO_THREADS);
 }
 
 TEST(AsyncServer, Start)
 {
-	AsyncServer<ChatHandler> server(TWO_THREADS);
-	//EXPECT_NO_THROW(server.Start(PORT));
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
+	EXPECT_NO_THROW(server.Start(PORT));
 }
+
+TEST(AsyncServer, AcceptConnection)
+{
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	EXPECT_CALL(*acceptor, async_accept(_,_)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+
+	AsyncServer<MockHandler, MockAcceptor> server(acceptor, TWO_THREADS);
+	server.Start(PORT);
+
+	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
+}
+
