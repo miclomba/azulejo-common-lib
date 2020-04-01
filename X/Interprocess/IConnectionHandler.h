@@ -25,6 +25,7 @@ public:
 	virtual void Start() = 0;
 
 	boost::asio::ip::tcp::socket& Socket();
+	boost::asio::io_context& IOService();
 
 protected:
 	boost::asio::io_context& ioServiceRef_;

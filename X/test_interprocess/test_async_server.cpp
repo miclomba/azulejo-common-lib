@@ -1,5 +1,6 @@
 #include "config.h"
 
+#include <memory>
 #include <stdexcept>
 
 /*
@@ -55,11 +56,11 @@ size_t MockHandler::startCount_ = 0;
 
 struct MockAcceptor : public tcp::acceptor
 {
-	MOCK_METHOD2(async_accept, void(boost::asio::ip::tcp::socket&, std::function<void(error_code)>));
+	MOCK_METHOD2(async_accept, void(tcp::socket&, std::function<void(error_code)>));
 
 	MockAcceptor(io_context& context) : tcp::acceptor(context), context_(context) {}
 
-	void AsyncAcceptImpl(boost::asio::ip::tcp::socket& socket, std::function<void(error_code)> ec)
+	void AsyncAcceptImpl(tcp::socket& socket, std::function<void(error_code)> ec)
 	{
 		context_.post([this]() { this->Accept(); });
 	}
@@ -78,7 +79,7 @@ struct Server : public AsyncServer<MockHandler, MockAcceptor>
 	using shared_conn_handler_t = std::shared_ptr<MockHandler>;
 
 	Server(std::shared_ptr<ConnAcceptorT> acceptor) : AsyncServer(acceptor) {}
-	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code ec)
+	void HandleNewConnection(shared_conn_handler_t handler, const error_code ec)
 	{
 		AsyncServer::HandleNewConnection(handler, ec);
 	}
@@ -88,14 +89,14 @@ struct Server : public AsyncServer<MockHandler, MockAcceptor>
 
 TEST(AsyncServer, Construct)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_NO_THROW(AsyncServer<MockHandler> server(acceptor, TWO_THREADS));
 }
 
 TEST(AsyncServer, ConstructThrowsWhenGivenZeroThreadCount)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_THROW(AsyncServer<MockHandler> server(acceptor, ZERO_THREADS), std::runtime_error);
 }
@@ -107,7 +108,7 @@ TEST(AsyncServer, ConstructThrowsWhenGivenNullAcceptor)
 
 TEST(AsyncServer, Join)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	EXPECT_NO_THROW(server.Join());
@@ -115,7 +116,7 @@ TEST(AsyncServer, Join)
 
 TEST(AsyncServer, JoinAfterStarting)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	server.Start(PORT);
@@ -124,7 +125,7 @@ TEST(AsyncServer, JoinAfterStarting)
 
 TEST(AsyncServer, GetNumThreads)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	const size_t numThreads = server.GetNumThreads();
@@ -133,7 +134,7 @@ TEST(AsyncServer, GetNumThreads)
 
 TEST(AsyncServer, Start)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	EXPECT_NO_THROW(server.Start(PORT));
@@ -141,7 +142,7 @@ TEST(AsyncServer, Start)
 
 TEST(AsyncServer, AcceptConnection)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_CALL(*acceptor, async_accept(_,_)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 
@@ -153,7 +154,7 @@ TEST(AsyncServer, AcceptConnection)
 
 TEST(AsyncServer, HandleNewConnection)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_CALL(*acceptor, async_accept(_, _)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 
@@ -171,7 +172,7 @@ TEST(AsyncServer, HandleNewConnection)
 
 TEST(AsyncServer, HandleNewConnectionWithErrorCode)
 {
-	boost::asio::io_context context;
+	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	ON_CALL(*acceptor, async_accept(_, _)).WillByDefault(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 

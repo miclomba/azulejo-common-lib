@@ -16,3 +16,8 @@ boost::asio::ip::tcp::socket& IConnectionHandler::Socket()
 	return socket_;
 }
 
+boost::asio::io_context& IConnectionHandler::IOService()
+{
+	return ioServiceRef_;
+}
+
