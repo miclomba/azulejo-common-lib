@@ -1,6 +1,5 @@
 #include "config.h"
 
-#include <stdexcept>
 #include <gtest/gtest.h>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -13,10 +12,6 @@ using interprocess::IConnectionHandler;
 
 namespace
 {
-const size_t TWO_THREADS = 2;
-const size_t ZERO_THREADS = 0;
-const uint16_t PORT = 1500;
-
 struct MockHandler : public IConnectionHandler {
 	MockHandler(io_context& context) : IConnectionHandler(context) {}
 	void Start() override { ++startCount_; }
