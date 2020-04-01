@@ -36,18 +36,30 @@ void AsyncServer_t::Join()
 TEMPLATE_T
 void AsyncServer_t::Start(const uint16_t port)
 {
+	assert(ioService_);
+
 	using boost::asio::ip::tcp;
+	using boost::system::error_code;
+
+	error_code ec;
 
 	tcp::endpoint endpoint(tcp::v4(), port);
-	acceptor_->open(endpoint.protocol());
-	acceptor_->set_option(tcp::acceptor::reuse_address(true));
-	acceptor_->bind(endpoint);
-	acceptor_->listen();
+	acceptor_->open(endpoint.protocol(), ec);
+	if (ec) throw std::runtime_error("AsyncServer could not open protocol via port " + std::to_string(port));
+
+	acceptor_->set_option(tcp::acceptor::reuse_address(true), ec);
+	if (ec) throw std::runtime_error("AsyncServer could not set option to reuse addresses");
+
+	acceptor_->bind(endpoint, ec);
+	if (ec) throw std::runtime_error("AsyncServer could not bind on endpoint");
+
+	acceptor_->listen(boost::asio::socket_base::max_listen_connections, ec);
+	if (ec) throw std::runtime_error("AsyncServer could not listen");
 
 	auto handler = std::make_shared<ConnHandlerT>(*ioService_);
-	acceptor_->async_accept(handler->Socket(), [=](auto ec) 
+	acceptor_->async_accept(handler->Socket(), [=](error_code errorCode) 
 	{
-		HandleNewConnection(handler, ec);
+		HandleNewConnection(handler, errorCode);
 	});
 
 	for (size_t i = 0; i < numThreads_; ++i)
@@ -55,14 +67,16 @@ void AsyncServer_t::Start(const uint16_t port)
 }
 
 TEMPLATE_T
-void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handler, const boost::system::error_code& ec)
+void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handler, const boost::system::error_code errorCode)
 {
-	if (ec) return;
+	using boost::system::error_code;
+
+	if (errorCode) return;
 
 	handler->Start();
 
 	auto newHandler = std::make_shared<ConnHandlerT>(*ioService_);
-	acceptor_->async_accept(newHandler->Socket(), [=](auto ec)
+	acceptor_->async_accept(newHandler->Socket(), [=](error_code ec)
 	{
 		HandleNewConnection(newHandler, ec);
 	});

@@ -9,6 +9,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/socket_base.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace interprocess {
@@ -32,8 +33,10 @@ public:
 
 	size_t GetNumThreads() const;
 
+protected:
+	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code ec);
+
 private:
-	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code& ec);
 
 	const size_t numThreads_;
 

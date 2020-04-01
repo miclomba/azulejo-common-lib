@@ -21,9 +21,12 @@
 #include "Interprocess/AsyncServer.h"
 #include "Interprocess/IConnectionHandler.h"
 
+namespace errc = boost::system::errc;
+
 using boost::asio::io_context;
 using boost::asio::ip::tcp;
 using boost::system::error_code;
+using boost::system::error_category;
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
@@ -39,8 +42,16 @@ const uint16_t PORT = 1500;
 
 struct MockHandler : public IConnectionHandler {
 	MockHandler(io_context& context) : IConnectionHandler(context) {}
-	void Start() override {}
+	void Start() override { ++startCount_; }
+
+	static void ResetStartCount() { startCount_ = 0; }
+	static size_t GetStartCount() { return startCount_; }
+
+private:
+	static size_t startCount_;
 };
+
+size_t MockHandler::startCount_ = 0;
 
 struct MockAcceptor : public tcp::acceptor
 {
@@ -59,6 +70,18 @@ private:
 	void Accept() { ++acceptCount_; }
 	size_t acceptCount_{ 0 };
 	io_context& context_;
+};
+
+template<typename ConnHandlerT, typename ConnAcceptorT>
+struct Server : public AsyncServer<MockHandler, MockAcceptor>
+{
+	using shared_conn_handler_t = std::shared_ptr<MockHandler>;
+
+	Server(std::shared_ptr<ConnAcceptorT> acceptor) : AsyncServer(acceptor) {}
+	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code ec)
+	{
+		AsyncServer::HandleNewConnection(handler, ec);
+	}
 };
 
 } // end namespace
@@ -126,5 +149,39 @@ TEST(AsyncServer, AcceptConnection)
 	server.Start(PORT);
 
 	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
+}
+
+TEST(AsyncServer, HandleNewConnection)
+{
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	EXPECT_CALL(*acceptor, async_accept(_, _)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+
+	MockHandler::ResetStartCount();
+	EXPECT_EQ(MockHandler::GetStartCount(), 0);
+
+	Server<MockHandler, MockAcceptor> server(acceptor);
+	server.HandleNewConnection(std::make_shared<MockHandler>(context), error_code());
+
+	EXPECT_EQ(MockHandler::GetStartCount(), 1);
+
+	context.run();
+	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
+}
+
+TEST(AsyncServer, HandleNewConnectionWithErrorCode)
+{
+	boost::asio::io_context context;
+	auto acceptor = std::make_shared<MockAcceptor>(context);
+	ON_CALL(*acceptor, async_accept(_, _)).WillByDefault(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+
+	MockHandler::ResetStartCount();
+	EXPECT_EQ(MockHandler::GetStartCount(), 0);
+
+	Server<MockHandler, MockAcceptor> server(acceptor);
+	server.HandleNewConnection(std::make_shared<MockHandler>(context), errc::make_error_code(errc::not_supported));
+
+	EXPECT_EQ(MockHandler::GetStartCount(), 0);
+	EXPECT_EQ(acceptor->GetAcceptCount(), 0);
 }
 
