@@ -12,17 +12,21 @@
 #include <boost/asio/streambuf.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Interprocess/IConnectionHandler.h"
-
 namespace networking {
 
-class ChatHandler : public interprocess::IConnectionHandler
+class ChatHandler : public std::enable_shared_from_this<ChatHandler>
 {
 public:
-	ChatHandler(boost::asio::io_context& context) : IConnectionHandler(context) {};
+	ChatHandler(boost::asio::io_context& context) : 
+		ioServiceRef_(context),
+		socket_(context),
+		writeStrand_(context)
+	{
+	}
+
 	~ChatHandler() = default;
 
-	void Start() override
+	void Start()
 	{
 		ReceivePacket();
 	}
@@ -38,6 +42,11 @@ public:
 	}
 
 private:
+
+	boost::asio::ip::tcp::socket& Socket()
+	{
+		return socket_;
+	}
 
 	void QueueMessage(std::string message)
 	{
@@ -95,6 +104,9 @@ private:
 	const char UNTIL_CONDITION = '\0';
 	boost::asio::streambuf inPacket_;
 	std::deque<std::string> packetQue_;
+	boost::asio::io_context& ioServiceRef_;
+	boost::asio::ip::tcp::socket socket_;
+	boost::asio::io_context::strand writeStrand_;
 };
 
 } // end networking

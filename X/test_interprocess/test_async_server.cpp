@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
 
 /*
 	This test project uses gmock google project. To install gmock:
@@ -19,8 +20,9 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "Interprocess/AsyncIO.h"
 #include "Interprocess/AsyncServer.h"
-#include "Interprocess/IConnectionHandler.h"
+#include "Interprocess/ConnectionHandler.h"
 
 namespace errc = boost::system::errc;
 
@@ -32,8 +34,9 @@ using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
 
+using interprocess::AsyncIO;
 using interprocess::AsyncServer;
-using interprocess::IConnectionHandler;
+using interprocess::ConnectionHandler;
 
 namespace
 {
@@ -41,15 +44,18 @@ const size_t TWO_THREADS = 2;
 const size_t ZERO_THREADS = 0;
 const uint16_t PORT = 1500;
 
-struct MockHandler : public IConnectionHandler {
-	MockHandler(io_context& context) : IConnectionHandler(context) {}
-	void Start() override { ++startCount_; }
+struct Packet : public std::string {};
+
+struct MockHandler : public ConnectionHandler<Packet> {
+	MockHandler(io_context& context) : ConnectionHandler(context, packetAsio_) {}
+	void Start() { ++startCount_; }
 
 	static void ResetStartCount() { startCount_ = 0; }
 	static size_t GetStartCount() { return startCount_; }
 
 private:
 	static size_t startCount_;
+	AsyncIO<Packet> packetAsio_;
 };
 
 size_t MockHandler::startCount_ = 0;
@@ -174,7 +180,7 @@ TEST(AsyncServer, HandleNewConnectionWithErrorCode)
 {
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
-	ON_CALL(*acceptor, async_accept(_, _)).WillByDefault(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+	ON_CALL(*acceptor, async_accept(_, _)).WillByDefault(Invoke(acceptor.get(), &MockAcceptor::AsyncAcceptImpl));
 
 	MockHandler::ResetStartCount();
 	EXPECT_EQ(MockHandler::GetStartCount(), 0);

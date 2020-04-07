@@ -31,7 +31,7 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc" />
-    <ClCompile Include="test_iconnection_handler.cpp">
+    <ClCompile Include="test_connection_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

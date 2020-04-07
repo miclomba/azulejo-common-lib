@@ -43,7 +43,7 @@
   <ItemGroup>
     <ClCompile Include="test_async_server.cpp" />
     <ClCompile Include="test_client.cpp" />
-    <ClCompile Include="test_iconnection_handler.cpp" />
+    <ClCompile Include="test_connection_handler.cpp" />
     <ClCompile Include="test_shared_memory.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup />
