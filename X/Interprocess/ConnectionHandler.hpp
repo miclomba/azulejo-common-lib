@@ -33,13 +33,19 @@ AsyncIO<PacketT>& ConnectionHandler_t::PacketAsyncIO()
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::Start()
+void ConnectionHandler_t::ReceivePackets()
 {
 	ReceivePacketStart();
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::SendPacket(PacketT packet)
+bool ConnectionHandler_t::HasPostedPackets() const
+{
+	return !outPacketQue_.empty();
+}
+
+TEMPLATE_T
+void ConnectionHandler_t::PostPacket(PacketT packet)
 {
 	// writing packets to a socket stream requires synchronization
 	ioServiceRef_.post(writeStrand_.wrap(
@@ -83,13 +89,13 @@ void ConnectionHandler_t::SendPacketDone(const boost::system::error_code& error)
 }
 
 TEMPLATE_T
-bool ConnectionHandler_t::HasReceivedPacket() const
+bool ConnectionHandler_t::HasReceivedPackets() const
 {
 	return !inPacketQue_.empty();
 }
 
 TEMPLATE_T
-PacketT ConnectionHandler_t::ReceivePacket()
+PacketT ConnectionHandler_t::GetPacket()
 {
 	if (inPacketQue_.empty())
 		throw std::runtime_error("Cannot receive packet from ConnectionHandler because there are no packets to receive");

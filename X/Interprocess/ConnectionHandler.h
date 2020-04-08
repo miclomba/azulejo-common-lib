@@ -31,12 +31,13 @@ public:
 	ConnectionHandler& operator=(ConnectionHandler&&) = delete;
 
 	//incoming
-	void Start();
-	PacketT ReceivePacket();
-	bool HasReceivedPacket() const;
+	void ReceivePackets();
+	bool HasReceivedPackets() const;
+	PacketT GetPacket();
 
 	//outgoing
-	void SendPacket(PacketT packet);
+	void PostPacket(PacketT packet);
+	bool HasPostedPackets() const;
 
 	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();

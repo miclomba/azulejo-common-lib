@@ -37,6 +37,10 @@ struct PacketIO : public AsyncIO<Packet>
 		std::function<void(const error_code& error, size_t bytesTransferred)>)
 	);
 
+	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, Packet packet,
+		std::function<void(const error_code& error, size_t bytesTransferred)>)
+	);
+
 	void AsyncReadUntilImpl(tcp::socket& socket, streambuf& inPacket, const char UNTIL_CONDITION,
 		std::function<void(const error_code& error, size_t bytesTransferred)> handler)
 	{
@@ -47,13 +51,19 @@ struct PacketIO : public AsyncIO<Packet>
 		handler(error_code(), 0);
 	}
 
-	size_t GetReadCount() const
+	void AsyncWriteImpl(tcp::socket& socket, Packet packet,
+		std::function<void(const error_code& error, size_t bytesTransferred)> handler)
 	{
-		return readCount_;
+		if (writeCount_ > 0)
+			return;
+
+		++writeCount_;
+		handler(error_code(), 0);
 	}
 
 private:
 	size_t readCount_{ 0 };
+	size_t writeCount_{ 0 };
 };
 
 struct MockConnHandler : public ConnectionHandler<Packet> {
@@ -97,16 +107,16 @@ TEST(ConnectionHandler, PacketAsyncIO)
 	EXPECT_EQ(&(handler->PacketAsyncIO()),packetAsio.get());
 }
 
-TEST(ConnectionHandler, Start)
+TEST(ConnectionHandler, ReceivePackets)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<AsyncIO<Packet>>();
 	auto handler = std::make_shared<ConnectionHandler<Packet>>(context, *packetAsio);
 
-	EXPECT_NO_THROW(handler->Start());
+	EXPECT_NO_THROW(handler->ReceivePackets());
 }
 
-TEST(ConnectionHandler, HasReceivedPacket)
+TEST(ConnectionHandler, HasReceivedPackets)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<PacketIO>();
@@ -114,12 +124,12 @@ TEST(ConnectionHandler, HasReceivedPacket)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	EXPECT_FALSE(handler->HasReceivedPacket());
-	EXPECT_NO_THROW(handler->Start());
-	EXPECT_TRUE(handler->HasReceivedPacket());
+	EXPECT_FALSE(handler->HasReceivedPackets());
+	EXPECT_NO_THROW(handler->ReceivePackets());
+	EXPECT_TRUE(handler->HasReceivedPackets());
 }
 
-TEST(ConnectionHandler, ReceivePacket)
+TEST(ConnectionHandler, GetPacket)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<PacketIO>();
@@ -127,16 +137,16 @@ TEST(ConnectionHandler, ReceivePacket)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	EXPECT_FALSE(handler->HasReceivedPacket());
+	EXPECT_FALSE(handler->HasReceivedPackets());
 	
-	handler->Start();
-	ASSERT_TRUE(handler->HasReceivedPacket());
+	handler->ReceivePackets();
+	ASSERT_TRUE(handler->HasReceivedPackets());
 
 	Packet packet;
-	EXPECT_NO_THROW(packet = handler->ReceivePacket());
+	EXPECT_NO_THROW(packet = handler->GetPacket());
 }
 
-TEST(ConnectionHandler, ReceivePacketThrows)
+TEST(ConnectionHandler, GetPacketThrows)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<PacketIO>();
@@ -144,6 +154,22 @@ TEST(ConnectionHandler, ReceivePacketThrows)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	ASSERT_FALSE(handler->HasReceivedPacket());
-	EXPECT_THROW(handler->ReceivePacket(), std::runtime_error);
+	ASSERT_FALSE(handler->HasReceivedPackets());
+	EXPECT_THROW(handler->GetPacket(), std::runtime_error);
+}
+
+TEST(ConnectionHandler, PostPacket)
+{
+	io_context context;
+	auto packetAsio = std::make_shared<PacketIO>();
+	auto handler = std::make_shared<MockConnHandler>(context, *packetAsio);
+
+	//EXPECT_CALL(*packetAsio, AsyncWrite(_, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncWriteImpl));
+
+	//EXPECT_FALSE(handler->HasPostedPackets());
+	//EXPECT_NO_THROW(handler->PostPacket(Packet()));
+	//EXPECT_TRUE(handler->HasPostedPackets());
+
+	//context.run();
+	//EXPECT_FALSE(handler->HasPostedPackets());
 }
