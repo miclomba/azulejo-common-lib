@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <memory>
+#include <vector>
 
 #include "config.h"
 
@@ -31,13 +32,14 @@ public:
 	ConnectionHandler& operator=(ConnectionHandler&&) = delete;
 
 	//incoming
-	void ReceivePackets();
-	bool HasReceivedPackets() const;
-	PacketT GetPacket();
+	void PostReceiveMessages();
+	bool HasReceivedMessages() const;
+
+	std::vector<PacketT> GetOneMessage();
 
 	//outgoing
-	void PostPacket(PacketT packet);
-	bool HasPostedPackets() const;
+	void PostOutgoingMessage(const std::vector<PacketT>& packets);
+	bool HasOutgoingMessages() const;
 
 	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();
@@ -45,23 +47,25 @@ public:
 
 protected:
 	//incoming
-	void QueueIncomingPacket(const boost::system::error_code& error, size_t bytesTransferred);
-	void ReceivePacketStart();
+	void ReceiveMessages();
+	void ReceiveMessageStart();
+	void QueueIncomingMessage(const boost::system::error_code& error, size_t bytesTransferred);
 
 	//outgoing
-	void QueueOutgoingPacket(PacketT packet);
-	void SendPacketStart();
-	void SendPacketDone(const boost::system::error_code& error);
+	void SendMessageStart();
+	void QueueOutgoingMessage(std::vector<PacketT> packet);
+	void SendMessageDone(const boost::system::error_code& error);
 
 	// incoming
 	const char UNTIL_CONDITION = '\0';
-	boost::asio::streambuf inPacket_;
-	std::deque<PacketT> inPacketQue_;
+	boost::asio::streambuf inMessage_;
+	std::deque<std::vector<PacketT>> inMessageQue_;
 
 	//outgoing
 	boost::asio::io_context::strand writeStrand_;
+	boost::asio::io_context::strand readStrand_;
 	boost::asio::io_context& ioServiceRef_;
-	std::deque<PacketT> outPacketQue_;
+	std::deque<std::vector<PacketT>> outMessageQue_;
 
 	boost::asio::ip::tcp::socket socket_;
 	AsyncIO<PacketT>& packetAsioRef_;

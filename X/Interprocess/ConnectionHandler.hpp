@@ -7,7 +7,8 @@ ConnectionHandler_t::ConnectionHandler(boost::asio::io_context& ioService, Async
 	ioServiceRef_(ioService),
 	packetAsioRef_(packetAsio),
 	socket_(ioService),
-	writeStrand_(ioService)
+	writeStrand_(ioService),
+	readStrand_(ioService)
 {
 }
 
@@ -33,107 +34,118 @@ AsyncIO<PacketT>& ConnectionHandler_t::PacketAsyncIO()
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::ReceivePackets()
+void ConnectionHandler_t::PostReceiveMessages()
 {
-	ReceivePacketStart();
-}
-
-TEMPLATE_T
-bool ConnectionHandler_t::HasPostedPackets() const
-{
-	return !outPacketQue_.empty();
-}
-
-TEMPLATE_T
-void ConnectionHandler_t::PostPacket(PacketT packet)
-{
-	// writing packets to a socket stream requires synchronization
-	ioServiceRef_.post(writeStrand_.wrap(
-		[me = shared_from_this(), packet]()
+	ioServiceRef_.post(readStrand_.wrap(
+		[me = shared_from_this()]()
 	{
 		auto meDerived = static_cast<ConnectionHandler*>(me.get());
-		meDerived->QueueOutgoingPacket(packet);
+		meDerived->ReceiveMessages();
 	}));
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::QueueOutgoingPacket(PacketT packet)
+void ConnectionHandler_t::ReceiveMessages()
 {
-	bool writeInProgress = !outPacketQue_.empty();
-	outPacketQue_.push_back(std::move(packet));
-
-	if (!writeInProgress)
-		SendPacketStart();
+	ReceiveMessageStart();
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::SendPacketStart()
+bool ConnectionHandler_t::HasOutgoingMessages() const
 {
-	outPacketQue_.front() += UNTIL_CONDITION;
-	packetAsioRef_.AsyncWrite(Socket(), boost::asio::buffer(outPacketQue_.front()),
+	return !outMessageQue_.empty();
+}
+
+TEMPLATE_T
+void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PacketT>& packets)
+{
+	// writing packets to a socket stream requires synchronization
+	ioServiceRef_.post(writeStrand_.wrap(
+		[me = shared_from_this(), packets]()
+	{
+		auto meDerived = static_cast<ConnectionHandler*>(me.get());
+		meDerived->QueueOutgoingMessage(packets);
+	}));
+}
+
+TEMPLATE_T
+void ConnectionHandler_t::QueueOutgoingMessage(std::vector<PacketT> packets)
+{
+	bool writeInProgress = !outMessageQue_.empty();
+	outMessageQue_.push_back(std::move(packets));
+
+	if (!writeInProgress)
+		SendMessageStart();
+}
+
+TEMPLATE_T
+void ConnectionHandler_t::SendMessageStart()
+{
+	outMessageQue_.front() += UNTIL_CONDITION;
+	packetAsioRef_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
 		[me = shared_from_this()](const boost::system::error_code& error, size_t)
 	{
 		auto meDerived = static_cast<ConnectionHandler*>(me.get());
-		meDerived->SendPacketDone(error);
+		meDerived->SendMessageDone(error);
 	});
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::SendPacketDone(const boost::system::error_code& error)
+void ConnectionHandler_t::SendMessageDone(const boost::system::error_code& error)
 {
 	if (error) return;
 
-	outPacketQue_.pop_front();
-	if (!outPacketQue_.empty())
-		SendPacketStart();
+	outMessageQue_.pop_front();
+	if (!outMessageQue_.empty())
+		SendMessageStart();
 }
 
 TEMPLATE_T
-bool ConnectionHandler_t::HasReceivedPackets() const
+bool ConnectionHandler_t::HasReceivedMessages() const
 {
-	return !inPacketQue_.empty();
+	return !inMessageQue_.empty();
 }
 
 TEMPLATE_T
-PacketT ConnectionHandler_t::GetPacket()
+std::vector<PacketT> ConnectionHandler_t::GetOneMessage()
 {
-	if (inPacketQue_.empty())
+	if (inMessageQue_.empty())
 		throw std::runtime_error("Cannot receive packet from ConnectionHandler because there are no packets to receive");
 
-	PacketT packet = std::move(inPacketQue_.front());
-	inPacketQue_.pop_front();
+	std::vector<PacketT> packets = std::move(inMessageQue_.front());
+	inMessageQue_.pop_front();
 
-	return packet;
+	return packets;
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::ReceivePacketStart()
+void ConnectionHandler_t::ReceiveMessageStart()
 {
 	// reading packets from a socket stream does not require synchronization 
-	packetAsioRef_.AsyncReadUntil(Socket(), inPacket_, UNTIL_CONDITION,
+	packetAsioRef_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
 		[me = shared_from_this()](const boost::system::error_code& error, size_t bytesTransferred)
 	{
 		auto meDerived = static_cast<ConnectionHandler*>(me.get());
-		meDerived->QueueIncomingPacket(error, bytesTransferred);
+		meDerived->QueueIncomingMessage(error, bytesTransferred);
 	});
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::QueueIncomingPacket(const boost::system::error_code& error, size_t bytesTransferred)
+void ConnectionHandler_t::QueueIncomingMessage(const boost::system::error_code& error, size_t bytesTransferred)
 {
 	if (error) return;
 
-	std::istream stream(&inPacket_);
+	std::istream stream(&inMessage_);
 
-	PacketT packet;
+	std::vector<PacketT> packet;
 
 	// TODO
 	// either write a stream operator or use the bytes transferred var to know how to build the packet
 	stream >> packet;
 
-	inPacketQue_.push_back(std::move(packet));
+	inMessageQue_.push_back(std::move(packet));
 
-	ReceivePacketStart();
+	ReceiveMessageStart();
 }
 
 #undef TEMPLATE_T 

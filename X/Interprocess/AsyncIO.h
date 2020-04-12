@@ -2,6 +2,7 @@
 #define interprocess_async_io_h
 
 #include <functional>
+#include <vector>
 
 #include "config.h"
 
@@ -33,7 +34,7 @@ public:
 
 	virtual void AsyncWrite(
 		boost::asio::ip::tcp::socket& socket,
-		PacketT& packet,
+		std::vector<PacketT>& packet,
 		std::function<void(const boost::system::error_code& error, size_t)> handler
 	);
 };

@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -23,11 +24,11 @@ using interprocess::ConnectionHandler;
 
 namespace
 {
-struct Packet : std::string {
-	friend void operator>>(std::istream& stream, Packet& packet);
+struct Packet {
+	friend void operator>>(std::istream& stream, std::vector<Packet>& packet);
 };
 
-void operator>>(std::istream& stream, Packet& packet)
+void operator>>(std::istream& stream, std::vector<Packet>& packet)
 {
 }
 
@@ -37,7 +38,7 @@ struct PacketIO : public AsyncIO<Packet>
 		std::function<void(const error_code& error, size_t bytesTransferred)>)
 	);
 
-	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, Packet packet,
+	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, std::vector<Packet>& packet,
 		std::function<void(const error_code& error, size_t bytesTransferred)>)
 	);
 
@@ -51,7 +52,7 @@ struct PacketIO : public AsyncIO<Packet>
 		handler(error_code(), 0);
 	}
 
-	void AsyncWriteImpl(tcp::socket& socket, Packet packet,
+	void AsyncWriteImpl(tcp::socket& socket, std::vector<Packet>& packet,
 		std::function<void(const error_code& error, size_t bytesTransferred)> handler)
 	{
 		if (writeCount_ > 0)
@@ -107,16 +108,17 @@ TEST(ConnectionHandler, PacketAsyncIO)
 	EXPECT_EQ(&(handler->PacketAsyncIO()),packetAsio.get());
 }
 
-TEST(ConnectionHandler, ReceivePackets)
+TEST(ConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<AsyncIO<Packet>>();
 	auto handler = std::make_shared<ConnectionHandler<Packet>>(context, *packetAsio);
 
-	EXPECT_NO_THROW(handler->ReceivePackets());
+	EXPECT_NO_THROW(handler->PostReceiveMessages());
+	context.run();
 }
 
-TEST(ConnectionHandler, HasReceivedPackets)
+TEST(ConnectionHandler, HasReceivedMessages)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<PacketIO>();
@@ -124,9 +126,10 @@ TEST(ConnectionHandler, HasReceivedPackets)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	EXPECT_FALSE(handler->HasReceivedPackets());
-	EXPECT_NO_THROW(handler->ReceivePackets());
-	EXPECT_TRUE(handler->HasReceivedPackets());
+	EXPECT_FALSE(handler->HasReceivedMessages());
+	EXPECT_NO_THROW(handler->PostReceiveMessages());
+	context.run();
+	EXPECT_TRUE(handler->HasReceivedMessages());
 }
 
 TEST(ConnectionHandler, GetPacket)
@@ -137,13 +140,14 @@ TEST(ConnectionHandler, GetPacket)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	EXPECT_FALSE(handler->HasReceivedPackets());
+	EXPECT_FALSE(handler->HasReceivedMessages());
 	
-	handler->ReceivePackets();
-	ASSERT_TRUE(handler->HasReceivedPackets());
+	handler->PostReceiveMessages();
+	context.run();
+	ASSERT_TRUE(handler->HasReceivedMessages());
 
-	Packet packet;
-	EXPECT_NO_THROW(packet = handler->GetPacket());
+	std::vector<Packet> packets;
+	EXPECT_NO_THROW(packets = handler->GetOneMessage());
 }
 
 TEST(ConnectionHandler, GetPacketThrows)
@@ -154,11 +158,11 @@ TEST(ConnectionHandler, GetPacketThrows)
 
 	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
-	ASSERT_FALSE(handler->HasReceivedPackets());
-	EXPECT_THROW(handler->GetPacket(), std::runtime_error);
+	ASSERT_FALSE(handler->HasReceivedMessages());
+	EXPECT_THROW(handler->GetOneMessage(), std::runtime_error);
 }
 
-TEST(ConnectionHandler, PostPacket)
+TEST(ConnectionHandler, PostOutgoingMessage)
 {
 	io_context context;
 	auto packetAsio = std::make_shared<PacketIO>();
@@ -166,10 +170,10 @@ TEST(ConnectionHandler, PostPacket)
 
 	//EXPECT_CALL(*packetAsio, AsyncWrite(_, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncWriteImpl));
 
-	//EXPECT_FALSE(handler->HasPostedPackets());
-	//EXPECT_NO_THROW(handler->PostPacket(Packet()));
-	//EXPECT_TRUE(handler->HasPostedPackets());
+	//EXPECT_FALSE(handler->HasOutgoingMessages());
+	//EXPECT_NO_THROW(handler->PostOutgoingMessage(Packet()));
+	//EXPECT_TRUE(handler->HasOutgoingMessages());
 
 	//context.run();
-	//EXPECT_FALSE(handler->HasPostedPackets());
+	//EXPECT_FALSE(handler->HasOutgoingMessages());
 }

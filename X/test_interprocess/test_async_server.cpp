@@ -44,7 +44,7 @@ const size_t TWO_THREADS = 2;
 const size_t ZERO_THREADS = 0;
 const uint16_t PORT = 1500;
 
-struct Packet : public std::string {};
+struct Packet {};
 
 struct MockHandler : public ConnectionHandler<Packet> {
 	MockHandler(io_context& context) : ConnectionHandler(context, packetAsio_) {}
