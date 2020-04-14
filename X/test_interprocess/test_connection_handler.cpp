@@ -24,9 +24,13 @@ using interprocess::ConnectionHandler;
 
 namespace
 {
-struct Packet {
-	friend void operator>>(std::istream& stream, std::vector<Packet>& packet);
-};
+using Packet = char;
+//struct Packet {
+//	Packet(const char byte = '\0') : byte_(byte) {}
+//	char byte_;
+
+//	friend void operator>>(std::istream& stream, std::vector<Packet>& packet);
+//};
 
 void operator>>(std::istream& stream, std::vector<Packet>& packet)
 {
@@ -38,7 +42,7 @@ struct PacketIO : public AsyncIO<Packet>
 		std::function<void(const error_code& error, size_t bytesTransferred)>)
 	);
 
-	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, std::vector<Packet>& packet,
+	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, boost::asio::mutable_buffer& packet,
 		std::function<void(const error_code& error, size_t bytesTransferred)>)
 	);
 
@@ -51,7 +55,7 @@ struct PacketIO : public AsyncIO<Packet>
 		handlerWrapper(error_code(), 0);
 	}
 
-	void AsyncWriteImpl(tcp::socket& socket, std::vector<Packet>& packet,
+	void AsyncWriteImpl(tcp::socket& socket, boost::asio::mutable_buffer& packet,
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
@@ -179,12 +183,14 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 	auto packetAsio = std::make_shared<PacketIO>();
 	auto handler = std::make_shared<MockConnHandler>(context, *packetAsio);
 
-	//EXPECT_CALL(*packetAsio, AsyncWrite(_, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncWriteImpl));
+	EXPECT_CALL(*packetAsio, AsyncWrite(_, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncWriteImpl));
 
-	//EXPECT_FALSE(handler->HasOutgoingMessages());
-	//EXPECT_NO_THROW(handler->PostOutgoingMessage(Packet()));
-	//EXPECT_TRUE(handler->HasOutgoingMessages());
+	EXPECT_FALSE(handler->HasOutgoingMessages());
 
-	//context.run();
-	//EXPECT_FALSE(handler->HasOutgoingMessages());
+	std::vector<Packet> message(1, Packet('1'));
+	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
+	EXPECT_TRUE(handler->HasOutgoingMessages());
+
+	EXPECT_EQ(context.run(), 1);
+	EXPECT_FALSE(handler->HasOutgoingMessages());
 }

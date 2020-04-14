@@ -94,8 +94,10 @@ bool ConnectionHandler_t::HasOutgoingMessages() const
 TEMPLATE_T
 void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PacketT> packets)
 {
-	const std::lock_guard<std::mutex> lock(writeLock_);
-	outMessageQue_.push_back(std::move(packets));
+	{
+		const std::lock_guard<std::mutex> lock(writeLock_);
+		outMessageQue_.push_back(std::move(packets));
+	}
 
 	SendMessageStart();
 }
@@ -105,7 +107,7 @@ void ConnectionHandler_t::SendMessageStart()
 {
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
-	outMessageQue_.front() += UNTIL_CONDITION;
+	outMessageQue_.front().push_back(PacketT('\0'));
 	packetAsioRef_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
 		writeStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t)
 	{

@@ -27,14 +27,14 @@ public:
 
 	virtual void AsyncReadUntil(
 		boost::asio::ip::tcp::socket& socket,
-		boost::asio::streambuf& inPacket,
+		boost::asio::streambuf& messageBuffer,
 		const char UNTIL_CONDITION,
 		std::function<void(const boost::system::error_code& error, size_t bytesTransferred)> handler
 	);
 
 	virtual void AsyncWrite(
 		boost::asio::ip::tcp::socket& socket,
-		std::vector<PacketT>& packet,
+		boost::asio::mutable_buffer& messageBuffer,
 		std::function<void(const boost::system::error_code& error, size_t)> handler
 	);
 };
