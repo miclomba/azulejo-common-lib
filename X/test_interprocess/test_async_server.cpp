@@ -172,7 +172,7 @@ TEST(AsyncServer, HandleNewConnection)
 
 	EXPECT_EQ(MockHandler::GetStartCount(), 1);
 
-	context.run();
+	EXPECT_EQ(context.run(), 1);
 	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
 }
 

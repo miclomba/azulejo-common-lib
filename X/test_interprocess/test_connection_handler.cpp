@@ -43,26 +43,32 @@ struct PacketIO : public AsyncIO<Packet>
 	);
 
 	void AsyncReadUntilImpl(tcp::socket& socket, streambuf& inPacket, const char UNTIL_CONDITION,
-		std::function<void(const error_code& error, size_t bytesTransferred)> handler)
+		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (readCount_ > 0)
-			return;
+		if (CalledReadMoreThanOnce()) return;
 
-		++readCount_;
-		handler(error_code(), 0);
+		// place the handler in the executor without waiting
+		handlerWrapper(error_code(), 0);
 	}
 
 	void AsyncWriteImpl(tcp::socket& socket, std::vector<Packet>& packet,
-		std::function<void(const error_code& error, size_t bytesTransferred)> handler)
+		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (writeCount_ > 0)
-			return;
+		if (CalledWriteMoreThanOnce()) return;
 
-		++writeCount_;
-		handler(error_code(), 0);
+		// place the handler in the executor without waiting
+		handlerWrapper(error_code(), 0);
+	}
+
+	size_t GetReadCount() const
+	{
+		return readCount_;
 	}
 
 private:
+	bool CalledReadMoreThanOnce() { return readCount_++ > 0; }
+	bool CalledWriteMoreThanOnce() { return writeCount_++ > 0; }
+
 	size_t readCount_{ 0 };
 	size_t writeCount_{ 0 };
 };
@@ -111,11 +117,16 @@ TEST(ConnectionHandler, PacketAsyncIO)
 TEST(ConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
-	auto packetAsio = std::make_shared<AsyncIO<Packet>>();
-	auto handler = std::make_shared<ConnectionHandler<Packet>>(context, *packetAsio);
+	auto packetAsio = std::make_shared<PacketIO>();
+	auto handler = std::make_shared<MockConnHandler>(context, *packetAsio);
+
+	EXPECT_CALL(*packetAsio, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(packetAsio.get(), &PacketIO::AsyncReadUntilImpl));
 
 	EXPECT_NO_THROW(handler->PostReceiveMessages());
-	context.run();
+	EXPECT_EQ(context.run(), 1);
+
+	// a second read indicates we completed one read cycle before forcing it to quit
+	EXPECT_EQ(packetAsio->GetReadCount(), 2);
 }
 
 TEST(ConnectionHandler, HasReceivedMessages)
@@ -128,7 +139,7 @@ TEST(ConnectionHandler, HasReceivedMessages)
 
 	EXPECT_FALSE(handler->HasReceivedMessages());
 	EXPECT_NO_THROW(handler->PostReceiveMessages());
-	context.run();
+	EXPECT_EQ(context.run(), 1);
 	EXPECT_TRUE(handler->HasReceivedMessages());
 }
 
@@ -143,7 +154,7 @@ TEST(ConnectionHandler, GetPacket)
 	EXPECT_FALSE(handler->HasReceivedMessages());
 	
 	handler->PostReceiveMessages();
-	context.run();
+	EXPECT_EQ(context.run(), 1);
 	ASSERT_TRUE(handler->HasReceivedMessages());
 
 	std::vector<Packet> packets;

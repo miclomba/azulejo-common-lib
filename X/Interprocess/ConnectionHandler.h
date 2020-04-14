@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "config.h"
@@ -38,7 +39,7 @@ public:
 	std::vector<PacketT> GetOneMessage();
 
 	//outgoing
-	void PostOutgoingMessage(const std::vector<PacketT>& packets);
+	void PostOutgoingMessage(std::vector<PacketT> packets);
 	bool HasOutgoingMessages() const;
 
 	boost::asio::ip::tcp::socket& Socket();
@@ -47,26 +48,25 @@ public:
 
 protected:
 	//incoming
-	void ReceiveMessages();
-	void ReceiveMessageStart();
-	void QueueIncomingMessage(const boost::system::error_code& error, size_t bytesTransferred);
+	void QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred);
 
 	//outgoing
 	void SendMessageStart();
-	void QueueOutgoingMessage(std::vector<PacketT> packet);
 	void SendMessageDone(const boost::system::error_code& error);
 
 	// incoming
 	const char UNTIL_CONDITION = '\0';
 	boost::asio::streambuf inMessage_;
+	mutable std::mutex readLock_;
+	boost::asio::io_context::strand readStrand_;
 	std::deque<std::vector<PacketT>> inMessageQue_;
 
 	//outgoing
+	mutable std::mutex writeLock_;
 	boost::asio::io_context::strand writeStrand_;
-	boost::asio::io_context::strand readStrand_;
-	boost::asio::io_context& ioServiceRef_;
 	std::deque<std::vector<PacketT>> outMessageQue_;
 
+	boost::asio::io_context& ioServiceRef_;
 	boost::asio::ip::tcp::socket socket_;
 	AsyncIO<PacketT>& packetAsioRef_;
 };
