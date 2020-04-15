@@ -56,26 +56,9 @@ void ConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& 
 {
 	if (error) return;
 
-	std::istream stream(&inMessage_);
-	std::vector<PODType> message;
-	size_t buff = 0;
-
-	std::string msg;
-	stream >> msg;
-
-	char* buffPtr = reinterpret_cast<char*>(&buff);
-
-	size_t size = sizeof(PODType);
-	message.reserve(msg.size() / size);
-	for (size_t i = 1; i <= msg.size(); ++i)
-	{
-		*buffPtr++ = msg[i-1];
-		if (i % size == 0)
-		{
-			buffPtr = reinterpret_cast<char*>(&buff);
-			message.push_back(*reinterpret_cast<PODType*>(&buff));
-		}
-	}
+	size_t podSize = sizeof(PODType);
+	std::vector<PODType> message(inMessage_.size() / podSize);
+	boost::asio::buffer_copy(boost::asio::buffer(message), inMessage_.data());
 
 	const std::lock_guard<std::mutex> lock(readLock_);
 	inMessageQue_.push_back(std::move(message));
