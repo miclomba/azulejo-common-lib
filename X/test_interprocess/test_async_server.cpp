@@ -62,19 +62,24 @@ size_t MockHandler::startCount_ = 0;
 
 struct MockAcceptor : public tcp::acceptor
 {
-	MOCK_METHOD2(async_accept, void(tcp::socket&, std::function<void(error_code)>));
+	MOCK_METHOD2(async_accept, void(tcp::socket&, std::function<void(const error_code&)>));
 
 	MockAcceptor(io_context& context) : tcp::acceptor(context), context_(context) {}
 
-	void AsyncAcceptImpl(tcp::socket& socket, std::function<void(error_code)> ec)
+	void AsyncAcceptImpl(tcp::socket& socket, std::function<void(const error_code&)> handler)
 	{
-		context_.post([this]() { this->Accept(); });
+		if (CalledAcceptMoreThanOnce()) return;
+		handler(error_code());
 	}
 
-	size_t GetAcceptCount() { return acceptCount_; }
+	void AsyncAcceptImplWithErrorParam(tcp::socket& socket, std::function<void(const error_code&)> handler)
+	{
+		if (CalledAcceptMoreThanOnce()) return;
+		handler(errc::make_error_code(errc::not_supported));
+	}
 
 private:
-	void Accept() { ++acceptCount_; }
+	bool CalledAcceptMoreThanOnce() { return acceptCount_++ > 0; }
 	size_t acceptCount_{ 0 };
 	io_context& context_;
 };
@@ -82,13 +87,7 @@ private:
 template<typename ConnHandlerT, typename ConnAcceptorT>
 struct Server : public AsyncServer<MockHandler, MockAcceptor>
 {
-	using shared_conn_handler_t = std::shared_ptr<MockHandler>;
-
 	Server(std::shared_ptr<ConnAcceptorT> acceptor) : AsyncServer(acceptor) {}
-	void HandleNewConnection(shared_conn_handler_t handler, const error_code ec)
-	{
-		AsyncServer::HandleNewConnection(handler, ec);
-	}
 };
 
 } // end namespace
@@ -117,7 +116,9 @@ TEST(AsyncServer, Join)
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
+	EXPECT_FALSE(context.stopped());
 	EXPECT_NO_THROW(server.Join());
+	EXPECT_TRUE(context.stopped());
 }
 
 TEST(AsyncServer, JoinAfterStarting)
@@ -126,7 +127,9 @@ TEST(AsyncServer, JoinAfterStarting)
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
 	server.Start(PORT);
+	EXPECT_FALSE(context.stopped());
 	EXPECT_NO_THROW(server.Join());
+	EXPECT_TRUE(context.stopped());
 }
 
 TEST(AsyncServer, GetNumThreads)
@@ -142,7 +145,12 @@ TEST(AsyncServer, Start)
 {
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
-	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
+	AsyncServer<MockHandler, MockAcceptor> server(acceptor, TWO_THREADS);
+
+	EXPECT_CALL(*acceptor, async_accept(_, _)).
+		Times(2).
+		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+
 	EXPECT_NO_THROW(server.Start(PORT));
 }
 
@@ -150,45 +158,43 @@ TEST(AsyncServer, AcceptConnection)
 {
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
-	EXPECT_CALL(*acceptor, async_accept(_,_)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
-
 	AsyncServer<MockHandler, MockAcceptor> server(acceptor, TWO_THREADS);
-	server.Start(PORT);
 
-	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
+	EXPECT_CALL(*acceptor, async_accept(_,_)).
+		Times(2).
+		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+
+	server.Start(PORT);
 }
 
 TEST(AsyncServer, HandleNewConnection)
 {
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
-	EXPECT_CALL(*acceptor, async_accept(_, _)).WillOnce(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
+	EXPECT_CALL(*acceptor, async_accept(_, _)).
+		Times(2).
+		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 
 	MockHandler::ResetStartCount();
-	EXPECT_EQ(MockHandler::GetStartCount(), 0);
 
 	Server<MockHandler, MockAcceptor> server(acceptor);
-	server.HandleNewConnection(std::make_shared<MockHandler>(context), error_code());
 
+	MockHandler::ResetStartCount();
+	server.Start(PORT);
 	EXPECT_EQ(MockHandler::GetStartCount(), 1);
-
-	EXPECT_EQ(context.run(), 1);
-	EXPECT_EQ(acceptor->GetAcceptCount(), 1);
 }
 
 TEST(AsyncServer, HandleNewConnectionWithErrorCode)
 {
 	io_context context;
 	auto acceptor = std::make_shared<MockAcceptor>(context);
-	ON_CALL(*acceptor, async_accept(_, _)).WillByDefault(Invoke(acceptor.get(), &MockAcceptor::AsyncAcceptImpl));
+	EXPECT_CALL(*acceptor, async_accept(_, _)).
+		Times(1).
+		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImplWithErrorParam));
 
 	MockHandler::ResetStartCount();
-	EXPECT_EQ(MockHandler::GetStartCount(), 0);
-
 	Server<MockHandler, MockAcceptor> server(acceptor);
-	server.HandleNewConnection(std::make_shared<MockHandler>(context), errc::make_error_code(errc::not_supported));
-
+	server.Start(PORT);
 	EXPECT_EQ(MockHandler::GetStartCount(), 0);
-	EXPECT_EQ(acceptor->GetAcceptCount(), 0);
 }
 

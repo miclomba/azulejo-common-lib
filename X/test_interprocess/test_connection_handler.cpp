@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "Interprocess/AsioAdapter.h"
 #include "Interprocess/ConnectionHandler.h"
@@ -16,11 +17,14 @@ using boost::asio::ip::tcp;
 using boost::asio::streambuf;
 using boost::system::error_code;
 using ::testing::_;
+using ::testing::DoAll;
 using ::testing::Invoke;
 using ::testing::Return;
 
 using interprocess::AsioAdapter;
 using interprocess::ConnectionHandler;
+
+namespace errc = boost::system::errc;
 
 namespace
 {
@@ -44,23 +48,28 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledReadMoreThanOnce()) return;
-
-		// place the handler in the executor without waiting
-		handlerWrapper(error_code(), 0);
+		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
 
 	void AsyncWriteImpl(tcp::socket& socket, boost::asio::mutable_buffer& message,
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
-
-		// place the handler in the executor without waiting
-		handlerWrapper(error_code(), 0);
+		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
 
-	size_t GetReadCount() const
+	void AsyncReadUntilImplWithErrorParam(tcp::socket& socket, streambuf& inMessage, const char UNTIL_CONDITION,
+		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		return readCount_;
+		if (CalledReadMoreThanOnce()) return;
+		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
+	}
+
+	void AsyncWriteImplWithErrorParam(tcp::socket& socket, boost::asio::mutable_buffer& message,
+		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
+	{
+		if (CalledWriteMoreThanOnce()) return;
+		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
 	}
 
 private:
@@ -118,13 +127,36 @@ TEST(ConnectionHandler, PostReceiveMessages)
 	auto ioAdapter = std::make_shared<IOAdapter>();
 	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
 
-	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl));
+	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
+		Times(2).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl)
+			)
+		);
 
 	EXPECT_NO_THROW(handler->PostReceiveMessages());
 	EXPECT_EQ(context.run(), 1);
+}
 
-	// a second read indicates we completed one read cycle before forcing it to quit
-	EXPECT_EQ(ioAdapter->GetReadCount(), 2);
+TEST(ConnectionHandler, PostReceiveMessagesWithError)
+{
+	io_context context;
+	auto ioAdapter = std::make_shared<IOAdapter>();
+	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+
+	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImplWithErrorParam)
+			)
+		);
+
+	EXPECT_FALSE(handler->HasReceivedMessages());
+	EXPECT_NO_THROW(handler->PostReceiveMessages());
+	EXPECT_EQ(context.run(), 1);
+	EXPECT_FALSE(handler->HasReceivedMessages());
 }
 
 TEST(ConnectionHandler, HasReceivedMessages)
@@ -133,7 +165,13 @@ TEST(ConnectionHandler, HasReceivedMessages)
 	auto ioAdapter = std::make_shared<IOAdapter>();
 	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
 
-	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl));
+	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
+		Times(2).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl)
+			)
+		);
 
 	EXPECT_FALSE(handler->HasReceivedMessages());
 	EXPECT_NO_THROW(handler->PostReceiveMessages());
@@ -147,7 +185,13 @@ TEST(ConnectionHandler, GetOneMessage)
 	auto ioAdapter = std::make_shared<IOAdapter>();
 	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
 
-	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl));
+	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
+		Times(2).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl)
+			)
+		);
 
 	EXPECT_FALSE(handler->HasReceivedMessages());
 	
@@ -165,8 +209,6 @@ TEST(ConnectionHandler, GetOneMessageThrows)
 	auto ioAdapter = std::make_shared<IOAdapter>();
 	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
 
-	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).WillRepeatedly(Invoke(ioAdapter.get(), &IOAdapter::AsyncReadUntilImpl));
-
 	ASSERT_FALSE(handler->HasReceivedMessages());
 	EXPECT_THROW(handler->GetOneMessage(), std::runtime_error);
 }
@@ -177,7 +219,13 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 	auto ioAdapter = std::make_shared<IOAdapter>();
 	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
 
-	EXPECT_CALL(*ioAdapter, AsyncWrite(_, _, _)).WillRepeatedly(Invoke(ioAdapter.get(), &IOAdapter::AsyncWriteImpl));
+	EXPECT_CALL(*ioAdapter, AsyncWrite(_, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncWriteImpl)
+			)
+		);
 
 	EXPECT_FALSE(handler->HasOutgoingMessages());
 
@@ -187,4 +235,28 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 
 	EXPECT_EQ(context.run(), 1);
 	EXPECT_FALSE(handler->HasOutgoingMessages());
+}
+
+TEST(ConnectionHandler, PostOutgoingMessageWithError)
+{
+	io_context context;
+	auto ioAdapter = std::make_shared<IOAdapter>();
+	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+
+	EXPECT_CALL(*ioAdapter, AsyncWrite(_, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(ioAdapter.get(), &IOAdapter::AsyncWriteImplWithErrorParam)
+			)
+		);
+
+	EXPECT_FALSE(handler->HasOutgoingMessages());
+
+	std::vector<PODType> message(1, PODType('1'));
+	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
+	EXPECT_TRUE(handler->HasOutgoingMessages());
+
+	EXPECT_EQ(context.run(), 1);
+	EXPECT_TRUE(handler->HasOutgoingMessages());
 }
