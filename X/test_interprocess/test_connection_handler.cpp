@@ -30,9 +30,7 @@ namespace
 {
 using PODType = char;
 
-void operator>>(std::istream& stream, std::vector<PODType>& message)
-{
-}
+const std::string RECEIVED_MESSAGE = "message_received";
 
 struct IOAdapter : public AsioAdapter<PODType>
 {
@@ -48,6 +46,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledReadMoreThanOnce()) return;
+		ReceiveMessage(inMessage);
 		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
 
@@ -62,6 +61,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledReadMoreThanOnce()) return;
+		ReceiveMessage(inMessage);
 		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
 	}
 
@@ -75,6 +75,12 @@ struct IOAdapter : public AsioAdapter<PODType>
 private:
 	bool CalledReadMoreThanOnce() { return readCount_++ > 0; }
 	bool CalledWriteMoreThanOnce() { return writeCount_++ > 0; }
+
+	void ReceiveMessage(streambuf& inMessage)
+	{
+		std::ostream stream(&inMessage);
+		stream << RECEIVED_MESSAGE;
+	}
 
 	size_t readCount_{ 0 };
 	size_t writeCount_{ 0 };
@@ -201,6 +207,9 @@ TEST(ConnectionHandler, GetOneMessage)
 
 	std::vector<PODType> message;
 	EXPECT_NO_THROW(message = handler->GetOneMessage());
+
+	for (size_t i = 0; i < message.size(); ++i)
+		EXPECT_EQ(message[i], RECEIVED_MESSAGE[i]);
 }
 
 TEST(ConnectionHandler, GetOneMessageThrows)
