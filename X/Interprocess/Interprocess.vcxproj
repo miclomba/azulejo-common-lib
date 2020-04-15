@@ -121,8 +121,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AsyncIO.h" />
-    <ClInclude Include="AsyncIO.hpp" />
+    <ClInclude Include="AsioAdapter.h" />
+    <ClInclude Include="AsioAdapter.hpp" />
     <ClInclude Include="AsyncServer.h" />
     <ClInclude Include="AsyncServer.hpp" />
     <ClInclude Include="config.h" />

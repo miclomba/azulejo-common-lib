@@ -39,11 +39,11 @@
     <ClInclude Include="ConnectionHandler.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
-    <ClInclude Include="AsyncIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AsyncIO.hpp">
+    <ClInclude Include="AsioAdapter.hpp">
       <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioAdapter.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

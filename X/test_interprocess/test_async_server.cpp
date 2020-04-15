@@ -20,7 +20,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Interprocess/AsyncIO.h"
+#include "Interprocess/AsioAdapter.h"
 #include "Interprocess/AsyncServer.h"
 #include "Interprocess/ConnectionHandler.h"
 
@@ -34,7 +34,7 @@ using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
 
-using interprocess::AsyncIO;
+using interprocess::AsioAdapter;
 using interprocess::AsyncServer;
 using interprocess::ConnectionHandler;
 
@@ -44,10 +44,10 @@ const size_t TWO_THREADS = 2;
 const size_t ZERO_THREADS = 0;
 const uint16_t PORT = 1500;
 
-struct Packet {};
+using PODType = char;
 
-struct MockHandler : public ConnectionHandler<Packet> {
-	MockHandler(io_context& context) : ConnectionHandler(context, packetAsio_) {}
+struct MockHandler : public ConnectionHandler<PODType> {
+	MockHandler(io_context& context) : ConnectionHandler(context, ioAdapter_) {}
 	void Start() { ++startCount_; }
 
 	static void ResetStartCount() { startCount_ = 0; }
@@ -55,7 +55,7 @@ struct MockHandler : public ConnectionHandler<Packet> {
 
 private:
 	static size_t startCount_;
-	AsyncIO<Packet> packetAsio_;
+	AsioAdapter<PODType> ioAdapter_;
 };
 
 size_t MockHandler::startCount_ = 0;

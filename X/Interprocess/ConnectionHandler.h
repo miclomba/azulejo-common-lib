@@ -15,16 +15,16 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
 
-#include "Interprocess/AsyncIO.h"
+#include "Interprocess/AsioAdapter.h"
 
 namespace interprocess {
 
-template<typename PacketT>
+template<typename PODType>
 class ConnectionHandler : 
-	public std::enable_shared_from_this<ConnectionHandler<PacketT>>
+	public std::enable_shared_from_this<ConnectionHandler<PODType>>
 {
 public:
-	ConnectionHandler(boost::asio::io_context& ioService, AsyncIO<PacketT>& packetAsio);
+	ConnectionHandler(boost::asio::io_context& ioService, AsioAdapter<PODType>& ioAdapter);
 
 	virtual ~ConnectionHandler();
 	ConnectionHandler(const ConnectionHandler&) = delete;
@@ -36,15 +36,15 @@ public:
 	void PostReceiveMessages();
 	bool HasReceivedMessages() const;
 
-	std::vector<PacketT> GetOneMessage();
+	std::vector<PODType> GetOneMessage();
 
 	//outgoing
-	void PostOutgoingMessage(std::vector<PacketT> packets);
+	void PostOutgoingMessage(std::vector<PODType> message);
 	bool HasOutgoingMessages() const;
 
 	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();
-	AsyncIO<PacketT>& PacketAsyncIO();
+	AsioAdapter<PODType>& IOAdapter();
 
 protected:
 	//incoming
@@ -59,16 +59,16 @@ protected:
 	boost::asio::streambuf inMessage_;
 	mutable std::mutex readLock_;
 	boost::asio::io_context::strand readStrand_;
-	std::deque<std::vector<PacketT>> inMessageQue_;
+	std::deque<std::vector<PODType>> inMessageQue_;
 
 	//outgoing
 	mutable std::mutex writeLock_;
 	boost::asio::io_context::strand writeStrand_;
-	std::deque<std::vector<PacketT>> outMessageQue_;
+	std::deque<std::vector<PODType>> outMessageQue_;
 
 	boost::asio::io_context& ioServiceRef_;
 	boost::asio::ip::tcp::socket socket_;
-	AsyncIO<PacketT>& packetAsioRef_;
+	AsioAdapter<PODType>& ioAdapterRef_;
 };
 
 #include "ConnectionHandler.hpp"

@@ -1,14 +1,14 @@
-#define TEMPLATE_T template<typename PacketT>
-#define AsyncIO_t AsyncIO<PacketT>
+#define TEMPLATE_T template<typename PODType>
+#define AsioAdapter_t AsioAdapter<PODType>
 
 TEMPLATE_T
-AsyncIO_t::AsyncIO() = default;
+AsioAdapter_t::AsioAdapter() = default;
 
 TEMPLATE_T
-AsyncIO_t::~AsyncIO() = default;
+AsioAdapter_t::~AsioAdapter() = default;
 
 TEMPLATE_T
-void AsyncIO_t::AsyncReadUntil(
+void AsioAdapter_t::AsyncReadUntil(
 	boost::asio::ip::tcp::socket& socket,
 	boost::asio::streambuf& messageBuffer,
 	const char UNTIL_CONDITION,
@@ -19,7 +19,7 @@ void AsyncIO_t::AsyncReadUntil(
 }
 
 TEMPLATE_T
-void AsyncIO_t::AsyncWrite(
+void AsioAdapter_t::AsyncWrite(
 	boost::asio::ip::tcp::socket& socket,
 	boost::asio::mutable_buffer& messageBuffer,
 	std::function<void(const boost::system::error_code& error, size_t)> handler
@@ -29,4 +29,4 @@ void AsyncIO_t::AsyncWrite(
 }
 
 #undef TEMPLATE_T 
-#undef AsyncIO_t 
+#undef AsioAdapter_t 

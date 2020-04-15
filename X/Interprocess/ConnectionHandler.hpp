@@ -1,11 +1,11 @@
 
-#define TEMPLATE_T template<typename PacketT>
-#define ConnectionHandler_t ConnectionHandler<PacketT>
+#define TEMPLATE_T template<typename PODType>
+#define ConnectionHandler_t ConnectionHandler<PODType>
 
 TEMPLATE_T
-ConnectionHandler_t::ConnectionHandler(boost::asio::io_context& ioService, AsyncIO<PacketT>& packetAsio) :
+ConnectionHandler_t::ConnectionHandler(boost::asio::io_context& ioService, AsioAdapter<PODType>& ioAdapter) :
 	ioServiceRef_(ioService),
-	packetAsioRef_(packetAsio),
+	ioAdapterRef_(ioAdapter),
 	socket_(ioService),
 	writeStrand_(ioService),
 	readStrand_(ioService)
@@ -28,9 +28,9 @@ boost::asio::io_context& ConnectionHandler_t::IOService()
 }
 
 TEMPLATE_T
-AsyncIO<PacketT>& ConnectionHandler_t::PacketAsyncIO()
+AsioAdapter<PODType>& ConnectionHandler_t::IOAdapter()
 {
-	return packetAsioRef_;
+	return ioAdapterRef_;
 }
 
 TEMPLATE_T
@@ -43,7 +43,7 @@ bool ConnectionHandler_t::HasReceivedMessages() const
 TEMPLATE_T
 void ConnectionHandler_t::PostReceiveMessages()
 {
-	packetAsioRef_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
+	ioAdapterRef_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
 		readStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t bytesTransferred)
 	{
 		auto meDerived = static_cast<ConnectionHandler*>(me.get());
@@ -58,30 +58,30 @@ void ConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& 
 
 	std::istream stream(&inMessage_);
 
-	std::vector<PacketT> packet;
+	std::vector<PODType> message;
 
 	// TODO
-	// either write a stream operator or use the bytes transferred var to know how to build the packet
-	stream >> packet;
+	// either write a stream operator or use the bytes transferred var to know how to build the message
+	stream >> message;
 
 	const std::lock_guard<std::mutex> lock(readLock_);
-	inMessageQue_.push_back(std::move(packet));
+	inMessageQue_.push_back(std::move(message));
 
 	PostReceiveMessages();
 }
 
 TEMPLATE_T
-std::vector<PacketT> ConnectionHandler_t::GetOneMessage()
+std::vector<PODType> ConnectionHandler_t::GetOneMessage()
 {
 	const std::lock_guard<std::mutex> lock(readLock_);
 
 	if (inMessageQue_.empty())
-		throw std::runtime_error("Cannot receive packet from ConnectionHandler because there are no packets to receive");
+		throw std::runtime_error("Cannot receive message from ConnectionHandler because there is no message to receive");
 
-	std::vector<PacketT> packets = std::move(inMessageQue_.front());
+	std::vector<PODType> message = std::move(inMessageQue_.front());
 	inMessageQue_.pop_front();
 
-	return packets;
+	return message;
 }
 
 TEMPLATE_T
@@ -92,11 +92,11 @@ bool ConnectionHandler_t::HasOutgoingMessages() const
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PacketT> packets)
+void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> message)
 {
 	{
 		const std::lock_guard<std::mutex> lock(writeLock_);
-		outMessageQue_.push_back(std::move(packets));
+		outMessageQue_.push_back(std::move(message));
 	}
 
 	SendMessageStart();
@@ -107,8 +107,8 @@ void ConnectionHandler_t::SendMessageStart()
 {
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
-	outMessageQue_.front().push_back(PacketT('\0'));
-	packetAsioRef_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
+	outMessageQue_.front().push_back(PODType('\0'));
+	ioAdapterRef_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
 		writeStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t)
 	{
 		auto meDerived = static_cast<ConnectionHandler*>(me.get());

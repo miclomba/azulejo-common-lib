@@ -1,5 +1,5 @@
-#ifndef interprocess_async_io_h
-#define interprocess_async_io_h
+#ifndef interprocess_asio_adapter_h
+#define interprocess_asio_adapter_h
 
 #include <functional>
 #include <vector>
@@ -13,17 +13,17 @@
 
 namespace interprocess {
 
-template<typename PacketT>
-class AsyncIO
+template<typename PODType>
+class AsioAdapter
 {
 public:
-	AsyncIO();
-	virtual ~AsyncIO();
+	AsioAdapter();
+	virtual ~AsioAdapter();
 
-	AsyncIO(const AsyncIO&) = delete;
-	AsyncIO& operator=(const AsyncIO&) = delete;
-	AsyncIO(AsyncIO&&) = delete;
-	AsyncIO& operator=(AsyncIO&&) = delete;
+	AsioAdapter(const AsioAdapter&) = delete;
+	AsioAdapter& operator=(const AsioAdapter&) = delete;
+	AsioAdapter(AsioAdapter&&) = delete;
+	AsioAdapter& operator=(AsioAdapter&&) = delete;
 
 	virtual void AsyncReadUntil(
 		boost::asio::ip::tcp::socket& socket,
@@ -39,7 +39,7 @@ public:
 	);
 };
 
-#include "AsyncIO.hpp"
+#include "AsioAdapter.hpp"
 
 } // end namespace interprocess
-#endif // interprocess_async_io_h
+#endif // interprocess_asio_adapter_h
