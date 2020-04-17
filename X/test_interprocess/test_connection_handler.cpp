@@ -32,6 +32,8 @@ namespace
 using PODType = char;
 
 const std::string RECEIVED_MESSAGE = "message_received";
+const std::string SENT_MESSAGE = "message_sent";
+const char UNTIL_SYMBOL = '\0';
 const uint16_t PORT = 3333;
 const std::string RAW_IP_ADDRESS = "::1";
 const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
@@ -63,6 +65,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
+		ValidateSentMessage(message);
 		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
 
@@ -78,6 +81,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
+		ValidateSentMessage(message);
 		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
 	}
 
@@ -89,6 +93,18 @@ private:
 	{
 		std::ostream stream(&inMessage);
 		stream << RECEIVED_MESSAGE;
+	}
+
+	void ValidateSentMessage(boost::asio::mutable_buffer& message)
+	{
+		size_t podSize = sizeof(PODType);
+		std::vector<PODType> messageVector(message.size() / podSize);
+		boost::asio::buffer_copy(boost::asio::buffer(messageVector), message);
+		EXPECT_EQ(messageVector.size(), SENT_MESSAGE.size() + 1);
+		size_t i = 0;
+		for (i = 0; i < SENT_MESSAGE.size(); ++i)
+			EXPECT_EQ(messageVector[i], SENT_MESSAGE.at(i));
+		EXPECT_EQ(messageVector[i], UNTIL_SYMBOL);
 	}
 
 	size_t readCount_{ 0 };
@@ -267,7 +283,7 @@ TEST(IConnectionHandler, PostOutgoingMessage)
 
 	EXPECT_FALSE(handler->HasOutgoingMessages());
 
-	std::vector<PODType> message(1, PODType('1'));
+	std::vector<PODType> message(SENT_MESSAGE.cbegin(), SENT_MESSAGE.cend());
 	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
 	EXPECT_TRUE(handler->HasOutgoingMessages());
 
@@ -293,7 +309,7 @@ TEST(IConnectionHandler, PostOutgoingMessageWithError)
 
 	EXPECT_FALSE(handler->HasOutgoingMessages());
 
-	std::vector<PODType> message(1, PODType('1'));
+	std::vector<PODType> message(SENT_MESSAGE.cbegin(), SENT_MESSAGE.cend());
 	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
 	EXPECT_TRUE(handler->HasOutgoingMessages());
 
