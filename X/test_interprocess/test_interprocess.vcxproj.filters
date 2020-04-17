@@ -9,9 +9,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -20,9 +17,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_shared_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
