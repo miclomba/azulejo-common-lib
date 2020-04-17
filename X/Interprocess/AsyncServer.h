@@ -28,7 +28,7 @@ public:
 	AsyncServer(AsyncServer&&) = delete;
 	AsyncServer& operator=(AsyncServer&&) = delete;
 
-	void Start(const uint16_t port);
+	void Start(const boost::asio::ip::tcp::endpoint& endPoint);
 	void Join();
 
 	size_t GetNumThreads() const;
@@ -40,6 +40,7 @@ private:
 
 	std::vector<std::thread> threadPool_;
 	boost::asio::io_context* ioService_;
+	boost::asio::ip::tcp::endpoint endPoint_;
 	std::shared_ptr<ConnAcceptorT> acceptor_;
 };
 

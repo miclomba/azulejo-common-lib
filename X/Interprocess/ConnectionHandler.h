@@ -24,7 +24,11 @@ class ConnectionHandler :
 	public std::enable_shared_from_this<ConnectionHandler<PODType>>
 {
 public:
-	ConnectionHandler(boost::asio::io_context& ioService, AsioAdapter<PODType>& ioAdapter);
+	ConnectionHandler(
+		boost::asio::io_context& ioService,
+		const boost::asio::ip::tcp::endpoint& endPoint,
+		AsioAdapter<PODType>& ioAdapter
+	);
 
 	virtual ~ConnectionHandler();
 	ConnectionHandler(const ConnectionHandler&) = delete;
@@ -46,7 +50,7 @@ public:
 	boost::asio::io_context& IOService();
 	AsioAdapter<PODType>& IOAdapter();
 
-protected:
+private:
 	//incoming
 	void QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred);
 

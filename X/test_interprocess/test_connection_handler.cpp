@@ -31,6 +31,7 @@ namespace
 using PODType = char;
 
 const std::string RECEIVED_MESSAGE = "message_received";
+const uint16_t PORT = 1500;
 
 struct IOAdapter : public AsioAdapter<PODType>
 {
@@ -87,22 +88,25 @@ private:
 };
 
 struct MockConnHandler : public ConnectionHandler<PODType> {
-	MockConnHandler(io_context& context, ::IOAdapter& ioAdapter) : ConnectionHandler(context, ioAdapter) {}
+	MockConnHandler(io_context& context, const tcp::endpoint& endPoint, ::IOAdapter& ioAdapter) : 
+		ConnectionHandler(context, endPoint, ioAdapter) {}
 };
 } // end namespace
 
 TEST(ConnectionHandler, Construct)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	IOAdapter ioAdapter;
-	EXPECT_NO_THROW(MockConnHandler handler(context, ioAdapter));
+	EXPECT_NO_THROW(MockConnHandler handler(context, endPoint, ioAdapter));
 }
 
 TEST(ConnectionHandler, Socket)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	IOAdapter ioAdapter;
-	MockConnHandler handler(context, ioAdapter);
+	MockConnHandler handler(context, endPoint, ioAdapter);
 
 	tcp::socket& soket = handler.Socket();
 	EXPECT_EQ(&(soket.get_io_context()), &context);
@@ -111,8 +115,9 @@ TEST(ConnectionHandler, Socket)
 TEST(ConnectionHandler, IOService)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	IOAdapter ioAdapter;
-	MockConnHandler handler(context, ioAdapter);
+	MockConnHandler handler(context, endPoint, ioAdapter);
 
 	io_context& contextRef = handler.IOService();
 	EXPECT_EQ(&(contextRef), &context);
@@ -121,8 +126,9 @@ TEST(ConnectionHandler, IOService)
 TEST(ConnectionHandler, IOAdapter)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<AsioAdapter<PODType>>();
-	auto handler = std::make_shared<ConnectionHandler<PODType>>(context, *ioAdapter);
+	auto handler = std::make_shared<ConnectionHandler<PODType>>(context, endPoint, *ioAdapter);
 
 	EXPECT_EQ(&(handler->IOAdapter()),ioAdapter.get());
 }
@@ -130,8 +136,9 @@ TEST(ConnectionHandler, IOAdapter)
 TEST(ConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -148,8 +155,9 @@ TEST(ConnectionHandler, PostReceiveMessages)
 TEST(ConnectionHandler, PostReceiveMessagesWithError)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
 		Times(1).
@@ -168,8 +176,9 @@ TEST(ConnectionHandler, PostReceiveMessagesWithError)
 TEST(ConnectionHandler, HasReceivedMessages)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -188,8 +197,9 @@ TEST(ConnectionHandler, HasReceivedMessages)
 TEST(ConnectionHandler, GetOneMessage)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -215,8 +225,9 @@ TEST(ConnectionHandler, GetOneMessage)
 TEST(ConnectionHandler, GetOneMessageThrows)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	ASSERT_FALSE(handler->HasReceivedMessages());
 	EXPECT_THROW(handler->GetOneMessage(), std::runtime_error);
@@ -225,8 +236,9 @@ TEST(ConnectionHandler, GetOneMessageThrows)
 TEST(ConnectionHandler, PostOutgoingMessage)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncWrite(_, _, _)).
 		Times(1).
@@ -249,8 +261,9 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 TEST(ConnectionHandler, PostOutgoingMessageWithError)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
 	auto ioAdapter = std::make_shared<IOAdapter>();
-	auto handler = std::make_shared<MockConnHandler>(context, *ioAdapter);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint, *ioAdapter);
 
 	EXPECT_CALL(*ioAdapter, AsyncWrite(_, _, _)).
 		Times(1).

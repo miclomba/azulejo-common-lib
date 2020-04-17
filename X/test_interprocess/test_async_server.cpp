@@ -27,6 +27,8 @@
 namespace errc = boost::system::errc;
 
 using boost::asio::io_context;
+using boost::asio::ip::address;
+using boost::asio::ip::basic_endpoint;
 using boost::asio::ip::tcp;
 using boost::system::error_code;
 using boost::system::error_category;
@@ -42,12 +44,16 @@ namespace
 {
 const size_t TWO_THREADS = 2;
 const size_t ZERO_THREADS = 0;
-const uint16_t PORT = 1500;
+const uint16_t PORT = 3333;
+const std::string RAW_IP_ADDRESS = "::1";
+const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
 
 using PODType = char;
 
 struct MockHandler : public ConnectionHandler<PODType> {
-	MockHandler(io_context& context) : ConnectionHandler(context, ioAdapter_) {}
+	MockHandler(io_context& context, const tcp::endpoint& endPoint) : 
+		ConnectionHandler(context, endPoint, ioAdapter_) {}
+
 	void Start() { ++startCount_; }
 
 	static void ResetStartCount() { startCount_ = 0; }
@@ -83,13 +89,6 @@ private:
 	size_t acceptCount_{ 0 };
 	io_context& context_;
 };
-
-template<typename ConnHandlerT, typename ConnAcceptorT>
-struct Server : public AsyncServer<MockHandler, MockAcceptor>
-{
-	Server(std::shared_ptr<ConnAcceptorT> acceptor) : AsyncServer(acceptor) {}
-};
-
 } // end namespace
 
 TEST(AsyncServer, Construct)
@@ -124,9 +123,11 @@ TEST(AsyncServer, Join)
 TEST(AsyncServer, JoinAfterStarting)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
+
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler> server(acceptor, TWO_THREADS);
-	server.Start(PORT);
+	server.Start(endPoint);
 	EXPECT_FALSE(context.stopped());
 	EXPECT_NO_THROW(server.Join());
 	EXPECT_TRUE(context.stopped());
@@ -144,6 +145,8 @@ TEST(AsyncServer, GetNumThreads)
 TEST(AsyncServer, Start)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
+
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler, MockAcceptor> server(acceptor, TWO_THREADS);
 
@@ -151,12 +154,14 @@ TEST(AsyncServer, Start)
 		Times(2).
 		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 
-	EXPECT_NO_THROW(server.Start(PORT));
+	EXPECT_NO_THROW(server.Start(endPoint));
 }
 
 TEST(AsyncServer, AcceptConnection)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
+
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	AsyncServer<MockHandler, MockAcceptor> server(acceptor, TWO_THREADS);
 
@@ -164,12 +169,14 @@ TEST(AsyncServer, AcceptConnection)
 		Times(2).
 		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImpl));
 
-	server.Start(PORT);
+	server.Start(endPoint);
 }
 
 TEST(AsyncServer, HandleNewConnection)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
+
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_CALL(*acceptor, async_accept(_, _)).
 		Times(2).
@@ -177,24 +184,40 @@ TEST(AsyncServer, HandleNewConnection)
 
 	MockHandler::ResetStartCount();
 
-	Server<MockHandler, MockAcceptor> server(acceptor);
+	AsyncServer<MockHandler, MockAcceptor> server(acceptor);
 
 	MockHandler::ResetStartCount();
-	server.Start(PORT);
+	server.Start(endPoint);
 	EXPECT_EQ(MockHandler::GetStartCount(), 1);
 }
 
 TEST(AsyncServer, HandleNewConnectionWithErrorCode)
 {
 	io_context context;
+	tcp::endpoint endPoint(tcp::v4(), PORT);
+
 	auto acceptor = std::make_shared<MockAcceptor>(context);
 	EXPECT_CALL(*acceptor, async_accept(_, _)).
 		Times(1).
 		WillRepeatedly(Invoke(&*acceptor, &MockAcceptor::AsyncAcceptImplWithErrorParam));
 
 	MockHandler::ResetStartCount();
-	Server<MockHandler, MockAcceptor> server(acceptor);
-	server.Start(PORT);
+	AsyncServer<MockHandler, MockAcceptor> server(acceptor);
+	server.Start(endPoint);
 	EXPECT_EQ(MockHandler::GetStartCount(), 0);
 }
 
+
+
+//test that socket endpoint connection
+/*
+int main()
+{
+	io_context context;
+	tcp::endpoint endPoint(IP_ADDRESS, PORT);
+
+	boost::asio::ip::tcp::socket soc(context, endPoint);
+	if (soc.is_open())
+		std::cout << "socket is open on localhost" << std::endl;
+}
+*/

@@ -3,13 +3,19 @@
 #define ConnectionHandler_t ConnectionHandler<PODType>
 
 TEMPLATE_T
-ConnectionHandler_t::ConnectionHandler(boost::asio::io_context& ioService, AsioAdapter<PODType>& ioAdapter) :
+ConnectionHandler_t::ConnectionHandler(
+	boost::asio::io_context& ioService,
+	const boost::asio::ip::tcp::endpoint& endPoint,
+	AsioAdapter<PODType>& ioAdapter
+) :
 	ioServiceRef_(ioService),
 	ioAdapterRef_(ioAdapter),
 	socket_(ioService),
 	writeStrand_(ioService),
 	readStrand_(ioService)
 {
+	//socket_.open(endPoint.protocol());
+	//socket_.bind(endPoint);
 }
 
 TEMPLATE_T
