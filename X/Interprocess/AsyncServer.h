@@ -20,7 +20,7 @@ class AsyncServer
 	using shared_conn_handler_t = std::shared_ptr<ConnHandlerT>;
 
 public:
-	AsyncServer(std::shared_ptr<ConnAcceptorT> acceptor, const size_t numThreads = 1);
+	AsyncServer(boost::asio::io_context& context, const size_t numThreads = 1);
 	virtual ~AsyncServer();
 
 	AsyncServer(const AsyncServer&) = delete;
@@ -33,13 +33,15 @@ public:
 
 	size_t GetNumThreads() const;
 
+	ConnAcceptorT& GetAcceptor();
+
 private:
 	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code ec);
 
 	const size_t numThreads_;
 
 	std::vector<std::thread> threadPool_;
-	boost::asio::io_context* ioService_;
+	boost::asio::io_context& ioService_;
 	boost::asio::ip::tcp::endpoint endPoint_;
 	std::shared_ptr<ConnAcceptorT> acceptor_;
 };
