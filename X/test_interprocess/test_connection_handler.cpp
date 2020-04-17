@@ -33,6 +33,11 @@ using PODType = char;
 const std::string RECEIVED_MESSAGE = "message_received";
 const uint16_t PORT = 1500;
 
+struct Socket : public tcp::socket
+{
+	Socket(io_context& context, const tcp::endpoint& endPoint) : tcp::socket(context) {}
+};
+
 struct IOAdapter : public AsioAdapter<PODType>
 {
 	MOCK_METHOD4(AsyncReadUntil, void(tcp::socket&, streambuf&, const char,
@@ -90,7 +95,7 @@ private:
 
 TEST(ConnectionHandler, Construct)
 {
-	using MockConnHandler = ConnectionHandler<PODType, IOAdapter>;
+	using MockConnHandler = ConnectionHandler<PODType, IOAdapter, Socket>;
 
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
@@ -101,7 +106,7 @@ TEST(ConnectionHandler, Socket)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter> handler(context, endPoint);
+	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
 
 	tcp::socket& soket = handler.Socket();
 	EXPECT_EQ(&(soket.get_io_context()), &context);
@@ -111,7 +116,7 @@ TEST(ConnectionHandler, IOService)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter> handler(context, endPoint);
+	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
 
 	io_context& contextRef = handler.IOService();
 	EXPECT_EQ(&(contextRef), &context);
@@ -121,7 +126,7 @@ TEST(ConnectionHandler, IOAdapter)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter> handler(context, endPoint);
+	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
 
 	EXPECT_NO_THROW(handler.IOAdapter());
 }
@@ -130,7 +135,7 @@ TEST(ConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -148,7 +153,7 @@ TEST(ConnectionHandler, PostReceiveMessagesWithError)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(1).
@@ -168,7 +173,7 @@ TEST(ConnectionHandler, HasReceivedMessages)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -188,7 +193,7 @@ TEST(ConnectionHandler, GetOneMessage)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -215,7 +220,7 @@ TEST(ConnectionHandler, GetOneMessageThrows)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter> handler(context, endPoint);
+	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
 
 	ASSERT_FALSE(handler.HasReceivedMessages());
 	EXPECT_THROW(handler.GetOneMessage(), std::runtime_error);
@@ -225,7 +230,7 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).
@@ -249,7 +254,7 @@ TEST(ConnectionHandler, PostOutgoingMessageWithError)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter>>(context, endPoint);
+	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).

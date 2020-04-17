@@ -1,6 +1,6 @@
 
-#define TEMPLATE_T template<typename PODType, typename AsioAdapterT>
-#define ConnectionHandler_t ConnectionHandler<PODType, AsioAdapterT>
+#define TEMPLATE_T template<typename PODType, typename AsioAdapterT, typename SocketT>
+#define ConnectionHandler_t ConnectionHandler<PODType, AsioAdapterT, SocketT>
 
 TEMPLATE_T
 ConnectionHandler_t::ConnectionHandler(
@@ -8,22 +8,21 @@ ConnectionHandler_t::ConnectionHandler(
 	const boost::asio::ip::tcp::endpoint& endPoint
 ) :
 	ioServiceRef_(ioService),
-	socket_(ioService),
 	writeStrand_(ioService),
 	readStrand_(ioService),
-	ioAdapter_(std::make_shared<AsioAdapterT>())
+	ioAdapter_(std::make_shared<AsioAdapterT>()),
+	socket_(std::make_shared<SocketT>(ioService, endPoint))
 {
-	//socket_.open(endPoint.protocol());
-	//socket_.bind(endPoint);
 }
 
 TEMPLATE_T
 ConnectionHandler_t::~ConnectionHandler() = default;
 
 TEMPLATE_T
-boost::asio::ip::tcp::socket& ConnectionHandler_t::Socket()
+SocketT& ConnectionHandler_t::Socket()
 {
-	return socket_;
+	assert(socket_);
+	return *socket_;
 }
 
 TEMPLATE_T

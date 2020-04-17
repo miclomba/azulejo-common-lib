@@ -19,9 +19,13 @@
 
 namespace interprocess {
 
-template<typename PODType, typename AsioAdapterT = AsioAdapter<PODType>>
+template<
+	typename PODType, 
+	typename AsioAdapterT = AsioAdapter<PODType>, 
+	typename SocketT = boost::asio::ip::tcp::socket
+>
 class ConnectionHandler : 
-	public std::enable_shared_from_this<ConnectionHandler<PODType, AsioAdapterT>>
+	public std::enable_shared_from_this<ConnectionHandler<PODType, AsioAdapterT, SocketT>>
 {
 public:
 	ConnectionHandler(
@@ -45,7 +49,7 @@ public:
 	void PostOutgoingMessage(std::vector<PODType> message);
 	bool HasOutgoingMessages() const;
 
-	boost::asio::ip::tcp::socket& Socket();
+	SocketT& Socket();
 	boost::asio::io_context& IOService();
 	AsioAdapterT& IOAdapter();
 
@@ -70,7 +74,7 @@ private:
 	std::deque<std::vector<PODType>> outMessageQue_;
 
 	boost::asio::io_context& ioServiceRef_;
-	boost::asio::ip::tcp::socket socket_;
+	std::shared_ptr<SocketT> socket_;
 	std::shared_ptr<AsioAdapterT> ioAdapter_;
 };
 
