@@ -1,5 +1,5 @@
-#ifndef interprocess_connection_handler_h
-#define interprocess_connection_handler_h
+#ifndef interprocess_iconnection_handler_h
+#define interprocess_iconnection_handler_h
 
 #include <deque>
 #include <memory>
@@ -24,20 +24,20 @@ template<
 	typename AsioAdapterT = AsioAdapter<PODType>, 
 	typename SocketT = boost::asio::ip::tcp::socket
 >
-class ConnectionHandler : 
-	public std::enable_shared_from_this<ConnectionHandler<PODType, AsioAdapterT, SocketT>>
+class IConnectionHandler : 
+	public std::enable_shared_from_this<IConnectionHandler<PODType, AsioAdapterT, SocketT>>
 {
 public:
-	ConnectionHandler(
+	IConnectionHandler(
 		boost::asio::io_context& ioService,
 		const boost::asio::ip::tcp::endpoint& endPoint
 	);
 
-	virtual ~ConnectionHandler();
-	ConnectionHandler(const ConnectionHandler&) = delete;
-	ConnectionHandler& operator=(const ConnectionHandler&) = delete;
-	ConnectionHandler(ConnectionHandler&&) = delete;
-	ConnectionHandler& operator=(ConnectionHandler&&) = delete;
+	virtual ~IConnectionHandler();
+	IConnectionHandler(const IConnectionHandler&) = delete;
+	IConnectionHandler& operator=(const IConnectionHandler&) = delete;
+	IConnectionHandler(IConnectionHandler&&) = delete;
+	IConnectionHandler& operator=(IConnectionHandler&&) = delete;
 
 	virtual void StartApplication() = 0;
 
@@ -80,8 +80,8 @@ private:
 	std::shared_ptr<AsioAdapterT> ioAdapter_;
 };
 
-#include "ConnectionHandler.hpp"
+#include "IConnectionHandler.hpp"
 
 } // end namespace interprocess
-#endif // interprocess_connection_handler_h
+#endif // interprocess_iconnection_handler_h
 

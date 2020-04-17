@@ -33,17 +33,17 @@
     <ClInclude Include="AsyncServer.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConnectionHandler.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
     <ClInclude Include="AsioAdapter.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
     <ClInclude Include="AsioAdapter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IConnectionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IConnectionHandler.hpp">
+      <Filter>Templates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@
 
 #include "Interprocess/AsioAdapter.h"
 #include "Interprocess/AsyncServer.h"
-#include "Interprocess/ConnectionHandler.h"
+#include "Interprocess/IConnectionHandler.h"
 
 namespace errc = boost::system::errc;
 
@@ -37,7 +37,7 @@ using ::testing::Return;
 
 using interprocess::AsioAdapter;
 using interprocess::AsyncServer;
-using interprocess::ConnectionHandler;
+using interprocess::IConnectionHandler;
 
 namespace
 {
@@ -52,9 +52,9 @@ struct Socket : public tcp::socket
 	Socket(io_context& context, const tcp::endpoint& endPoint) : tcp::socket(context) {}
 };
 
-struct MockHandler : public ConnectionHandler<PODType, IOAdapter, Socket> {
+struct MockHandler : public IConnectionHandler<PODType, IOAdapter, Socket> {
 	MockHandler(io_context& context, const tcp::endpoint& endPoint) : 
-		ConnectionHandler(context, endPoint) {}
+		IConnectionHandler(context, endPoint) {}
 
 	void StartApplication() override { ++startCount_; }
 

@@ -1,9 +1,9 @@
 
 #define TEMPLATE_T template<typename PODType, typename AsioAdapterT, typename SocketT>
-#define ConnectionHandler_t ConnectionHandler<PODType, AsioAdapterT, SocketT>
+#define IConnectionHandler_t IConnectionHandler<PODType, AsioAdapterT, SocketT>
 
 TEMPLATE_T
-ConnectionHandler_t::ConnectionHandler(
+IConnectionHandler_t::IConnectionHandler(
 	boost::asio::io_context& ioService,
 	const boost::asio::ip::tcp::endpoint& endPoint
 ) :
@@ -16,48 +16,48 @@ ConnectionHandler_t::ConnectionHandler(
 }
 
 TEMPLATE_T
-ConnectionHandler_t::~ConnectionHandler() = default;
+IConnectionHandler_t::~IConnectionHandler() = default;
 
 TEMPLATE_T
-SocketT& ConnectionHandler_t::Socket()
+SocketT& IConnectionHandler_t::Socket()
 {
 	assert(socket_);
 	return *socket_;
 }
 
 TEMPLATE_T
-boost::asio::io_context& ConnectionHandler_t::IOService()
+boost::asio::io_context& IConnectionHandler_t::IOService()
 {
 	return ioServiceRef_;
 }
 
 TEMPLATE_T
-AsioAdapterT& ConnectionHandler_t::IOAdapter()
+AsioAdapterT& IConnectionHandler_t::IOAdapter()
 {
 	assert(ioAdapter_);
 	return *ioAdapter_;
 }
 
 TEMPLATE_T
-bool ConnectionHandler_t::HasReceivedMessages() const
+bool IConnectionHandler_t::HasReceivedMessages() const
 {
 	const std::lock_guard<std::mutex> lock(readLock_);
 	return !inMessageQue_.empty();
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::PostReceiveMessages()
+void IConnectionHandler_t::PostReceiveMessages()
 {
 	ioAdapter_->AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
 		readStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t bytesTransferred)
 	{
-		auto meDerived = static_cast<ConnectionHandler_t*>(me.get());
+		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->QueueReceivedMessage(error, bytesTransferred);
 	}));
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred)
+void IConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred)
 {
 	if (error) return;
 
@@ -72,12 +72,12 @@ void ConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& 
 }
 
 TEMPLATE_T
-std::vector<PODType> ConnectionHandler_t::GetOneMessage()
+std::vector<PODType> IConnectionHandler_t::GetOneMessage()
 {
 	const std::lock_guard<std::mutex> lock(readLock_);
 
 	if (inMessageQue_.empty())
-		throw std::runtime_error("Cannot receive message from ConnectionHandler because there is no message to receive");
+		throw std::runtime_error("Cannot receive message from IConnectionHandler because there is no message to receive");
 
 	std::vector<PODType> message = std::move(inMessageQue_.front());
 	inMessageQue_.pop_front();
@@ -86,14 +86,14 @@ std::vector<PODType> ConnectionHandler_t::GetOneMessage()
 }
 
 TEMPLATE_T
-bool ConnectionHandler_t::HasOutgoingMessages() const
+bool IConnectionHandler_t::HasOutgoingMessages() const
 {
 	const std::lock_guard<std::mutex> lock(writeLock_);
 	return !outMessageQue_.empty();
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> message)
+void IConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> message)
 {
 	{
 		const std::lock_guard<std::mutex> lock(writeLock_);
@@ -104,7 +104,7 @@ void ConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> message
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::SendMessageStart()
+void IConnectionHandler_t::SendMessageStart()
 {
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
@@ -112,13 +112,13 @@ void ConnectionHandler_t::SendMessageStart()
 	ioAdapter_->AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
 		writeStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t)
 	{
-		auto meDerived = static_cast<ConnectionHandler_t*>(me.get());
+		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->SendMessageDone(error);
 	}));
 }
 
 TEMPLATE_T
-void ConnectionHandler_t::SendMessageDone(const boost::system::error_code& error)
+void IConnectionHandler_t::SendMessageDone(const boost::system::error_code& error)
 {
 	if (error) return;
 
@@ -130,5 +130,5 @@ void ConnectionHandler_t::SendMessageDone(const boost::system::error_code& error
 }
 
 #undef TEMPLATE_T 
-#undef ConnectionHandler_t 
+#undef IConnectionHandler_t 
 

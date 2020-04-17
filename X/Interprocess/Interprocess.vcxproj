@@ -126,9 +126,9 @@
     <ClInclude Include="AsyncServer.h" />
     <ClInclude Include="AsyncServer.hpp" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="ConnectionHandler.h" />
-    <ClInclude Include="ConnectionHandler.hpp" />
     <ClInclude Include="IClient.h" />
+    <ClInclude Include="IConnectionHandler.h" />
+    <ClInclude Include="IConnectionHandler.hpp" />
     <ClInclude Include="ISharedMemory.h" />
   </ItemGroup>
   <ItemGroup>
