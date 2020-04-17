@@ -19,15 +19,14 @@
 
 namespace interprocess {
 
-template<typename PODType>
+template<typename PODType, typename AsioAdapterT = AsioAdapter<PODType>>
 class ConnectionHandler : 
-	public std::enable_shared_from_this<ConnectionHandler<PODType>>
+	public std::enable_shared_from_this<ConnectionHandler<PODType, AsioAdapterT>>
 {
 public:
 	ConnectionHandler(
 		boost::asio::io_context& ioService,
-		const boost::asio::ip::tcp::endpoint& endPoint,
-		AsioAdapter<PODType>& ioAdapter
+		const boost::asio::ip::tcp::endpoint& endPoint
 	);
 
 	virtual ~ConnectionHandler();
@@ -48,7 +47,7 @@ public:
 
 	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();
-	AsioAdapter<PODType>& IOAdapter();
+	AsioAdapterT& IOAdapter();
 
 private:
 	//incoming
@@ -72,7 +71,7 @@ private:
 
 	boost::asio::io_context& ioServiceRef_;
 	boost::asio::ip::tcp::socket socket_;
-	AsioAdapter<PODType>& ioAdapterRef_;
+	std::shared_ptr<AsioAdapterT> ioAdapter_;
 };
 
 #include "ConnectionHandler.hpp"

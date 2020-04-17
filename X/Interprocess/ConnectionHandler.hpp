@@ -1,18 +1,17 @@
 
-#define TEMPLATE_T template<typename PODType>
-#define ConnectionHandler_t ConnectionHandler<PODType>
+#define TEMPLATE_T template<typename PODType, typename AsioAdapterT>
+#define ConnectionHandler_t ConnectionHandler<PODType, AsioAdapterT>
 
 TEMPLATE_T
 ConnectionHandler_t::ConnectionHandler(
 	boost::asio::io_context& ioService,
-	const boost::asio::ip::tcp::endpoint& endPoint,
-	AsioAdapter<PODType>& ioAdapter
+	const boost::asio::ip::tcp::endpoint& endPoint
 ) :
 	ioServiceRef_(ioService),
-	ioAdapterRef_(ioAdapter),
 	socket_(ioService),
 	writeStrand_(ioService),
-	readStrand_(ioService)
+	readStrand_(ioService),
+	ioAdapter_(std::make_shared<AsioAdapterT>())
 {
 	//socket_.open(endPoint.protocol());
 	//socket_.bind(endPoint);
@@ -34,9 +33,10 @@ boost::asio::io_context& ConnectionHandler_t::IOService()
 }
 
 TEMPLATE_T
-AsioAdapter<PODType>& ConnectionHandler_t::IOAdapter()
+AsioAdapterT& ConnectionHandler_t::IOAdapter()
 {
-	return ioAdapterRef_;
+	assert(ioAdapter_);
+	return *ioAdapter_;
 }
 
 TEMPLATE_T
@@ -49,10 +49,10 @@ bool ConnectionHandler_t::HasReceivedMessages() const
 TEMPLATE_T
 void ConnectionHandler_t::PostReceiveMessages()
 {
-	ioAdapterRef_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
+	ioAdapter_->AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
 		readStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t bytesTransferred)
 	{
-		auto meDerived = static_cast<ConnectionHandler*>(me.get());
+		auto meDerived = static_cast<ConnectionHandler_t*>(me.get());
 		meDerived->QueueReceivedMessage(error, bytesTransferred);
 	}));
 }
@@ -110,10 +110,10 @@ void ConnectionHandler_t::SendMessageStart()
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
 	outMessageQue_.front().push_back(PODType('\0'));
-	ioAdapterRef_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
+	ioAdapter_->AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
 		writeStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t)
 	{
-		auto meDerived = static_cast<ConnectionHandler*>(me.get());
+		auto meDerived = static_cast<ConnectionHandler_t*>(me.get());
 		meDerived->SendMessageDone(error);
 	}));
 }
