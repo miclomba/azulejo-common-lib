@@ -13,6 +13,7 @@
 #include "Interprocess/ConnectionHandler.h"
 
 using boost::asio::io_context;
+using boost::asio::ip::address;
 using boost::asio::ip::tcp;
 using boost::asio::streambuf;
 using boost::system::error_code;
@@ -31,7 +32,9 @@ namespace
 using PODType = char;
 
 const std::string RECEIVED_MESSAGE = "message_received";
-const uint16_t PORT = 1500;
+const uint16_t PORT = 3333;
+const std::string RAW_IP_ADDRESS = "::1";
+const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
 
 struct Socket : public tcp::socket
 {
@@ -91,14 +94,26 @@ private:
 	size_t readCount_{ 0 };
 	size_t writeCount_{ 0 };
 };
+
+struct MockConnHandler : public ConnectionHandler<PODType, IOAdapter, Socket>	
+{
+	MockConnHandler(io_context& context, const tcp::endpoint& endPoint) : 
+		ConnectionHandler(context, endPoint) {}
+	void StartApplication() override {}
+};
 } // end namespace
 
-TEST(ConnectionHandler, Construct)
+TEST(ConnectionHandler, ConstructForServer)
 {
-	using MockConnHandler = ConnectionHandler<PODType, IOAdapter, Socket>;
-
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
+	EXPECT_NO_THROW(MockConnHandler handler(context, endPoint));
+}
+
+TEST(ConnectionHandler, ConstructForClient)
+{
+	io_context context;
+	tcp::endpoint endPoint(IP_ADDRESS, PORT);
 	EXPECT_NO_THROW(MockConnHandler handler(context, endPoint));
 }
 
@@ -106,7 +121,7 @@ TEST(ConnectionHandler, Socket)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
+	MockConnHandler handler(context, endPoint);
 
 	tcp::socket& soket = handler.Socket();
 	EXPECT_EQ(&(soket.get_io_context()), &context);
@@ -116,7 +131,7 @@ TEST(ConnectionHandler, IOService)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
+	MockConnHandler handler(context, endPoint);
 
 	io_context& contextRef = handler.IOService();
 	EXPECT_EQ(&(contextRef), &context);
@@ -126,7 +141,7 @@ TEST(ConnectionHandler, IOAdapter)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
+	MockConnHandler handler(context, endPoint);
 
 	EXPECT_NO_THROW(handler.IOAdapter());
 }
@@ -135,7 +150,7 @@ TEST(ConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -153,7 +168,7 @@ TEST(ConnectionHandler, PostReceiveMessagesWithError)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(1).
@@ -173,7 +188,7 @@ TEST(ConnectionHandler, HasReceivedMessages)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -193,7 +208,7 @@ TEST(ConnectionHandler, GetOneMessage)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -220,7 +235,7 @@ TEST(ConnectionHandler, GetOneMessageThrows)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	ConnectionHandler<PODType, IOAdapter, Socket> handler(context, endPoint);
+	MockConnHandler handler(context, endPoint);
 
 	ASSERT_FALSE(handler.HasReceivedMessages());
 	EXPECT_THROW(handler.GetOneMessage(), std::runtime_error);
@@ -230,7 +245,7 @@ TEST(ConnectionHandler, PostOutgoingMessage)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).
@@ -254,7 +269,7 @@ TEST(ConnectionHandler, PostOutgoingMessageWithError)
 {
 	io_context context;
 	tcp::endpoint endPoint(tcp::v4(), PORT);
-	auto handler = std::make_shared<ConnectionHandler<PODType, IOAdapter, Socket>>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).
@@ -273,3 +288,16 @@ TEST(ConnectionHandler, PostOutgoingMessageWithError)
 	EXPECT_EQ(context.run(), 1);
 	EXPECT_TRUE(handler->HasOutgoingMessages());
 }
+
+//test that socket endpoint connection
+/*
+int main()
+{
+	io_context context;
+	tcp::endpoint endPoint(IP_ADDRESS, PORT);
+
+	boost::asio::ip::tcp::socket soc(context, endPoint);
+	if (soc.is_open())
+		std::cout << "socket is open on localhost" << std::endl;
+}
+*/

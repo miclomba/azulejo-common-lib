@@ -27,7 +27,6 @@
 namespace errc = boost::system::errc;
 
 using boost::asio::io_context;
-using boost::asio::ip::address;
 using boost::asio::ip::basic_endpoint;
 using boost::asio::ip::tcp;
 using boost::system::error_code;
@@ -45,8 +44,6 @@ namespace
 const size_t TWO_THREADS = 2;
 const size_t ZERO_THREADS = 0;
 const uint16_t PORT = 3333;
-const std::string RAW_IP_ADDRESS = "::1";
-const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
 
 using PODType = char;
 using IOAdapter = AsioAdapter<PODType>;
@@ -59,7 +56,7 @@ struct MockHandler : public ConnectionHandler<PODType, IOAdapter, Socket> {
 	MockHandler(io_context& context, const tcp::endpoint& endPoint) : 
 		ConnectionHandler(context, endPoint) {}
 
-	void Start() { ++startCount_; }
+	void StartApplication() override { ++startCount_; }
 
 	static void ResetStartCount() { startCount_ = 0; }
 	static size_t GetStartCount() { return startCount_; }
@@ -217,17 +214,3 @@ TEST(AsyncServer, HandleNewConnectionWithErrorCode)
 	EXPECT_EQ(MockHandler::GetStartCount(), 0);
 }
 
-
-
-//test that socket endpoint connection
-/*
-int main()
-{
-	io_context context;
-	tcp::endpoint endPoint(IP_ADDRESS, PORT);
-
-	boost::asio::ip::tcp::socket soc(context, endPoint);
-	if (soc.is_open())
-		std::cout << "socket is open on localhost" << std::endl;
-}
-*/

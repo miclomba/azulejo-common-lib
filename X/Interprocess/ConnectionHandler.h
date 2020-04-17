@@ -39,6 +39,8 @@ public:
 	ConnectionHandler(ConnectionHandler&&) = delete;
 	ConnectionHandler& operator=(ConnectionHandler&&) = delete;
 
+	virtual void StartApplication() = 0;
+
 	//incoming
 	void PostReceiveMessages();
 	bool HasReceivedMessages() const;

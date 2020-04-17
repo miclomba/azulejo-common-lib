@@ -68,7 +68,7 @@ void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handl
 
 	if (errorCode) return;
 
-	handler->Start();
+	handler->StartApplication();
 
 	auto newHandler = std::make_shared<ConnHandlerT>(ioService_, endPoint_);
 	acceptor_->async_accept(newHandler->Socket(), [=](error_code ec)
