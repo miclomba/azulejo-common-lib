@@ -1,17 +1,13 @@
 
-#define TEMPLATE_T template<typename PODType, typename AsioAdapterT, typename SocketT>
-#define IConnectionHandler_t IConnectionHandler<PODType, AsioAdapterT, SocketT>
+#define TEMPLATE_T template<typename PODType, typename AsioAdapterT>
+#define IConnectionHandler_t IConnectionHandler<PODType, AsioAdapterT>
 
 TEMPLATE_T
-IConnectionHandler_t::IConnectionHandler(
-	boost::asio::io_context& ioService,
-	const boost::asio::ip::tcp::endpoint& endPoint
-) :
+IConnectionHandler_t::IConnectionHandler(boost::asio::io_context& ioService) :
 	ioServiceRef_(ioService),
 	writeStrand_(ioService),
 	readStrand_(ioService),
-	ioAdapter_(std::make_shared<AsioAdapterT>()),
-	socket_(std::make_shared<SocketT>(ioService, endPoint))
+	socket_(ioService)
 {
 }
 
@@ -19,10 +15,9 @@ TEMPLATE_T
 IConnectionHandler_t::~IConnectionHandler() = default;
 
 TEMPLATE_T
-SocketT& IConnectionHandler_t::Socket()
+boost::asio::ip::tcp::socket& IConnectionHandler_t::Socket()
 {
-	assert(socket_);
-	return *socket_;
+	return socket_;
 }
 
 TEMPLATE_T
@@ -34,8 +29,7 @@ boost::asio::io_context& IConnectionHandler_t::IOService()
 TEMPLATE_T
 AsioAdapterT& IConnectionHandler_t::IOAdapter()
 {
-	assert(ioAdapter_);
-	return *ioAdapter_;
+	return ioAdapter_;
 }
 
 TEMPLATE_T
@@ -48,8 +42,8 @@ bool IConnectionHandler_t::HasReceivedMessages() const
 TEMPLATE_T
 void IConnectionHandler_t::PostReceiveMessages()
 {
-	ioAdapter_->AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
-		readStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t bytesTransferred)
+	ioAdapter_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
+		readStrand_.wrap([me = shared_from_this()](boost::system::error_code error, size_t bytesTransferred)
 	{
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->QueueReceivedMessage(error, bytesTransferred);
@@ -109,8 +103,8 @@ void IConnectionHandler_t::SendMessageStart()
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
 	outMessageQue_.front().push_back(PODType('\0'));
-	ioAdapter_->AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
-		writeStrand_.wrap([me = shared_from_this()](const boost::system::error_code& error, size_t)
+	ioAdapter_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
+		writeStrand_.wrap([me = shared_from_this()](boost::system::error_code error, size_t)
 	{
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->SendMessageDone(error);
@@ -127,6 +121,22 @@ void IConnectionHandler_t::SendMessageDone(const boost::system::error_code& erro
 	outMessageQue_.pop_front();
 	if (!outMessageQue_.empty())
 		SendMessageStart();
+}
+
+TEMPLATE_T
+void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::iterator endPointIter)
+{
+	if (Socket().is_open())
+		throw std::runtime_error("IConnectionHandler cannot connect because socket is already open");
+
+	ioAdapter_.AsyncConnect(Socket(), endPointIter,
+		[me = shared_from_this()](boost::system::error_code error, boost::asio::ip::tcp::resolver::iterator)
+	{
+		if (error) return;
+
+		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
+		meDerived->StartApplication(me);
+	});
 }
 
 #undef TEMPLATE_T 

@@ -29,13 +29,19 @@ public:
 		boost::asio::ip::tcp::socket& socket,
 		boost::asio::streambuf& messageBuffer,
 		const char UNTIL_CONDITION,
-		std::function<void(const boost::system::error_code& error, size_t bytesTransferred)> handler
+		std::function<void(boost::system::error_code error, size_t bytesTransferred)> handler
 	);
 
 	virtual void AsyncWrite(
 		boost::asio::ip::tcp::socket& socket,
 		boost::asio::mutable_buffer& messageBuffer,
-		std::function<void(const boost::system::error_code& error, size_t)> handler
+		std::function<void(boost::system::error_code error, size_t)> handler
+	);
+
+	void AsyncConnect(
+		boost::asio::ip::tcp::socket& socket,
+		boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+		std::function<void(boost::system::error_code error, boost::asio::ip::tcp::resolver::iterator)> handler
 	);
 };
 

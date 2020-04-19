@@ -47,16 +47,12 @@ const uint16_t PORT = 3333;
 
 using PODType = char;
 using IOAdapter = AsioAdapter<PODType>;
-struct Socket : public tcp::socket
-{
-	Socket(io_context& context, const tcp::endpoint& endPoint) : tcp::socket(context) {}
-};
 
-struct MockHandler : public IConnectionHandler<PODType, IOAdapter, Socket> {
-	MockHandler(io_context& context, const tcp::endpoint& endPoint) : 
-		IConnectionHandler(context, endPoint) {}
+struct MockHandler : public IConnectionHandler<PODType, IOAdapter> {
+	MockHandler(io_context& context) : 
+		IConnectionHandler(context) {}
 
-	void StartApplication() override { ++startCount_; }
+	void StartApplication(IConnectionHandler::shared_conn_handler_t) override { ++startCount_; }
 
 	static void ResetStartCount() { startCount_ = 0; }
 	static size_t GetStartCount() { return startCount_; }

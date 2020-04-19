@@ -14,6 +14,7 @@
 
 using boost::asio::io_context;
 using boost::asio::ip::address;
+using boost::asio::ip::basic_resolver_results;
 using boost::asio::ip::tcp;
 using boost::asio::streambuf;
 using boost::system::error_code;
@@ -38,23 +39,22 @@ const uint16_t PORT = 3333;
 const std::string RAW_IP_ADDRESS = "::1";
 const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
 
-struct Socket : public tcp::socket
-{
-	Socket(io_context& context, const tcp::endpoint& endPoint) : tcp::socket(context) {}
-};
-
 struct IOAdapter : public AsioAdapter<PODType>
 {
 	MOCK_METHOD4(AsyncReadUntil, void(tcp::socket&, streambuf&, const char,
-		std::function<void(const error_code& error, size_t bytesTransferred)>)
+		std::function<void(error_code error, size_t bytesTransferred)>)
 	);
 
 	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, boost::asio::mutable_buffer& message,
-		std::function<void(const error_code& error, size_t bytesTransferred)>)
+		std::function<void(error_code error, size_t bytesTransferred)>)
+	);
+
+	MOCK_METHOD3(AsyncConnect, void(tcp::socket&, tcp::resolver::iterator endPointIter,
+		std::function<void(error_code error, tcp::resolver::iterator endPointIter)>)
 	);
 
 	void AsyncReadUntilImpl(tcp::socket& socket, streambuf& inMessage, const char UNTIL_CONDITION,
-		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledReadMoreThanOnce()) return;
 		ReceiveMessage(inMessage);
@@ -62,15 +62,22 @@ struct IOAdapter : public AsioAdapter<PODType>
 	}
 
 	void AsyncWriteImpl(tcp::socket& socket, boost::asio::mutable_buffer& message,
-		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
 		ValidateSentMessage(message);
 		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
 
+	void AsyncConnectImpl(tcp::socket& socket, tcp::resolver::iterator endPointIter,
+		std::function<void(error_code error, tcp::resolver::iterator endPointIter)>&& handler)
+	{
+		ValidateEndPoint(endPointIter);
+		handler(error_code(), endPointIter); 
+	}
+
 	void AsyncReadUntilImplWithErrorParam(tcp::socket& socket, streambuf& inMessage, const char UNTIL_CONDITION,
-		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledReadMoreThanOnce()) return;
 		ReceiveMessage(inMessage);
@@ -78,11 +85,18 @@ struct IOAdapter : public AsioAdapter<PODType>
 	}
 
 	void AsyncWriteImplWithErrorParam(tcp::socket& socket, boost::asio::mutable_buffer& message,
-		std::function<void(const error_code& error, size_t bytesTransferred)>&& handlerWrapper)
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		if (CalledWriteMoreThanOnce()) return;
 		ValidateSentMessage(message);
 		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
+	}
+
+	void AsyncConnectImplWithErrorParam(tcp::socket& socket, tcp::resolver::iterator endPointIter,
+		std::function<void(error_code error, tcp::resolver::iterator endPointIter)>&& handler)
+	{
+		ValidateEndPoint(endPointIter);
+		handler(errc::make_error_code(errc::not_supported), endPointIter);
 	}
 
 private:
@@ -107,37 +121,42 @@ private:
 		EXPECT_EQ(messageVector[i], UNTIL_SYMBOL);
 	}
 
+	void ValidateEndPoint(tcp::resolver::iterator endPointIter)
+	{
+		EXPECT_EQ((*endPointIter).endpoint().address(), IP_ADDRESS);
+		EXPECT_EQ((*endPointIter).endpoint().port(), PORT);
+	}
+
 	size_t readCount_{ 0 };
 	size_t writeCount_{ 0 };
 };
 
-struct MockConnHandler : public IConnectionHandler<PODType, IOAdapter, Socket>	
+struct MockConnHandler : public IConnectionHandler<PODType, IOAdapter>	
 {
-	MockConnHandler(io_context& context, const tcp::endpoint& endPoint) : 
-		IConnectionHandler(context, endPoint) {}
-	void StartApplication() override {}
+	MockConnHandler(io_context& context) : 
+		IConnectionHandler(context) {}
+	void StartApplication(IConnectionHandler::shared_conn_handler_t) override { ++startCount_; }
+
+	static void ResetStartCount() { startCount_ = 0; }
+	static size_t GetStartCount() { return startCount_; }
+
+private:
+	static size_t startCount_;
 };
+
+size_t MockConnHandler::startCount_{ 0 };
 } // end namespace
 
-TEST(IConnectionHandler, ConstructForServer)
+TEST(IConnectionHandler, Construct)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
-	EXPECT_NO_THROW(MockConnHandler handler(context, endPoint));
-}
-
-TEST(IConnectionHandler, ConstructForClient)
-{
-	io_context context;
-	tcp::endpoint endPoint(IP_ADDRESS, PORT);
-	EXPECT_NO_THROW(MockConnHandler handler(context, endPoint));
+	EXPECT_NO_THROW(MockConnHandler handler(context));
 }
 
 TEST(IConnectionHandler, Socket)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
-	MockConnHandler handler(context, endPoint);
+	MockConnHandler handler(context);
 
 	tcp::socket& soket = handler.Socket();
 	EXPECT_EQ(&(soket.get_io_context()), &context);
@@ -146,8 +165,7 @@ TEST(IConnectionHandler, Socket)
 TEST(IConnectionHandler, IOService)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
-	MockConnHandler handler(context, endPoint);
+	MockConnHandler handler(context);
 
 	io_context& contextRef = handler.IOService();
 	EXPECT_EQ(&(contextRef), &context);
@@ -156,8 +174,7 @@ TEST(IConnectionHandler, IOService)
 TEST(IConnectionHandler, IOAdapter)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
-	MockConnHandler handler(context, endPoint);
+	MockConnHandler handler(context);
 
 	EXPECT_NO_THROW(handler.IOAdapter());
 }
@@ -165,10 +182,9 @@ TEST(IConnectionHandler, IOAdapter)
 TEST(IConnectionHandler, PostReceiveMessages)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -185,10 +201,9 @@ TEST(IConnectionHandler, PostReceiveMessages)
 TEST(IConnectionHandler, PostReceiveMessagesWithError)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(1).
@@ -207,10 +222,9 @@ TEST(IConnectionHandler, PostReceiveMessagesWithError)
 TEST(IConnectionHandler, HasReceivedMessages)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -229,10 +243,9 @@ TEST(IConnectionHandler, HasReceivedMessages)
 TEST(IConnectionHandler, GetOneMessage)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
 		Times(2).
@@ -258,8 +271,7 @@ TEST(IConnectionHandler, GetOneMessage)
 TEST(IConnectionHandler, GetOneMessageThrows)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
-	MockConnHandler handler(context, endPoint);
+	MockConnHandler handler(context);
 
 	ASSERT_FALSE(handler.HasReceivedMessages());
 	EXPECT_THROW(handler.GetOneMessage(), std::runtime_error);
@@ -268,10 +280,9 @@ TEST(IConnectionHandler, GetOneMessageThrows)
 TEST(IConnectionHandler, PostOutgoingMessage)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).
@@ -294,10 +305,9 @@ TEST(IConnectionHandler, PostOutgoingMessage)
 TEST(IConnectionHandler, PostOutgoingMessageWithError)
 {
 	io_context context;
-	tcp::endpoint endPoint(tcp::v4(), PORT);
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
-	auto handler = std::make_shared<MockConnHandler>(context, endPoint);
+	auto handler = std::make_shared<MockConnHandler>(context);
 
 	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
 		Times(1).
@@ -317,15 +327,58 @@ TEST(IConnectionHandler, PostOutgoingMessageWithError)
 	EXPECT_TRUE(handler->HasOutgoingMessages());
 }
 
-//test that socket endpoint connection
-/*
-int main()
+TEST(IConnectionHandler, Connect)
 {
 	io_context context;
-	tcp::endpoint endPoint(IP_ADDRESS, PORT);
+	tcp::resolver resolver(context);
+	tcp::resolver::iterator endPointIterator = resolver.resolve({ RAW_IP_ADDRESS, std::to_string(PORT) });
 
-	boost::asio::ip::tcp::socket soc(context, endPoint);
-	if (soc.is_open())
-		std::cout << "socket is open on localhost" << std::endl;
+	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
+	auto handler = std::make_shared<MockConnHandler>(context);
+
+	EXPECT_CALL(handler->IOAdapter(), AsyncConnect(_, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncConnectImpl)
+			)
+		);
+
+	MockConnHandler::ResetStartCount();
+	EXPECT_NO_THROW(handler->Connect(endPointIterator));
+	EXPECT_EQ(MockConnHandler::GetStartCount(), 1);
 }
-*/
+
+TEST(IConnectionHandler, ConnectWithError)
+{
+	io_context context;
+	tcp::resolver resolver(context);
+	tcp::resolver::iterator endPointIterator = resolver.resolve({ RAW_IP_ADDRESS, std::to_string(PORT) });
+
+	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
+	auto handler = std::make_shared<MockConnHandler>(context);
+
+	EXPECT_CALL(handler->IOAdapter(), AsyncConnect(_, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncConnectImplWithErrorParam)
+			)
+		);
+
+	MockConnHandler::ResetStartCount();
+	EXPECT_NO_THROW(handler->Connect(endPointIterator));
+	EXPECT_EQ(MockConnHandler::GetStartCount(), 0);
+}
+
+TEST(IConnectionHandler, ConnectThrowsIfSocketIsOpen)
+{
+	io_context context;
+	tcp::resolver resolver(context);
+	tcp::resolver::iterator endPointIterator = resolver.resolve({ RAW_IP_ADDRESS, std::to_string(PORT) });
+
+	MockConnHandler handler(context);
+	handler.Socket().open(tcp::v4());
+	EXPECT_THROW(handler.Connect(endPointIterator), std::runtime_error);
+}
+

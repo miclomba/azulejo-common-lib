@@ -36,10 +36,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChatHandler.h" />
+    <ClInclude Include="chat_client.h" />
+    <ClInclude Include="chat_server.h" />
+    <ClInclude Include="chat_message.hpp" />
     <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="chat_client_server.cpp" />
     <ClCompile Include="test_async_server.cpp" />
     <ClCompile Include="test_connection_handler.cpp" />
     <ClCompile Include="test_shared_memory.cpp" />

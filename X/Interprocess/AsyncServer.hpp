@@ -1,12 +1,12 @@
 
-#define TEMPLATE_T template<typename ConnHandlerT, typename ConnAcceptorT>
-#define AsyncServer_t AsyncServer<ConnHandlerT, ConnAcceptorT>
+#define TEMPLATE_T template<typename ConnHandlerT, typename AcceptorT>
+#define AsyncServer_t AsyncServer<ConnHandlerT, AcceptorT>
 
 TEMPLATE_T
 AsyncServer_t::AsyncServer(boost::asio::io_context& context, const size_t numThreads) :
 	ioService_(context),
 	numThreads_(numThreads),
-	acceptor_(std::make_shared<ConnAcceptorT>(context))
+	acceptor_(context)
 {
 	if (numThreads_ == 0)
 		throw std::runtime_error("Cannot construct AsyncServer because number of threads is invalid");
@@ -38,21 +38,20 @@ void AsyncServer_t::Start(const boost::asio::ip::tcp::endpoint& endPoint)
 
 	error_code ec;
 
-	endPoint_ = endPoint;
-	acceptor_->open(endPoint_.protocol(), ec);
-	if (ec) throw std::runtime_error("AsyncServer could not open protocol via port " + std::to_string(endPoint_.port()));
+	acceptor_.open(endPoint.protocol(), ec);
+	if (ec) throw std::runtime_error("AsyncServer could not open protocol via port " + std::to_string(endPoint.port()));
 
-	acceptor_->set_option(tcp::acceptor::reuse_address(true), ec);
+	acceptor_.set_option(tcp::acceptor::reuse_address(true), ec);
 	if (ec) throw std::runtime_error("AsyncServer could not set option to reuse addresses");
 
-	acceptor_->bind(endPoint_, ec);
+	acceptor_.bind(endPoint, ec);
 	if (ec) throw std::runtime_error("AsyncServer could not bind on endpoint");
 
-	acceptor_->listen(boost::asio::socket_base::max_listen_connections, ec);
+	acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
 	if (ec) throw std::runtime_error("AsyncServer could not listen");
 
-	auto handler = std::make_shared<ConnHandlerT>(ioService_, endPoint_);
-	acceptor_->async_accept(handler->Socket(), [=](error_code errorCode) 
+	auto handler = std::make_shared<ConnHandlerT>(ioService_);
+	acceptor_.async_accept(handler->Socket(), [=](error_code errorCode) 
 	{
 		HandleNewConnection(handler, errorCode);
 	});
@@ -68,10 +67,10 @@ void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handl
 
 	if (errorCode) return;
 
-	handler->StartApplication();
+	handler->StartApplication(handler);
 
-	auto newHandler = std::make_shared<ConnHandlerT>(ioService_, endPoint_);
-	acceptor_->async_accept(newHandler->Socket(), [=](error_code ec)
+	auto newHandler = std::make_shared<ConnHandlerT>(ioService_);
+	acceptor_.async_accept(newHandler->Socket(), [=](error_code ec)
 	{
 		HandleNewConnection(newHandler, ec);
 	});
@@ -84,10 +83,9 @@ size_t AsyncServer_t::GetNumThreads() const
 }
 
 TEMPLATE_T
-ConnAcceptorT& AsyncServer_t::GetAcceptor()
+AcceptorT& AsyncServer_t::GetAcceptor()
 {
-	assert(acceptor_);
-	return *acceptor_;
+	return acceptor_;
 }
 
 #undef TEMPLATE_T 

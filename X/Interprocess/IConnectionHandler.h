@@ -19,19 +19,14 @@
 
 namespace interprocess {
 
-template<
-	typename PODType, 
-	typename AsioAdapterT = AsioAdapter<PODType>, 
-	typename SocketT = boost::asio::ip::tcp::socket
->
+template<typename PODType, typename AsioAdapterT = AsioAdapter<PODType>>
 class IConnectionHandler : 
-	public std::enable_shared_from_this<IConnectionHandler<PODType, AsioAdapterT, SocketT>>
+	public std::enable_shared_from_this<IConnectionHandler<PODType, AsioAdapterT>>
 {
 public:
-	IConnectionHandler(
-		boost::asio::io_context& ioService,
-		const boost::asio::ip::tcp::endpoint& endPoint
-	);
+	using shared_conn_handler_t = std::shared_ptr<IConnectionHandler>;
+
+	IConnectionHandler(boost::asio::io_context& ioService);
 
 	virtual ~IConnectionHandler();
 	IConnectionHandler(const IConnectionHandler&) = delete;
@@ -39,7 +34,7 @@ public:
 	IConnectionHandler(IConnectionHandler&&) = delete;
 	IConnectionHandler& operator=(IConnectionHandler&&) = delete;
 
-	virtual void StartApplication() = 0;
+	virtual void StartApplication(shared_conn_handler_t thisHandler) = 0;
 
 	//incoming
 	void PostReceiveMessages();
@@ -51,7 +46,11 @@ public:
 	void PostOutgoingMessage(std::vector<PODType> message);
 	bool HasOutgoingMessages() const;
 
-	SocketT& Socket();
+	//connection
+	void Connect(boost::asio::ip::tcp::resolver::iterator endPointIter);
+
+	// accessors
+	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();
 	AsioAdapterT& IOAdapter();
 
@@ -76,8 +75,8 @@ private:
 	std::deque<std::vector<PODType>> outMessageQue_;
 
 	boost::asio::io_context& ioServiceRef_;
-	std::shared_ptr<SocketT> socket_;
-	std::shared_ptr<AsioAdapterT> ioAdapter_;
+	boost::asio::ip::tcp::socket socket_;
+	AsioAdapterT ioAdapter_;
 };
 
 #include "IConnectionHandler.hpp"

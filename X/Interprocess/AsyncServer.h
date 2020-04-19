@@ -14,7 +14,7 @@
 
 namespace interprocess {
 
-template<typename ConnHandlerT, typename ConnAcceptorT = boost::asio::ip::tcp::acceptor>
+template<typename ConnHandlerT, typename AcceptorT = boost::asio::ip::tcp::acceptor>
 class AsyncServer 
 {
 	using shared_conn_handler_t = std::shared_ptr<ConnHandlerT>;
@@ -33,7 +33,7 @@ public:
 
 	size_t GetNumThreads() const;
 
-	ConnAcceptorT& GetAcceptor();
+	AcceptorT& GetAcceptor();
 
 private:
 	void HandleNewConnection(shared_conn_handler_t handler, const boost::system::error_code ec);
@@ -42,8 +42,7 @@ private:
 
 	std::vector<std::thread> threadPool_;
 	boost::asio::io_context& ioService_;
-	boost::asio::ip::tcp::endpoint endPoint_;
-	std::shared_ptr<ConnAcceptorT> acceptor_;
+	AcceptorT acceptor_;
 };
 
 #include "AsyncServer.hpp"
