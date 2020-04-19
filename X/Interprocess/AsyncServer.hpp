@@ -67,6 +67,7 @@ void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handl
 
 	if (errorCode) return;
 
+	// TODO this needs to be put on the io service queue so that a new accept call can be made
 	handler->StartApplication(handler);
 
 	auto newHandler = std::make_shared<ConnHandlerT>(ioService_);

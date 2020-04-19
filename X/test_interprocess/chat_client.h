@@ -26,17 +26,15 @@ typedef std::deque<chat_message> chat_message_queue;
 class chat_client
 {
 public:
-  chat_client(boost::asio::io_service& io_service,
-      tcp::resolver::iterator endpoint_iterator)
-    : io_service_(io_service),
-      socket_(io_service)
+  chat_client(interprocess::IConnectionHandler<char>* handler) :
+	  handler_(handler),
+      socket_(handler_->Socket())
   {
-    do_connect(endpoint_iterator);
   }
 
   void write(const chat_message& msg)
   {
-    io_service_.post(
+    handler_->IOService().post(
         [this, msg]()
         {
           bool write_in_progress = !write_msgs_.empty();
@@ -44,24 +42,6 @@ public:
           if (!write_in_progress)
           {
             do_write();
-          }
-        });
-  }
-
-  void close()
-  {
-    io_service_.post([this]() { socket_.close(); });
-  }
-
-private:
-  void do_connect(tcp::resolver::iterator endpoint_iterator)
-  {
-    boost::asio::async_connect(socket_, endpoint_iterator,
-        [this](boost::system::error_code ec, tcp::resolver::iterator)
-        {
-          if (!ec)
-          {
-            do_read_header();
           }
         });
   }
@@ -83,6 +63,7 @@ private:
         });
   }
 
+private:
   void do_read_body()
   {
     boost::asio::async_read(socket_,
@@ -125,10 +106,31 @@ private:
   }
 
 private:
-  boost::asio::io_service& io_service_;
-  tcp::socket socket_;
+  tcp::socket& socket_;
   chat_message read_msg_;
   chat_message_queue write_msgs_;
+  interprocess::IConnectionHandler<char>* handler_{ nullptr };
+};
+
+struct ClientChatHandler : public interprocess::IConnectionHandler<char>
+{
+	ClientChatHandler(boost::asio::io_service& context) :
+		interprocess::IConnectionHandler<char>(context),
+		client_(this)
+	{
+	}
+
+	void StartApplication(IConnectionHandler::shared_conn_handler_t handler) override {
+		client_.do_read_header();
+	}
+
+	void write(const chat_message& msg)
+	{
+		client_.write(msg);
+	}
+
+private:
+	chat_client client_;
 };
 
 #endif // CHAT_CLIENT_H

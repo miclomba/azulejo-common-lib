@@ -35,10 +35,12 @@ int main(int argc, char* argv[])
 			boost::asio::io_service io_service;
 			tcp::endpoint endpoint(tcp::v6(), std::atoi(argv[2]));
 
-			interprocess::AsyncServer<ChatHandler> server(io_service, 1);
+			interprocess::AsyncServer<ServerChatHandler> server(io_service, 1);
 			server.Start(endpoint);
 
-			io_service.run();
+			std::string input;
+			std::cin >> input;
+			//io_service.run();
 		}
 		catch (std::exception& e)
 		{
@@ -47,17 +49,19 @@ int main(int argc, char* argv[])
 	}
 	else if (std::string(argv[1]) == "chat_client")
 	{
-		if (argc != 3)
+		if (argc != 4)
 		{
 			std::cerr << "Usage: chat_client <host> <port>\n";
 			return 1;
 		}
 
 		boost::asio::io_service io_service;
-
 		tcp::resolver resolver(io_service);
 		auto endpoint_iterator = resolver.resolve({ argv[2], argv[3] });
-		chat_client c(io_service, endpoint_iterator);
+
+		// handlers must be shared_ptrs
+		auto client = std::make_shared<ClientChatHandler>(io_service);
+		client->Connect(endpoint_iterator);
 
 		std::thread t([&io_service]() { io_service.run(); });
 
@@ -68,10 +72,10 @@ int main(int argc, char* argv[])
 			msg.body_length(std::strlen(line));
 			std::memcpy(msg.body(), line, msg.body_length());
 			msg.encode_header();
-			c.write(msg);
+			client->write(msg);
 		}
 
-		c.close();
+		client->Socket().close();
 		t.join();
 	}
 }

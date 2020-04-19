@@ -83,8 +83,9 @@ class chat_session
     public std::enable_shared_from_this<chat_session>
 {
 public:
-  chat_session(tcp::socket& socket, chat_room& room)
-    : socket_(socket),
+  chat_session(interprocess::IConnectionHandler<char>::shared_conn_handler_t handler, chat_room& room) : 
+	  handler_(handler),
+	  socket_(handler_->Socket()),
       room_(room)
   {
   }
@@ -170,23 +171,24 @@ private:
   chat_room& room_;
   chat_message read_msg_;
   chat_message_queue write_msgs_;
+  interprocess::IConnectionHandler<char>::shared_conn_handler_t handler_;
 };
 
-struct ChatHandler : public interprocess::IConnectionHandler<char>
+struct ServerChatHandler : public interprocess::IConnectionHandler<char>
 {
-	ChatHandler(boost::asio::io_service& context) :
+	ServerChatHandler(boost::asio::io_service& context) :
 		interprocess::IConnectionHandler<char>(context)
 	{
 	}
 
 	void StartApplication(IConnectionHandler::shared_conn_handler_t handler) override {
-		std::make_shared<chat_session>(Socket(), room_)->start();
+		std::make_shared<chat_session>(handler, room_)->start();
 	}
 
 private:
 	static chat_room room_;
 };
 
-chat_room ChatHandler::room_;
+chat_room ServerChatHandler::room_;
 
 #endif // CHAT_SERVER_H
