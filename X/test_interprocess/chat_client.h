@@ -28,11 +28,9 @@ typedef std::deque<chat_message> chat_message_queue;
 class chat_client : public IConnectionHandler<char> 
 {
 public:
-	chat_client(boost::asio::io_context& io_context, const tcp::resolver::results_type& endpoints) : 
+	chat_client(boost::asio::io_context& io_context) :
 		IConnectionHandler(io_context) 
 	{
-		//Connect(endpoints);
-		do_connect(endpoints);
 	}
 
 	void StartApplication(shared_conn_handler_t thisHandler)
@@ -60,19 +58,6 @@ public:
 	}
 
 private:
-	
-	void do_connect(const tcp::resolver::results_type& endpoints)
-	{
-		boost::asio::async_connect(Socket(), endpoints,
-			[this](boost::system::error_code ec, tcp::endpoint)
-			{
-			if (!ec)
-			{
-				do_read_header();
-			}
-			});
-	}
-	
 	void do_read_header()
 	{
 		boost::asio::async_read(Socket(),

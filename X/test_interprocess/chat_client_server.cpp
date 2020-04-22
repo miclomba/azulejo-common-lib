@@ -12,7 +12,7 @@
 #include "config.h"
 #include "chat_server.h"
 #include "chat_client.h"
-/*
+
 int main(int argc, char* argv[])
 {
 	if (argc < 1)
@@ -58,7 +58,8 @@ int main(int argc, char* argv[])
 
 			tcp::resolver resolver(io_context);
 			tcp::resolver::results_type endpoints = resolver.resolve(argv[2], argv[3]);
-			auto c = std::make_shared<chat_client>(io_context, endpoints);
+			auto c = std::make_shared<chat_client>(io_context); 
+			c->Connect(endpoints);
 
 			std::thread t([&io_context]() { io_context.run(); });
 
@@ -81,4 +82,4 @@ int main(int argc, char* argv[])
 		}
 	}
 }
-*/
+
