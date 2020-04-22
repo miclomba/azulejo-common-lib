@@ -47,7 +47,7 @@ public:
 	bool HasOutgoingMessages() const;
 
 	//connection
-	void Connect(boost::asio::ip::tcp::resolver::iterator endPointIter);
+	void Connect(boost::asio::ip::tcp::resolver::results_type endPoints);
 
 	// accessors
 	boost::asio::ip::tcp::socket& Socket();

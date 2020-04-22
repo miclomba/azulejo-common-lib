@@ -12,7 +12,7 @@
 #include "config.h"
 #include "chat_server.h"
 #include "chat_client.h"
-
+/*
 int main(int argc, char* argv[])
 {
 	if (argc < 1)
@@ -81,4 +81,4 @@ int main(int argc, char* argv[])
 		}
 	}
 }
-
+*/

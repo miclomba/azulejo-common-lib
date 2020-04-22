@@ -31,8 +31,8 @@ void AsioAdapter_t::AsyncWrite(
 TEMPLATE_T
 void AsioAdapter_t::AsyncConnect(
 	boost::asio::ip::tcp::socket& socket,
-	boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
-	std::function<void(boost::system::error_code error, boost::asio::ip::tcp::resolver::iterator)> handler
+	boost::asio::ip::tcp::resolver::results_type endpoint_iterator,
+	std::function<void(boost::system::error_code error, boost::asio::ip::tcp::endpoint)> handler
 )
 {
 	boost::asio::async_connect(socket, endpoint_iterator, handler);

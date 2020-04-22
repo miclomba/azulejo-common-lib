@@ -124,13 +124,13 @@ void IConnectionHandler_t::SendMessageDone(const boost::system::error_code& erro
 }
 
 TEMPLATE_T
-void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::iterator endPointIter)
+void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::results_type endPoints)
 {
 	if (Socket().is_open())
 		throw std::runtime_error("IConnectionHandler cannot connect because socket is already open");
 
-	ioAdapter_.AsyncConnect(Socket(), endPointIter,
-		[me = shared_from_this()](boost::system::error_code error, boost::asio::ip::tcp::resolver::iterator)
+	ioAdapter_.AsyncConnect(Socket(), endPoints,
+		[me = shared_from_this()](boost::system::error_code error, boost::asio::ip::tcp::endpoint)
 	{
 		if (error) return;
 
