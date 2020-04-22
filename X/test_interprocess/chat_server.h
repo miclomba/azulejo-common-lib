@@ -4,14 +4,11 @@
 // chat_server.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2018 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-
-#include "config.h"
-
 
 #include <cstdlib>
 #include <deque>
@@ -22,9 +19,6 @@
 #include <utility>
 #include <boost/asio.hpp>
 #include "chat_message.hpp"
-
-#include "Interprocess/AsyncServer.h"
-#include "Interprocess/IConnectionHandler.h"
 
 using boost::asio::ip::tcp;
 
@@ -83,9 +77,8 @@ class chat_session
     public std::enable_shared_from_this<chat_session>
 {
 public:
-  chat_session(interprocess::IConnectionHandler<char>::shared_conn_handler_t handler, chat_room& room) : 
-	  handler_(handler),
-	  socket_(handler_->Socket()),
+  chat_session(tcp::socket socket, chat_room& room)
+    : socket_(std::move(socket)),
       room_(room)
   {
   }
@@ -167,28 +160,41 @@ private:
         });
   }
 
-  tcp::socket& socket_;
+  tcp::socket socket_;
   chat_room& room_;
   chat_message read_msg_;
   chat_message_queue write_msgs_;
-  interprocess::IConnectionHandler<char>::shared_conn_handler_t handler_;
 };
 
-struct ServerChatHandler : public interprocess::IConnectionHandler<char>
-{
-	ServerChatHandler(boost::asio::io_service& context) :
-		interprocess::IConnectionHandler<char>(context)
-	{
-	}
+//----------------------------------------------------------------------
 
-	void StartApplication(IConnectionHandler::shared_conn_handler_t handler) override {
-		std::make_shared<chat_session>(handler, room_)->start();
-	}
+class chat_server
+{
+public:
+  chat_server(boost::asio::io_context& io_context,
+      const tcp::endpoint& endpoint)
+    : acceptor_(io_context, endpoint)
+  {
+    do_accept();
+  }
 
 private:
-	static chat_room room_;
-};
+  void do_accept()
+  {
+    acceptor_.async_accept(
+        [this](boost::system::error_code ec, tcp::socket socket)
+        {
+          if (!ec)
+          {
+            std::make_shared<chat_session>(std::move(socket), room_)->start();
+          }
 
-chat_room ServerChatHandler::room_;
+          do_accept();
+        });
+  }
+
+  tcp::acceptor acceptor_;
+  chat_room room_;
+};
 
 #endif // CHAT_SERVER_H

@@ -12,7 +12,7 @@
 #include "config.h"
 #include "chat_server.h"
 #include "chat_client.h"
-/*
+
 int main(int argc, char* argv[])
 {
 	if (argc < 1)
@@ -28,19 +28,16 @@ int main(int argc, char* argv[])
 		{
 			if (argc < 3)
 			{
-				std::cerr << "Usage: chat_server <port>\n";
+				std::cerr << "Usage: chat_server <port> [<port> ...]\n";
 				return 1;
 			}
 
-			boost::asio::io_service io_service;
-			tcp::endpoint endpoint(tcp::v6(), std::atoi(argv[2]));
+			boost::asio::io_context io_context;
 
-			interprocess::AsyncServer<ServerChatHandler> server(io_service, 1);
-			server.Start(endpoint);
+			tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[2]));
+			chat_server server(io_context, endpoint);
 
-			std::string input;
-			std::cin >> input;
-			//io_service.run();
+			io_context.run();
 		}
 		catch (std::exception& e)
 		{
@@ -49,34 +46,39 @@ int main(int argc, char* argv[])
 	}
 	else if (std::string(argv[1]) == "chat_client")
 	{
-		if (argc != 4)
+		try
 		{
-			std::cerr << "Usage: chat_client <host> <port>\n";
-			return 1;
+			if (argc != 4)
+			{
+				std::cerr << "Usage: chat_client <host> <port>\n";
+				return 1;
+			}
+
+			boost::asio::io_context io_context;
+
+			tcp::resolver resolver(io_context);
+			tcp::resolver::results_type endpoints = resolver.resolve(argv[2], argv[3]);
+			auto c = std::make_shared<chat_client>(io_context, endpoints);
+
+			std::thread t([&io_context]() { io_context.run(); });
+
+			char line[chat_message::max_body_length + 1];
+			while (std::cin.getline(line, chat_message::max_body_length + 1))
+			{
+				chat_message msg;
+				msg.body_length(std::strlen(line));
+				std::memcpy(msg.body(), line, msg.body_length());
+				msg.encode_header();
+				c->write(msg);
+			}
+
+			c->close();
+			t.join();
 		}
-
-		boost::asio::io_service io_service;
-		tcp::resolver resolver(io_service);
-		auto endpoint_iterator = resolver.resolve({ argv[2], argv[3] });
-
-		// handlers must be shared_ptrs
-		auto client = std::make_shared<ClientChatHandler>(io_service);
-		client->Connect(endpoint_iterator);
-
-		std::thread t([&io_service]() { io_service.run(); });
-
-		char line[chat_message::max_body_length + 1];
-		while (std::cin.getline(line, chat_message::max_body_length + 1))
+		catch (std::exception& e)
 		{
-			chat_message msg;
-			msg.body_length(std::strlen(line));
-			std::memcpy(msg.body(), line, msg.body_length());
-			msg.encode_header();
-			client->write(msg);
+			std::cerr << "Exception: " << e.what() << "\n";
 		}
-
-		client->Socket().close();
-		t.join();
 	}
 }
-*/
+
