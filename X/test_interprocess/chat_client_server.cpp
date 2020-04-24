@@ -1,19 +1,13 @@
 
-//
-// chat_server.cpp
-// ~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include "config.h"
 #include "chat_server.h"
 #include "chat_client.h"
 
+#ifndef USER_DEFINED_MAIN
+int fake_main(int argc, char* argv[])
+#else
 int main(int argc, char* argv[])
+#endif
 {
 	if (argc < 1)
 	{
@@ -58,22 +52,35 @@ int main(int argc, char* argv[])
 
 			tcp::resolver resolver(io_context);
 			tcp::resolver::results_type endpoints = resolver.resolve(argv[2], argv[3]);
+
 			auto c = std::make_shared<chat_client>(io_context); 
 			c->Connect(endpoints);
 
 			std::thread t([&io_context]() { io_context.run(); });
-
-			char line[chat_message::max_body_length + 1];
-			while (std::cin.getline(line, chat_message::max_body_length + 1))
+			
+			std::string line;
+			while (std::getline(std::cin, line))
 			{
+				if (c->HasReceivedMessages())
+				{
+					auto receivedMessage = c->GetOneMessage();
+					for (char c : receivedMessage)
+						std::cout << c;
+					std::cout << '\n';
+				}
+
+				if (line.empty())
+					continue;
+
 				chat_message msg;
-				msg.body_length(std::strlen(line));
-				std::memcpy(msg.body(), line, msg.body_length());
+				msg.body_length(line.length());
+				std::memcpy(msg.body(), line.c_str(), msg.body_length() + 1);
 				msg.encode_header();
 				c->write(msg);
 			}
+			
 
-			c->close();
+			c->Close();
 			t.join();
 		}
 		catch (std::exception& e)
@@ -81,5 +88,7 @@ int main(int argc, char* argv[])
 			std::cerr << "Exception: " << e.what() << "\n";
 		}
 	}
+
+	return 0;
 }
 

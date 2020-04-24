@@ -25,10 +25,10 @@ public:
 	AsioAdapter(AsioAdapter&&) = delete;
 	AsioAdapter& operator=(AsioAdapter&&) = delete;
 
-	virtual void AsyncReadUntil(
+	virtual void AsyncRead(
 		boost::asio::ip::tcp::socket& socket,
-		boost::asio::streambuf& messageBuffer,
-		const char UNTIL_CONDITION,
+		std::vector<PODType>& messageBuffer,
+		const size_t bytesToRead,
 		std::function<void(boost::system::error_code error, size_t bytesTransferred)> handler
 	);
 

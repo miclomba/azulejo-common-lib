@@ -8,14 +8,16 @@ TEMPLATE_T
 AsioAdapter_t::~AsioAdapter() = default;
 
 TEMPLATE_T
-void AsioAdapter_t::AsyncReadUntil(
+void AsioAdapter_t::AsyncRead(
 	boost::asio::ip::tcp::socket& socket,
-	boost::asio::streambuf& messageBuffer,
-	const char UNTIL_CONDITION,
+	std::vector<PODType>& messageBuffer,
+	const size_t bytesToRead,
 	std::function<void(boost::system::error_code error, size_t bytesTransferred)> handler
 )
 {
-	boost::asio::async_read_until(socket, messageBuffer, UNTIL_CONDITION, handler);
+	if (bytesToRead > messageBuffer.size() * sizeof(PODType))
+		throw std::runtime_error("AsyncRead cannot read more bytes than available in the buffer");
+	boost::asio::async_read(socket, boost::asio::buffer(messageBuffer.data(), bytesToRead), handler);
 }
 
 TEMPLATE_T

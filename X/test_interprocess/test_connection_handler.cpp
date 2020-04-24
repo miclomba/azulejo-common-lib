@@ -32,16 +32,18 @@ namespace
 {
 using PODType = char;
 
-const std::string RECEIVED_MESSAGE = "message_received";
+const std::string RECEIVED_MESSAGE = "   7message";
+const std::string RECEIVED_BAD_MESSAGE = "    message";
 const std::string SENT_MESSAGE = "message_sent";
-const char UNTIL_SYMBOL = '\0';
+const std::string SENT_MESSAGE_WITH_HEADER = "  12message_sent";
+const size_t HEADER_LENGTH = 4;
 const uint16_t PORT = 3333;
 const std::string RAW_IP_ADDRESS = "::1";
 const address IP_ADDRESS = address::from_string(RAW_IP_ADDRESS);
 
 struct IOAdapter : public AsioAdapter<PODType>
 {
-	MOCK_METHOD4(AsyncReadUntil, void(tcp::socket&, streambuf&, const char,
+	MOCK_METHOD4(AsyncRead, void(tcp::socket&, std::vector<char>&, const size_t,
 		std::function<void(error_code error, size_t bytesTransferred)>)
 	);
 
@@ -53,18 +55,18 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(error_code error, tcp::endpoint endPoint)>)
 	);
 
-	void AsyncReadUntilImpl(tcp::socket& socket, streambuf& inMessage, const char UNTIL_CONDITION,
+	void AsyncReadImpl(tcp::socket& socket, std::vector<char>& inMessage, const size_t length,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (CalledReadMoreThanOnce()) return;
-		ReceiveMessage(inMessage);
-		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
+		if (CalledReadTooManyTimes()) return;
+		ReceiveMessage(inMessage, RECEIVED_MESSAGE);
+		// place the handler in the executor without waiting
+		handlerWrapper(error_code(), readCount_ == 1 ? HEADER_LENGTH : RECEIVED_MESSAGE.size()); 
 	}
 
 	void AsyncWriteImpl(tcp::socket& socket, boost::asio::mutable_buffer& message,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (CalledWriteMoreThanOnce()) return;
 		ValidateSentMessage(message);
 		handlerWrapper(error_code(), 0); // place the handler in the executor without waiting
 	}
@@ -76,18 +78,36 @@ struct IOAdapter : public AsioAdapter<PODType>
 		handler(error_code(), endPoints.begin()->endpoint()); 
 	}
 
-	void AsyncReadUntilImplWithErrorParam(tcp::socket& socket, streambuf& inMessage, const char UNTIL_CONDITION,
+	void AsyncReadImplWithErrorParamReadingHeader(tcp::socket& socket, std::vector<char>& inMessage, const size_t length,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (CalledReadMoreThanOnce()) return;
-		ReceiveMessage(inMessage);
-		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
+		if (CalledReadTooManyTimes()) return;
+		ReceiveMessage(inMessage, RECEIVED_MESSAGE);
+		handlerWrapper(errc::make_error_code(errc::not_supported), HEADER_LENGTH); // place the handler in the executor without waiting
+	}
+
+	void AsyncReadImplWithErrorParamReadingHeaderLength(tcp::socket& socket, std::vector<char>& inMessage, const size_t length,
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
+	{
+		if (CalledReadTooManyTimes()) return;
+		ReceiveMessage(inMessage, RECEIVED_BAD_MESSAGE);
+		handlerWrapper(error_code(), HEADER_LENGTH); // place the handler in the executor without waiting
+	}
+
+	void AsyncReadImplWithErrorParamReadingBody(tcp::socket& socket, std::vector<char>& inMessage, const size_t length,
+		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
+	{
+		if (CalledReadTooManyTimes()) return;
+		ReceiveMessage(inMessage, RECEIVED_MESSAGE);
+		handlerWrapper(
+			readCount_ == 1 ? error_code() : errc::make_error_code(errc::not_supported),
+			readCount_ == 1 ? HEADER_LENGTH : RECEIVED_MESSAGE.size()
+		); 
 	}
 
 	void AsyncWriteImplWithErrorParam(tcp::socket& socket, boost::asio::mutable_buffer& message,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
-		if (CalledWriteMoreThanOnce()) return;
 		ValidateSentMessage(message);
 		handlerWrapper(errc::make_error_code(errc::not_supported), 0); // place the handler in the executor without waiting
 	}
@@ -100,13 +120,12 @@ struct IOAdapter : public AsioAdapter<PODType>
 	}
 
 private:
-	bool CalledReadMoreThanOnce() { return readCount_++ > 0; }
-	bool CalledWriteMoreThanOnce() { return writeCount_++ > 0; }
+	bool CalledReadTooManyTimes() { return readCount_++ > 1; }
 
-	void ReceiveMessage(streambuf& inMessage)
+	void ReceiveMessage(std::vector<char>& inMessage, const std::string& message)
 	{
-		std::ostream stream(&inMessage);
-		stream << RECEIVED_MESSAGE;
+		for (size_t i = 0; i < message.size(); ++i)
+			inMessage[i] = message[i];
 	}
 
 	void ValidateSentMessage(boost::asio::mutable_buffer& message)
@@ -114,11 +133,9 @@ private:
 		size_t podSize = sizeof(PODType);
 		std::vector<PODType> messageVector(message.size() / podSize);
 		boost::asio::buffer_copy(boost::asio::buffer(messageVector), message);
-		EXPECT_EQ(messageVector.size(), SENT_MESSAGE.size() + 1);
-		size_t i = 0;
-		for (i = 0; i < SENT_MESSAGE.size(); ++i)
-			EXPECT_EQ(messageVector[i], SENT_MESSAGE.at(i));
-		EXPECT_EQ(messageVector[i], UNTIL_SYMBOL);
+		ASSERT_EQ(messageVector.size(), SENT_MESSAGE_WITH_HEADER.size());
+		for (size_t i = 0; i < SENT_MESSAGE_WITH_HEADER.size(); ++i)
+			EXPECT_EQ(messageVector[i], SENT_MESSAGE_WITH_HEADER.at(i));
 	}
 
 	void ValidateEndPoint(tcp::resolver::results_type& endPoint)
@@ -128,7 +145,6 @@ private:
 	}
 
 	size_t readCount_{ 0 };
-	size_t writeCount_{ 0 };
 };
 
 struct MockConnHandler : public IConnectionHandler<PODType, IOAdapter>	
@@ -186,11 +202,11 @@ TEST(IConnectionHandler, PostReceiveMessages)
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
 	auto handler = std::make_shared<MockConnHandler>(context);
 
-	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
-		Times(2).
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
+		Times(3).
 		WillRepeatedly(
 			DoAll(
-				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadUntilImpl)
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImpl)
 			)
 		);
 
@@ -198,18 +214,60 @@ TEST(IConnectionHandler, PostReceiveMessages)
 	EXPECT_EQ(context.run(), 1);
 }
 
-TEST(IConnectionHandler, PostReceiveMessagesWithError)
+TEST(IConnectionHandler, PostReceiveMessagesWithErrorReadingHeader)
 {
 	io_context context;
 
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
 	auto handler = std::make_shared<MockConnHandler>(context);
 
-	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
 		Times(1).
 		WillRepeatedly(
 			DoAll(
-				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadUntilImplWithErrorParam)
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImplWithErrorParamReadingHeader)
+			)
+		);
+
+	EXPECT_FALSE(handler->HasReceivedMessages());
+	EXPECT_NO_THROW(handler->PostReceiveMessages());
+	EXPECT_EQ(context.run(), 1);
+	EXPECT_FALSE(handler->HasReceivedMessages());
+}
+
+TEST(IConnectionHandler, PostReceiveMessagesWithErrorReadingHeaderLength)
+{
+	io_context context;
+
+	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
+	auto handler = std::make_shared<MockConnHandler>(context);
+
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
+		Times(1).
+		WillRepeatedly(
+			DoAll(
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImplWithErrorParamReadingHeaderLength)
+			)
+		);
+
+	EXPECT_FALSE(handler->HasReceivedMessages());
+	EXPECT_NO_THROW(handler->PostReceiveMessages());
+	EXPECT_EQ(context.run(), 1);
+	EXPECT_FALSE(handler->HasReceivedMessages());
+}
+
+TEST(IConnectionHandler, PostReceiveMessagesWithErrorReadingBody)
+{
+	io_context context;
+
+	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
+	auto handler = std::make_shared<MockConnHandler>(context);
+
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
+		Times(2).
+		WillRepeatedly(
+			DoAll(
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImplWithErrorParamReadingBody)
 			)
 		);
 
@@ -226,11 +284,11 @@ TEST(IConnectionHandler, HasReceivedMessages)
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
 	auto handler = std::make_shared<MockConnHandler>(context);
 
-	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
-		Times(2).
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
+		Times(3).
 		WillRepeatedly(
 			DoAll(
-				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadUntilImpl)
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImpl)
 			)
 		);
 
@@ -247,11 +305,11 @@ TEST(IConnectionHandler, GetOneMessage)
 	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
 	auto handler = std::make_shared<MockConnHandler>(context);
 
-	EXPECT_CALL(handler->IOAdapter(), AsyncReadUntil(_, _, _, _)).
-		Times(2).
+	EXPECT_CALL(handler->IOAdapter(), AsyncRead(_, _, _, _)).
+		Times(3).
 		WillRepeatedly(
 			DoAll(
-				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadUntilImpl)
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncReadImpl)
 			)
 		);
 
@@ -264,6 +322,7 @@ TEST(IConnectionHandler, GetOneMessage)
 	std::vector<PODType> message;
 	EXPECT_NO_THROW(message = handler->GetOneMessage());
 
+	ASSERT_TRUE(message.size() == RECEIVED_MESSAGE.size());
 	for (size_t i = 0; i < message.size(); ++i)
 		EXPECT_EQ(message[i], RECEIVED_MESSAGE[i]);
 }
@@ -302,6 +361,32 @@ TEST(IConnectionHandler, PostOutgoingMessage)
 	EXPECT_FALSE(handler->HasOutgoingMessages());
 }
 
+TEST(IConnectionHandler, PostOutgoingMessages)
+{
+	io_context context;
+
+	// we use a shared_ptr here because MockConnHandler must be shared_from_this to execute
+	auto handler = std::make_shared<MockConnHandler>(context);
+
+	EXPECT_CALL(handler->IOAdapter(), AsyncWrite(_, _, _)).
+		Times(2).
+		WillRepeatedly(
+			DoAll(
+				Invoke(&(handler->IOAdapter()), &IOAdapter::AsyncWriteImpl)
+			)
+		);
+
+	EXPECT_FALSE(handler->HasOutgoingMessages());
+
+	std::vector<PODType> message(SENT_MESSAGE.cbegin(), SENT_MESSAGE.cend());
+	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
+	EXPECT_NO_THROW(handler->PostOutgoingMessage(message));
+	EXPECT_TRUE(handler->HasOutgoingMessages());
+
+	EXPECT_EQ(context.run(), 3);
+	EXPECT_FALSE(handler->HasOutgoingMessages());
+}
+
 TEST(IConnectionHandler, PostOutgoingMessageWithError)
 {
 	io_context context;
@@ -324,7 +409,7 @@ TEST(IConnectionHandler, PostOutgoingMessageWithError)
 	EXPECT_TRUE(handler->HasOutgoingMessages());
 
 	EXPECT_EQ(context.run(), 1);
-	EXPECT_TRUE(handler->HasOutgoingMessages());
+	EXPECT_FALSE(handler->HasOutgoingMessages());
 }
 
 TEST(IConnectionHandler, Connect)

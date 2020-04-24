@@ -34,7 +34,7 @@ public:
 	IConnectionHandler(IConnectionHandler&&) = delete;
 	IConnectionHandler& operator=(IConnectionHandler&&) = delete;
 
-	virtual void StartApplication(shared_conn_handler_t thisHandler) = 0;
+	virtual void StartApplication(shared_conn_handler_t thisHandler);
 
 	//incoming
 	void PostReceiveMessages();
@@ -49,6 +49,9 @@ public:
 	//connection
 	void Connect(boost::asio::ip::tcp::resolver::results_type endPoints);
 
+	//close
+	void Close();
+
 	// accessors
 	boost::asio::ip::tcp::socket& Socket();
 	boost::asio::io_context& IOService();
@@ -56,15 +59,17 @@ public:
 
 private:
 	//incoming
-	void QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred);
+	void QueueReceivedMessage(size_t bytesTransferred);
+	size_t ReceivedDataLength(const size_t bytesTransferreds);
 
 	//outgoing
+	std::vector<PODType> WrapWithHeader(const std::vector<PODType> message) const;
 	void SendMessageStart();
-	void SendMessageDone(const boost::system::error_code& error);
+	void SendMessageDone();
 
 	// incoming
-	const char UNTIL_CONDITION = '\0';
-	boost::asio::streambuf inMessage_;
+	const size_t HEADER_LENGTH = 4;
+	std::vector<char> inMessage_;
 	mutable std::mutex readLock_;
 	boost::asio::io_context::strand readStrand_;
 	std::deque<std::vector<PODType>> inMessageQue_;

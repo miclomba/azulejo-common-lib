@@ -1,14 +1,5 @@
 #ifndef CHAT_SERVER_H
 #define CHAT_SERVER_H
-//
-// chat_server.cpp
-// ~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2018 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 #include <cstdlib>
 #include <deque>
@@ -18,6 +9,7 @@
 #include <set>
 #include <utility>
 #include <boost/asio.hpp>
+
 #include "chat_message.hpp"
 
 using boost::asio::ip::tcp;

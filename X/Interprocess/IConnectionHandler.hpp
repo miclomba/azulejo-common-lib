@@ -9,6 +9,8 @@ IConnectionHandler_t::IConnectionHandler(boost::asio::io_context& ioService) :
 	readStrand_(ioService),
 	socket_(ioService)
 {
+	const size_t BUFFER_SIZE = 512;
+	inMessage_.resize(BUFFER_SIZE / sizeof(PODType), 0);
 }
 
 TEMPLATE_T
@@ -33,6 +35,12 @@ AsioAdapterT& IConnectionHandler_t::IOAdapter()
 }
 
 TEMPLATE_T
+void IConnectionHandler_t::StartApplication(shared_conn_handler_t thisHandler)
+{
+	PostReceiveMessages();
+}
+
+TEMPLATE_T
 bool IConnectionHandler_t::HasReceivedMessages() const
 {
 	const std::lock_guard<std::mutex> lock(readLock_);
@@ -40,24 +48,48 @@ bool IConnectionHandler_t::HasReceivedMessages() const
 }
 
 TEMPLATE_T
+size_t IConnectionHandler_t::ReceivedDataLength(const size_t bytesTransferred)
+{
+	if (bytesTransferred != HEADER_LENGTH)
+		throw std::runtime_error("IConnectionHandler cannot determine length of received data");
+
+	std::vector<char> header(bytesTransferred + 1);
+	std::memcpy(header.data(), inMessage_.data(), HEADER_LENGTH);
+	header[HEADER_LENGTH] = '\0';
+	return static_cast<size_t>(std::atoll(header.data()));
+}
+
+TEMPLATE_T
 void IConnectionHandler_t::PostReceiveMessages()
 {
-	ioAdapter_.AsyncReadUntil(Socket(), inMessage_, UNTIL_CONDITION,
-		readStrand_.wrap([me = shared_from_this()](boost::system::error_code error, size_t bytesTransferred)
+	ioAdapter_.AsyncRead(Socket(), inMessage_, HEADER_LENGTH,
+		readStrand_.wrap([meShared = shared_from_this()](boost::system::error_code error, size_t bytesTransferred)
 	{
-		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
-		meDerived->QueueReceivedMessage(error, bytesTransferred);
+		if (error) return;
+
+		auto me = static_cast<IConnectionHandler_t*>(meShared.get());
+		size_t dataLength = me->ReceivedDataLength(bytesTransferred);
+
+		if (dataLength == 0)
+			return;
+
+		me->ioAdapter_.AsyncRead(me->Socket(), me->inMessage_, dataLength,
+			me->readStrand_.wrap([meShared](boost::system::error_code error, size_t bytesTransferred)
+		{
+			if (error) return;
+
+			auto me = static_cast<IConnectionHandler_t*>(meShared.get());
+			me->QueueReceivedMessage(bytesTransferred);
+		}));
 	}));
 }
 
 TEMPLATE_T
-void IConnectionHandler_t::QueueReceivedMessage(const boost::system::error_code& error, size_t bytesTransferred)
+void IConnectionHandler_t::QueueReceivedMessage(size_t bytesTransferred)
 {
-	if (error) return;
-
 	size_t podSize = sizeof(PODType);
-	std::vector<PODType> message(inMessage_.size() / podSize);
-	boost::asio::buffer_copy(boost::asio::buffer(message), inMessage_.data());
+	std::vector<PODType> message(bytesTransferred / podSize);
+	std::memcpy(message.data(), inMessage_.data(), bytesTransferred);
 
 	const std::lock_guard<std::mutex> lock(readLock_);
 	inMessageQue_.push_back(std::move(message));
@@ -87,40 +119,75 @@ bool IConnectionHandler_t::HasOutgoingMessages() const
 }
 
 TEMPLATE_T
+std::vector<PODType> IConnectionHandler_t::WrapWithHeader(const std::vector<PODType> message) const
+{
+	std::string size = std::to_string(message.size());
+	size_t spaces = HEADER_LENGTH - size.length();
+
+	std::string header;
+	for (size_t i = 0; i < spaces; ++i)
+		header.push_back(' ');
+	header += size;
+	std::vector<PODType> headerAndMessage(header.begin(), header.end());
+	headerAndMessage.insert(headerAndMessage.end(), message.begin(), message.end());
+
+	return headerAndMessage;
+}
+
+TEMPLATE_T
 void IConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> message)
 {
 	{
+		std::vector<PODType> wrappedMessage = WrapWithHeader(std::move(message));
+
 		const std::lock_guard<std::mutex> lock(writeLock_);
-		outMessageQue_.push_back(std::move(message));
+		outMessageQue_.push_back(std::move(wrappedMessage));
 	}
 
-	SendMessageStart();
+	IOService().post([me = shared_from_this()]() 
+	{
+		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
+		meDerived->SendMessageStart();
+	});
 }
 
 TEMPLATE_T
 void IConnectionHandler_t::SendMessageStart()
 {
-	const std::lock_guard<std::mutex> lock(writeLock_);
-
-	outMessageQue_.front().push_back(PODType('\0'));
-	ioAdapter_.AsyncWrite(Socket(), boost::asio::buffer(outMessageQue_.front()),
-		writeStrand_.wrap([me = shared_from_this()](boost::system::error_code error, size_t)
+	auto message = std::make_shared<std::vector<PODType>>();
 	{
+		const std::lock_guard<std::mutex> lock(writeLock_);
+
+		if (outMessageQue_.empty())
+			return;
+
+		*message = std::move(outMessageQue_.front());
+		outMessageQue_.pop_front();
+	}
+
+	ioAdapter_.AsyncWrite(Socket(), boost::asio::buffer(*message),
+		writeStrand_.wrap([me = shared_from_this(), message](boost::system::error_code error, size_t)
+	{
+		if (error) return;
+
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
-		meDerived->SendMessageDone(error);
+		meDerived->SendMessageDone();
 	}));
 }
 
 TEMPLATE_T
-void IConnectionHandler_t::SendMessageDone(const boost::system::error_code& error)
+void IConnectionHandler_t::SendMessageDone()
 {
-	if (error) return;
-
 	const std::lock_guard<std::mutex> lock(writeLock_);
 
-	outMessageQue_.pop_front();
 	if (!outMessageQue_.empty())
-		SendMessageStart();
+	{
+		IOService().post([me = shared_from_this()]() 
+		{
+			auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
+			meDerived->SendMessageStart();
+		});
+	}
 }
 
 TEMPLATE_T
@@ -136,6 +203,16 @@ void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::results_type 
 
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->StartApplication(me);
+	});
+}
+
+TEMPLATE_T
+void IConnectionHandler_t::Close()
+{
+	IOService().post([me = shared_from_this()]() 
+	{ 
+		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
+		meDerived->Socket().close(); 
 	});
 }
 
