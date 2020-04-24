@@ -26,6 +26,8 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 
+			//std::thread t([]() { globalRoom_.run(); });
+
 			boost::asio::io_context io_context;
 
 			tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[2]));
