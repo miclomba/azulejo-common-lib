@@ -10,6 +10,6 @@
 #define ROOT_FILESYSTEM "/"
 #endif
 
-#define USER_DEFINED_MAIN 1
+//#define USER_DEFINED_MAIN 1
 
 #endif // test_interprocess_config_h
