@@ -38,7 +38,6 @@
   <ItemGroup>
     <ClInclude Include="chat_client.h" />
     <ClInclude Include="chat_server.h" />
-    <ClInclude Include="chat_message.hpp" />
     <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,10 @@
 #ifndef CHAT_SERVER_H
 #define CHAT_SERVER_H
 
-#include <cstdlib>
 #include <deque>
-#include <iostream>
-#include <list>
 #include <memory>
 #include <set>
-#include <utility>
-#include <boost/asio.hpp>
+#include <vector>
 
 #include "Interprocess/AsyncServer.h"
 #include "Interprocess/IConnectionHandler.h"

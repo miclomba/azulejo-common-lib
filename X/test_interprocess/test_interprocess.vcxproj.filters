@@ -12,9 +12,6 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="chat_message.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="chat_server.h">
       <Filter>Header Files</Filter>
     </ClInclude>

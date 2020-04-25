@@ -1,8 +1,6 @@
 #ifndef CHAT_CLIENT_H
 #define CHAT_CLIENT_H
 
-#include "chat_message.hpp"
-
 #include "Interprocess/IConnectionHandler.h"
 
 using interprocess::IConnectionHandler;
