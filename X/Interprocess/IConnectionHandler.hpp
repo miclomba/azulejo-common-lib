@@ -35,12 +35,6 @@ AsioAdapterT& IConnectionHandler_t::IOAdapter()
 }
 
 TEMPLATE_T
-void IConnectionHandler_t::StartApplication(shared_conn_handler_t thisHandler)
-{
-	PostReceiveMessages();
-}
-
-TEMPLATE_T
 bool IConnectionHandler_t::HasReceivedMessages() const
 {
 	const std::lock_guard<std::mutex> lock(readLock_);

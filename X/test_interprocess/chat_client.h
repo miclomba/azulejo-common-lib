@@ -14,6 +14,11 @@ public:
 		IConnectionHandler(io_context) 
 	{
 	}
+
+	void StartApplication(shared_conn_handler_t thisHandler) override
+	{
+		PostReceiveMessages();
+	}
 };
 
 #endif // CHAT_CLIENT_H

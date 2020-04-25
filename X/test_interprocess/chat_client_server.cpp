@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 
+			// run the chat room
 			std::thread t([]() { globalRoom_.run(); });
 
 			boost::asio::io_context io_context;
@@ -33,6 +34,7 @@ int main(int argc, char* argv[])
 			tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[2]));
 			chat_server server(io_context, endpoint, 1);
 
+			// run the server
 			io_context.run();
 		}
 		catch (std::exception& e)

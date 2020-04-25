@@ -34,7 +34,7 @@ public:
 	IConnectionHandler(IConnectionHandler&&) = delete;
 	IConnectionHandler& operator=(IConnectionHandler&&) = delete;
 
-	virtual void StartApplication(shared_conn_handler_t thisHandler);
+	virtual void StartApplication(shared_conn_handler_t thisHandler) = 0;
 
 	//incoming
 	void PostReceiveMessages();
