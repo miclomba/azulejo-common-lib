@@ -14,19 +14,6 @@ public:
 		IConnectionHandler(io_context) 
 	{
 	}
-
-	void write(const chat_message& msg)
-	{
-		PostOutgoingMessage(ChatMessageToVector(msg));
-	}
-
-private:
-	std::vector<char> ChatMessageToVector(const chat_message& msg)
-	{
-		size_t size = msg.length();
-		std::string chatMessageStr(msg.data(), size + 1);
-		return std::vector<char>(chatMessageStr.begin(), chatMessageStr.begin() + size);
-	}
 };
 
 #endif // CHAT_CLIENT_H

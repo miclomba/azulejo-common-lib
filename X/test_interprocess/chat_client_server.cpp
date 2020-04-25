@@ -26,12 +26,12 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 
-			//std::thread t([]() { globalRoom_.run(); });
+			std::thread t([]() { globalRoom_.run(); });
 
 			boost::asio::io_context io_context;
 
 			tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[2]));
-			chat_server server(io_context, endpoint);
+			chat_server server(io_context, endpoint, 1);
 
 			io_context.run();
 		}
@@ -74,13 +74,9 @@ int main(int argc, char* argv[])
 				if (line.empty())
 					continue;
 
-				chat_message msg;
-				msg.body_length(line.length());
-				std::memcpy(msg.body(), line.c_str(), msg.body_length() + 1);
-				msg.encode_header();
-				c->write(msg);
+				std::vector<char> msg(line.begin(), line.end());
+				c->PostOutgoingMessage(std::move(msg));
 			}
-			
 
 			c->Close();
 			t.join();

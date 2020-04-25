@@ -62,10 +62,12 @@ public:
 				if (participant->HasReceivedMessages())
 				{
 					auto message = participant->GetOneMessage();
+					std::string messageStr(message.begin(), message.end());
 
 					chat_message chatMessage;
-					chatMessage.body_length(message.size());
-					std::memcpy(chatMessage.data(), message.data(), message.size());
+					chatMessage.body_length(messageStr.length());
+					std::memcpy(chatMessage.data() + HEADER_LENGTH, messageStr.data(), chatMessage.body_length() + 1);
+					chatMessage.encode_header();
 
 					deliver(chatMessage);
 				}
@@ -74,9 +76,11 @@ public:
 	}
 
 private:
-  std::set<std::shared_ptr<chat_participant>> participants_;
-  enum { max_recent_msgs = 100 };
-  std::deque<chat_message> recent_msgs_;
+	std::set<std::shared_ptr<chat_participant>> participants_;
+	enum { max_recent_msgs = 100 };
+	std::deque<chat_message> recent_msgs_;
+
+  const size_t HEADER_LENGTH = 4;
 };
 
 chat_room globalRoom_;
@@ -94,15 +98,9 @@ public:
 
 	void StartApplication(shared_conn_handler_t thisHandler) override
 	{
-		start();
+		room_.join(std::dynamic_pointer_cast<chat_session>(shared_from_this()));
+		PostReceiveMessages();
 	}
-
-  void start()
-  {
-	room_.join(std::dynamic_pointer_cast<chat_session>(shared_from_this()));
-	do_read_header();
-	//PostReceiveMessages();
-  }
 
   void deliver(const chat_message& msg)
   {
@@ -115,43 +113,6 @@ public:
   }
 
 private:
-  void do_read_header()
-  {
-	auto self(shared_from_this());
-	boost::asio::async_read(Socket(),
-		boost::asio::buffer(read_msg_.data(), chat_message::header_length),
-		[this, self](boost::system::error_code ec, std::size_t /*length*/)
-		{
-		  if (!ec && read_msg_.decode_header())
-		  {
-			do_read_body();
-		  }
-		  else
-		  {
-			room_.leave(std::dynamic_pointer_cast<chat_session>(shared_from_this()));
-		  }
-		});
-  }
-
-  void do_read_body()
-  {
-	auto self(shared_from_this());
-	boost::asio::async_read(Socket(),
-		boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
-		[this, self](boost::system::error_code ec, std::size_t /*length*/)
-		{
-		  if (!ec)
-		  {
-			room_.deliver(read_msg_);
-			do_read_header();
-		  }
-		  else
-		  {
-			room_.leave(std::dynamic_pointer_cast<chat_session>(shared_from_this()));
-		  }
-		});
-  }
-  
   void do_write()
   {
 	auto self(shared_from_this());
@@ -178,6 +139,14 @@ private:
   chat_room& room_;
   chat_message read_msg_;
   std::deque<chat_message> write_msgs_;
+
+private:
+	std::vector<char> ChatMessageToVector(const chat_message& msg)
+	{
+		size_t size = msg.length();
+		std::string chatMessageStr(msg.data(), size + 1);
+		return std::vector<char>(chatMessageStr.begin(), chatMessageStr.begin() + size);
+	}
 };
 
 //----------------------------------------------------------------------
@@ -185,8 +154,8 @@ private:
 class chat_server : public interprocess::AsyncServer<chat_session>
 {
 public:
-	chat_server(boost::asio::io_context& io_context, const tcp::endpoint& endpoint) : 
-		AsyncServer<chat_session>(io_context)
+	chat_server(boost::asio::io_context& io_context, const tcp::endpoint& endpoint, const size_t numThreads) : 
+		AsyncServer<chat_session>(io_context, numThreads)
 	{
 		Start(endpoint);
 	}
