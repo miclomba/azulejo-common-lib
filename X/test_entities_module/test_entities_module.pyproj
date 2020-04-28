@@ -5,15 +5,16 @@
     <ProjectGuid>6ad8ebc0-8e65-4052-a365-844f6739d245</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>test_entities_module.py</StartupFile>
-    <SearchPath>..\x64\Debug</SearchPath>
+    <SearchPath>
+    </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>test_entities_module</Name>
     <RootNamespace>test_entities_module</RootNamespace>
-    <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
