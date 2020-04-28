@@ -1,7 +1,7 @@
 #ifndef test_events_config_h
 #define test_events_config_h
 
-#define BOOST_ALL_DYN_LINK 1
-#define GTEST_LANG_CXX11 1
+#include "Config/config_boost.h"
+#include "Config/config_gtest.h"
 
 #endif
