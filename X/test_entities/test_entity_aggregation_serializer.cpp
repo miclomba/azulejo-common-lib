@@ -27,7 +27,7 @@ using Key = Entity::Key;
 
 namespace
 {
-const std::string JSON_ROOT = (fs::path(ROOT_FILESYSTEM) / "users" / "miclomba" / "Downloads").string(); 
+const std::string JSON_ROOT = (fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY).string(); 
 const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";

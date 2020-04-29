@@ -5,8 +5,10 @@
 
 #ifdef _WIN32
 #define ROOT_FILESYSTEM "C:/"
+#define TEST_DIRECTORY "/users/miclomba/downloads"
 #else
 #define ROOT_FILESYSTEM "/"
+#define TEST_DIRECTORY "/home/miclomba/downloads"
 #endif
 
 #endif

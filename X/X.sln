@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Entities", "Entities\Entities.vcxproj", "{94B435D2-9DCA-42D2-8758-0D2CF9F95120}"
+	ProjectSection(ProjectDependencies) = postProject
+		{66A2F160-D100-4761-A4E4-90F0B778BB53} = {66A2F160-D100-4761-A4E4-90F0B778BB53}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_entities", "test_entities\test_entities.vcxproj", "{3D017588-8579-4C78-B56C-D8750D15F75D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -71,6 +74,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_intraprocess", "test_i
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Config", "Config\Config.vcxproj", "{66A2F160-D100-4761-A4E4-90F0B778BB53}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DatabaseAdapters", "DatabaseAdapters\DatabaseAdapters.vcxproj", "{9A269E09-7695-4342-A7C2-88ED5E29C907}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_database_adapters", "test_database_adapters\test_database_adapters.vcxproj", "{F5E8ED2A-97C5-4531-B424-9660B191DA92}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9A269E09-7695-4342-A7C2-88ED5E29C907} = {9A269E09-7695-4342-A7C2-88ED5E29C907}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -236,6 +246,26 @@ Global
 		{66A2F160-D100-4761-A4E4-90F0B778BB53}.Release|x64.Build.0 = Release|x64
 		{66A2F160-D100-4761-A4E4-90F0B778BB53}.Release|x86.ActiveCfg = Release|Win32
 		{66A2F160-D100-4761-A4E4-90F0B778BB53}.Release|x86.Build.0 = Release|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Debug|x64.ActiveCfg = Debug|x64
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Debug|x64.Build.0 = Debug|x64
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Debug|x86.ActiveCfg = Debug|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Debug|x86.Build.0 = Debug|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Release|x64.ActiveCfg = Release|x64
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Release|x64.Build.0 = Release|x64
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Release|x86.ActiveCfg = Release|Win32
+		{9A269E09-7695-4342-A7C2-88ED5E29C907}.Release|x86.Build.0 = Release|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Debug|x64.ActiveCfg = Debug|x64
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Debug|x64.Build.0 = Debug|x64
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Debug|x86.ActiveCfg = Debug|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Debug|x86.Build.0 = Debug|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Release|x64.ActiveCfg = Release|x64
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Release|x64.Build.0 = Release|x64
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Release|x86.ActiveCfg = Release|Win32
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -260,6 +290,8 @@ Global
 		{5C300806-751A-4540-991A-1AE6DF60F50A} = {968AB570-B4DF-4922-9FB8-141785405B16}
 		{63FF1EF5-303C-4CF2-8895-8EF48796665F} = {33B35DAA-AB45-43DB-BCEA-837735A53CC1}
 		{6DDD2E28-CC46-4AE1-8153-FA92C0B6E3B7} = {33B35DAA-AB45-43DB-BCEA-837735A53CC1}
+		{9A269E09-7695-4342-A7C2-88ED5E29C907} = {968AB570-B4DF-4922-9FB8-141785405B16}
+		{F5E8ED2A-97C5-4531-B424-9660B191DA92} = {33B35DAA-AB45-43DB-BCEA-837735A53CC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27BC0844-2DA4-47B9-924A-ED61D47529A9}

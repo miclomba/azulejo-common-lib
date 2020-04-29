@@ -1,5 +1,5 @@
-#ifndef entity_h
-#define entity_h
+#ifndef entity_entity_h
+#define entity_entity_h
 
 #include <functional>
 #include <map>
@@ -64,5 +64,5 @@ private:
 
 } // end namespace entity
 
-#endif // entity_h
+#endif // entity_entity_h
 
