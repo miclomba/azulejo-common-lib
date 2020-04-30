@@ -4,6 +4,10 @@
 #include "config.h"
 
 #include <filesystem>
+#include <functional>
+#include <string>
+
+#include <boost/optional.hpp>
 
 // forward decl
 struct sqlite3;
@@ -13,6 +17,8 @@ namespace database_adapters {
 class DATABASE_ADAPTERS_DLL_EXPORT Sqlite
 {
 public:
+	using RowCallbackType = std::function<int(int numCols, char** colValues, char** colNames)>;
+
 	Sqlite();
 	Sqlite(const Sqlite&);
 	Sqlite& operator=(const Sqlite&);
@@ -20,11 +26,15 @@ public:
 	Sqlite& operator=(Sqlite&&);
 	~Sqlite();
 
+	void Execute(const std::string& sql, boost::optional<RowCallbackType> rowCallback = boost::none);
+
 	bool IsOpen() const;
 	void Open(const std::filesystem::path& dbPath);
 	void Close();
 
 private:
+	void FreeErrorMessage(char* const ec);
+
 	sqlite3* db_{ nullptr };
 };
 

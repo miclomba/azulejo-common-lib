@@ -61,3 +61,64 @@ TEST_F(SqliteF, Close)
 	EXPECT_NO_THROW(db.Close());
 	EXPECT_FALSE(db.IsOpen());
 }
+
+TEST_F(SqliteF, Create)
+{
+	Sqlite db;
+
+	db.Open(DB_PATH);
+	db.Close();
+}
+
+TEST_F(SqliteF, CreateTable)
+{
+	Sqlite db;
+
+	std::string sql = "CREATE TABLE IF NOT EXISTS GRADES( \
+		ID		INTEGER		PRIMARY KEY AUTOINCREMENT, \
+		NAME	TEXT		NOT NULL, \
+		LNAME	TEXT		NOT NULL, \
+		AGE		INT			NOT NULL, \
+		ADDRESS	CHAR(50), \
+		GRADE	CHAR(1) );";
+
+	db.Open(DB_PATH);
+	db.Execute(sql);
+	db.Close();
+}
+
+TEST_F(SqliteF, InsertData)
+{
+	Sqlite db;
+
+	std::string sql = 
+		"INSERTO INTO GRADES (NAME LNAME AGE ADDRESS GRADE) VALUES ('Alice', 'Chapa', 35, 'Tampa', 'A'); \
+		 INSERTO INTO GRADES (NAME LNAME AGE ADDRESS GRADE) VALUES ('Bob', 'Lee', 20, 'Dallas', 'B'); \
+		 INSERTO INTO GRADES (NAME LNAME AGE ADDRESS GRADE) VALUES ('Fred', 'Cooper', 24, 'New York', 'C'); ";
+
+	db.Open(DB_PATH);
+	db.Execute(sql);
+	db.Close();
+}
+
+TEST_F(SqliteF, Select)
+{
+	Sqlite db;
+
+	std::string sql = "SELECT * FROM GRADES;";
+
+	db.Open(DB_PATH);
+
+	std::function<int(int,char**,char**)> rowHandler = 
+		[](int numCols, char** colValues, char** colNames) 
+	{
+		for (int i = 0; i < numCols; ++i)
+			std::cout << colNames[i] << "\t = " << colValues[i];
+		std::cout << std::endl;
+
+		return 0;
+	};
+
+	db.Execute(sql, rowHandler);
+	db.Close();
+}
