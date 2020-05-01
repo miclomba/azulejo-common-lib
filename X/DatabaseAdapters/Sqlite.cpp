@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <stdexcept>
+#include <stdio.h>
 
 #include <boost/optional.hpp>
 
@@ -73,10 +74,11 @@ void Sqlite::Execute(const std::string& sql, boost::optional<Sqlite::RowCallback
 	char* error;
 	int res = sqlite3_exec(db_, sql.c_str(), RowCallbackWrapper, callback, &error);
 
-	std::string errorStr(error);
-	FreeErrorMessage(error);
-
 	if (res != SQLITE_OK)
+	{
+		std::string errorStr(error);
+		FreeErrorMessage(error);
 		throw std::runtime_error("Sqlite could not execute command: '" + sql + "' due to: " + errorStr);
+	}
 }
 

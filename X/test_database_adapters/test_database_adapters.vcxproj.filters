@@ -13,4 +13,7 @@
   <ItemGroup>
     <ClCompile Include="test_sqlite.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
