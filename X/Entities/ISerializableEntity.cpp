@@ -8,12 +8,11 @@
 #include "EntityAggregationDeserializer.h"
 
 using entity::Entity;
+using entity::EntityAggregationDeserializer;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
-
-namespace entity {
 
 ISerializableEntity::ISerializableEntity() = default;
 ISerializableEntity::~ISerializableEntity() = default;
@@ -35,13 +34,12 @@ SharedEntity& ISerializableEntity::GetAggregatedMember(const Key& key) const
 		return members[key];
 
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-	if (deserializer->HasSerializationKey(key))
+	if (deserializer->HasRegisteredKey(key))
 	{
 		std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
 
-		deserializer->Deserialize(*entity);
+		deserializer->LoadEntity(*entity);
 		members[key] = std::move(entity);
 	}
 	return members[key];
 }
-} // end namespace entity

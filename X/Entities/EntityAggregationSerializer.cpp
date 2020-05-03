@@ -13,11 +13,10 @@
 namespace pt = boost::property_tree;
 
 using entity::Entity;
+using entity::EntityAggregationSerializer;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
-
-namespace entity {
 
 EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
 
@@ -80,4 +79,3 @@ std::string EntityAggregationSerializer::GetSerializationPath() const
 	return serializationPath_.string();
 }
 
-} // end namespace entity

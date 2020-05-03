@@ -34,10 +34,10 @@ public:
 	void RegisterEntity(const Entity::Key& key);
 	void UnregisterEntity(const Entity::Key& key);
 	void UnregisterAll();
-	bool HasSerializationKey(const Entity::Key& key) const;
+	bool HasRegisteredKey(const Entity::Key& key) const;
 
 	// deserialization & generation
-	void Deserialize(ISerializableEntity& entity);
+	void LoadEntity(ISerializableEntity& entity);
 	std::unique_ptr<ISerializableEntity> GenerateEntity(const Entity::Key& key) const;
 
 private:
@@ -47,7 +47,7 @@ private:
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
 
-	void DeserializeWithParentKey(ISerializableEntity& entity, const Entity::Key& parentKey = "");
+	void LoadWithParentKey(ISerializableEntity& entity, const Entity::Key& parentKey = "");
 
 	static EntityAggregationDeserializer* instance_;
 

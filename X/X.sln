@@ -76,6 +76,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Config", "Config\Config.vcxproj", "{66A2F160-D100-4761-A4E4-90F0B778BB53}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DatabaseAdapters", "DatabaseAdapters\DatabaseAdapters.vcxproj", "{9A269E09-7695-4342-A7C2-88ED5E29C907}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94B435D2-9DCA-42D2-8758-0D2CF9F95120} = {94B435D2-9DCA-42D2-8758-0D2CF9F95120}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_database_adapters", "test_database_adapters\test_database_adapters.vcxproj", "{F5E8ED2A-97C5-4531-B424-9660B191DA92}"
 	ProjectSection(ProjectDependencies) = postProject

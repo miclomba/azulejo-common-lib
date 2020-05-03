@@ -255,21 +255,21 @@ TEST(EntityAggregationDeserializer, GetSerializationStructureThrows)
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST(EntityAggregationDeserializer, HasSerializationKeyFalse)
+TEST(EntityAggregationDeserializer, HasRegisteredKeyFalse)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 
 	EntityAggregationDeserializer::ResetInstance();
 }
 
-TEST(EntityAggregationDeserializer, HasSerializationKeyTrue)
+TEST(EntityAggregationDeserializer, HasRegisteredKeyTrue)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
 	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasRegisteredKey(ENTITY_1A));
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -278,9 +278,9 @@ TEST(EntityAggregationDeserializer, RegisterEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasRegisteredKey(ENTITY_1A));
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -298,9 +298,9 @@ TEST(EntityAggregationDeserializer, RegisterEntityThrowsUsingDuplicateKey)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A), std::runtime_error);
 
 	EntityAggregationDeserializer::ResetInstance();
@@ -310,11 +310,11 @@ TEST(EntityAggregationDeserializer, UnregisterEntity)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->UnregisterEntity(ENTITY_1A));
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -323,7 +323,7 @@ TEST(EntityAggregationDeserializer, UnregisterEntityThrows)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_THROW(deserializer->UnregisterEntity(ENTITY_1A), std::runtime_error);
 
 	EntityAggregationDeserializer::ResetInstance();
@@ -333,11 +333,11 @@ TEST(EntityAggregationDeserializer, UnregisterAll)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_TRUE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_NO_THROW(deserializer->UnregisterAll());
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 
 	EntityAggregationDeserializer::ResetInstance();
 }
@@ -358,7 +358,7 @@ TEST(EntityAggregationDeserializer, GenerateEntityThrows)
 {
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
 
-	EXPECT_FALSE(deserializer->HasSerializationKey(ENTITY_1A));
+	EXPECT_FALSE(deserializer->HasRegisteredKey(ENTITY_1A));
 	EXPECT_THROW(deserializer->GenerateEntity(ENTITY_1A), std::runtime_error);
 
 	EntityAggregationDeserializer::ResetInstance();
@@ -377,7 +377,7 @@ TEST_F(EntityAggregationDeserializerF, DeserializeRoot)
 	// deserialize an entity
 	TypeA entity1a;
 	entity1a.SetKey(ENTITY_1A);
-	EXPECT_NO_THROW(deserializer->Deserialize(entity1a));
+	EXPECT_NO_THROW(deserializer->LoadEntity(entity1a));
 
 	// verify
 	std::map<Key, ISerializableEntity*> membersMap = entity1a.GetAggregatedProtectedMembers();
@@ -408,7 +408,7 @@ TEST_F(EntityAggregationDeserializerF, DeserializeIntermediate)
 	// deserialize an entity
 	TypeA entity2a;
 	entity2a.SetKey(ENTITY_2A);
-	EXPECT_NO_THROW(deserializer->Deserialize(entity2a));
+	EXPECT_NO_THROW(deserializer->LoadEntity(entity2a));
 
 	// verify
 	std::map<Key, ISerializableEntity*> membersMap = entity2a.GetAggregatedProtectedMembers();
@@ -433,7 +433,7 @@ TEST_F(EntityAggregationDeserializerF, DeserializeLeaf)
 	// deserialize an entity
 	TypeA entity1b;
 	entity1b.SetKey(ENTITY_1B);
-	EXPECT_NO_THROW(deserializer->Deserialize(entity1b));
+	EXPECT_NO_THROW(deserializer->LoadEntity(entity1b));
 
 	// verify
 	std::map<Key, ISerializableEntity*> membersMap = entity1b.GetAggregatedProtectedMembers();
@@ -450,7 +450,7 @@ TEST(EntityAggregationDeserializer, DeserializeReturnsWithoutSerializationStruct
 	typeA.SetKey(BAD_KEY);
 	typeA.SetPath(VALUE);
 
-	EXPECT_NO_THROW(deserializer->Deserialize(typeA));
+	EXPECT_NO_THROW(deserializer->LoadEntity(typeA));
 	EXPECT_EQ(typeA.GetPath(), VALUE);
 	EXPECT_EQ(typeA.GetKey(), BAD_KEY);
 
@@ -467,7 +467,7 @@ TEST_F(EntityAggregationDeserializerF, DeserializeReturnsWithBadKey)
 	badEntity.SetKey(BAD_KEY);
 	badEntity.SetPath(VALUE);
 
-	EXPECT_NO_THROW(deserializer->Deserialize(badEntity));
+	EXPECT_NO_THROW(deserializer->LoadEntity(badEntity));
 	EXPECT_EQ(badEntity.GetPath(), VALUE);
 	EXPECT_EQ(badEntity.GetKey(), BAD_KEY);
 

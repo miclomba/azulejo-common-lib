@@ -16,6 +16,9 @@
     <Filter Include="sqlite3">
       <UniqueIdentifier>{629152d1-d8e0-45d8-a006-0e46b250f93f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Templates">
+      <UniqueIdentifier>{be92a6b4-f0f8-462c-99b5-4802f5c83a49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -30,6 +33,18 @@
     <ClInclude Include="Sqlite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityAggregationDetabularizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityAggregationTabularizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ITabularizableEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityAggregationDetabularizer.hpp">
+      <Filter>Templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shell.c">
@@ -39,6 +54,15 @@
       <Filter>sqlite3</Filter>
     </ClCompile>
     <ClCompile Include="Sqlite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAggregationDetabularizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAggregationTabularizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ITabularizableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
