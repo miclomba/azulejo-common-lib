@@ -31,7 +31,8 @@ using SharedEntity = Entity::SharedEntity;
 
 namespace
 {
-const std::string JSON_ROOT = (fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY).string(); 
+const fs::path ROOT_DIR = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY;
+const std::string JSON_ROOT = ROOT_DIR.string(); 
 const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";
@@ -40,7 +41,10 @@ const std::string NON_ENTITY = "not_an_entity";
 const std::string BAD_KEY = "bad_key";
 const std::string VALUE = "value";
 const std::string DB_NAME = "db.sqlite";
-const fs::path DB_PATH = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY / DB_NAME;
+const fs::path DB_PATH = ROOT_DIR / DB_NAME;
+const std::string TABLE_NAME = "tbl";
+const std::vector<std::string> COLUMN_NAMES{ "pkey","entityKey" };
+const std::vector<std::string> ENTITY_KEY_ROW_VALUES{ ENTITY_1A, ENTITY_2A, ENTITY_1B };
 
 struct TypeA : public ITabularizableEntity
 {
@@ -72,22 +76,26 @@ struct TypeA : public ITabularizableEntity
 
 	void Load(Sqlite& database) override
 	{
-		/*
+		size_t row = GetKey() == ENTITY_KEY_ROW_VALUES[0] ? 
+			1 : GetKey() == ENTITY_KEY_ROW_VALUES[1] ?
+				2 : 3;
+
 		std::function<int(int, char**, char**)> rowHandler =
-			[this](int numCols, char** colValues, char** colNames)
+			[this, &row](int numCols, char** colValues, char** colNames)
 		{
 			EXPECT_EQ(COLUMN_NAMES.size(), numCols);
 			for (int i = 0; i < numCols; ++i)
 			{
-				EXPECT_EQ(colNames[i], COLUMN_NAMES[i]);
-				EXPECT_EQ(colValues[i], i == 0 ? std::to_string(i) : GetKey());
+				std::string colName = colNames[i];
+				EXPECT_EQ(colName, COLUMN_NAMES[i]);
+				std::string colValue = colValues[i];
+				EXPECT_EQ(colValue, i == 0 ? std::to_string(row) : GetKey());
 			}
 			return 0;
 		};
 
 		std::string sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAMES[1] + "='" + GetKey() + "';";
 		database.Execute(sql, rowHandler);
-		*/
 	}
 };
 
@@ -147,6 +155,25 @@ struct SqliteRemover
 	}
 };
 
+void CreateDatabaseTable()
+{
+	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	Sqlite& database = detabularizer->GetDatabase();
+
+	database.Open(DB_PATH);
+
+	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAMES[0] + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAMES[1] + " TEXT NOT NULL);";
+	database.Execute(sql);
+
+	for (size_t i = 0; i < ENTITY_KEY_ROW_VALUES.size(); ++i)
+	{
+		sql = "INSERT INTO " + TABLE_NAME + " (" + COLUMN_NAMES.at(1) + ") VALUES ('" + ENTITY_KEY_ROW_VALUES[i] + "');";
+		database.Execute(sql);
+	}
+
+	database.Close();
+}
+
 struct EntityAggregationDetabularizerF : public testing::Test
 {
 	EntityAggregationDetabularizerF()
@@ -156,6 +183,9 @@ struct EntityAggregationDetabularizerF : public testing::Test
 		EXPECT_FALSE(fs::exists(jsonFile_));
 		CreateEntityFile(jsonFile_);
 		EXPECT_TRUE(fs::exists(jsonFile_));
+
+		CreateDatabaseTable();
+		EXPECT_TRUE(fs::exists(DB_PATH));
 	}
 
 	~EntityAggregationDetabularizerF()
