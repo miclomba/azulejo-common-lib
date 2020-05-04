@@ -12,6 +12,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityHierarchy.h"
 #include "EntityRegistry.h"
 #include "ISerializableEntity.h"
 
@@ -29,9 +30,7 @@ public:
 	EntityRegistry<ISerializableEntity>& GetRegistry();
 
 	// structure
-	void LoadSerializationStructure(const std::string& pathToJSON);
-	bool HasSerializationStructure() const;
-	boost::property_tree::ptree GetSerializationStructure() const;
+	EntityHierarchy& GetHierarchy();
 
 	// deserialization 
 	void LoadEntity(ISerializableEntity& entity);
@@ -48,9 +47,7 @@ private:
 	static EntityAggregationDeserializer* instance_;
 
 	EntityRegistry<ISerializableEntity> registry_;
-	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
-	mutable std::map<Entity::Key, std::function<std::unique_ptr<ISerializableEntity>(void)>> keyToEntityMap_;
+	EntityHierarchy hierarchy_;
 };
 
 } // end namespace entity

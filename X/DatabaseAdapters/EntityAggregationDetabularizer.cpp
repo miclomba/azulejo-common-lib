@@ -10,6 +10,8 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Entities/Entity.h"
+#include "Entities/EntityHierarchy.h"
+#include "Entities/EntityRegistry.h"
 #include "ITabularizableEntity.h"
 #include "Sqlite.h"
 
@@ -19,6 +21,8 @@ using database_adapters::EntityAggregationDetabularizer;
 using database_adapters::ITabularizableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
+using entity::EntityHierarchy;
+using entity::EntityRegistry;
 
 using Key = Entity::Key;
 
@@ -81,37 +85,14 @@ void EntityAggregationDetabularizer::ResetInstance()
 	instance_ = nullptr;
 }
 
-entity::EntityRegistry<ITabularizableEntity>& EntityAggregationDetabularizer::GetRegistry()
+EntityRegistry<ITabularizableEntity>& EntityAggregationDetabularizer::GetRegistry()
 {
 	return registry_;
 }
 
-void EntityAggregationDetabularizer::LoadSerializationStructure(const std::string& pathToJSON)
+EntityHierarchy& EntityAggregationDetabularizer::GetHierarchy()
 {
-	serializationPath_ = pathToJSON;
-
-	std::ifstream file(pathToJSON);
-	if (file)
-	{
-		boost::property_tree::read_json(file, serializationStructure_);
-	}
-	else
-	{
-		serializationPath_.clear();
-		throw std::runtime_error("Could not open " + pathToJSON + " when loading tabularization structure");
-	}
-}
-
-bool EntityAggregationDetabularizer::HasSerializationStructure() const
-{
-	return !serializationPath_.empty() && !serializationStructure_.empty();
-}
-
-pt::ptree EntityAggregationDetabularizer::GetSerializationStructure() const
-{
-	if (HasSerializationStructure())
-		return serializationStructure_;
-	throw std::runtime_error("EntityAggregationDetabularizer has no tabularization structure");
+	return hierarchy_;
 }
 
 void EntityAggregationDetabularizer::CloseDatabase()
@@ -137,10 +118,10 @@ void EntityAggregationDetabularizer::LoadEntity(ITabularizableEntity& entity)
 	if (!databaseAdapter_.IsOpen())
 		throw std::runtime_error("Cannot detabularize entity because the database is not open");
 
-	if (!HasSerializationStructure())
+	if (!hierarchy_.HasSerializationStructure())
 		return;
 
-	std::string keyPath = GetKeyPath(entity.GetKey(), serializationStructure_);
+	std::string keyPath = GetKeyPath(entity.GetKey(), hierarchy_.GetSerializationStructure());
 	if (keyPath.empty())
 		return;
 
@@ -151,7 +132,7 @@ void EntityAggregationDetabularizer::LoadWithParentKey(ITabularizableEntity& ent
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
-	boost::optional<pt::ptree&> tree = serializationStructure_.get_child_optional(searchPath);
+	boost::optional<pt::ptree&> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)
 		throw std::runtime_error("Cannot locate entity key in the detabularization json structure");
 

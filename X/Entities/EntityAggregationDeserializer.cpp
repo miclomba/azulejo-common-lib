@@ -9,6 +9,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityHierarchy.h"
 #include "EntityRegistry.h"
 #include "ISerializableEntity.h"
 
@@ -16,6 +17,7 @@ namespace pt = boost::property_tree;
 
 using entity::Entity;
 using entity::EntityAggregationDeserializer;
+using entity::EntityHierarchy;
 using entity::EntityRegistry;
 using entity::ISerializableEntity;
 
@@ -81,40 +83,17 @@ EntityRegistry<ISerializableEntity>& EntityAggregationDeserializer::GetRegistry(
 	return registry_;
 }
 
-void EntityAggregationDeserializer::LoadSerializationStructure(const std::string& pathToJSON)
+EntityHierarchy& EntityAggregationDeserializer::GetHierarchy()
 {
-	serializationPath_ = pathToJSON;
-
-	std::ifstream file(pathToJSON);
-	if (file)
-	{
-		boost::property_tree::read_json(file, serializationStructure_);
-	}
-	else
-	{
-		serializationPath_.clear();
-		throw std::runtime_error("Could not open " + pathToJSON + " when loading serialization structure");
-	}
-}
-
-bool EntityAggregationDeserializer::HasSerializationStructure() const
-{
-	return !serializationPath_.empty() && !serializationStructure_.empty();
-}
-
-pt::ptree EntityAggregationDeserializer::GetSerializationStructure() const
-{
-	if (HasSerializationStructure())
-		return serializationStructure_;
-	throw std::runtime_error("EntityAggregationDeserializer has no serialization structure");
+	return hierarchy_;
 }
 
 void EntityAggregationDeserializer::LoadEntity(ISerializableEntity& entity)
 {
-	if (!HasSerializationStructure())
+	if (!hierarchy_.HasSerializationStructure())
 		return;
 
-	std::string keyPath = GetKeyPath(entity.GetKey(), serializationStructure_);
+	std::string keyPath = GetKeyPath(entity.GetKey(), hierarchy_.GetSerializationStructure());
 	if (keyPath.empty())
 		return;
 
@@ -125,13 +104,13 @@ void EntityAggregationDeserializer::LoadWithParentKey(ISerializableEntity& entit
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
-	boost::optional<pt::ptree&> tree = serializationStructure_.get_child_optional(searchPath);
+	boost::optional<pt::ptree&> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)
 		throw std::runtime_error("Cannot locate entity key in the deserialization json structure");
 
 	std::string relativePath = searchPath;
 	std::replace(relativePath.begin(), relativePath.end(), '.', '/');
-	std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
+	std::string absolutePath = (hierarchy_.GetSerializationPath().parent_path() / relativePath).string();
 	entity.Load(*tree, absolutePath);
 
 	for (const std::pair<std::string, pt::ptree>& child : *tree)

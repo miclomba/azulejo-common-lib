@@ -126,20 +126,6 @@ std::shared_ptr<TypeA> CreateEntityWithUnloadedMember(const Key& root, const Key
 	return rootEntity;
 }
 
-std::string CreateJSONFile()
-{
-	std::string jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
-	CreateEntityFile(jsonFile);
-	EXPECT_TRUE(fs::exists(jsonFile));
-	return jsonFile;
-}
-
-void RemoveJSONFile(const std::string& jsonFile)
-{
-	fs::remove(jsonFile);
-	EXPECT_FALSE(fs::exists(jsonFile));
-}
-
 struct SqliteRemover
 {
 	SqliteRemover() { RemoveDB(); }
@@ -231,69 +217,6 @@ TEST(EntityAggregationDetabularizer, ResetInstanceClosesDatabase)
 	EXPECT_NO_THROW(EntityAggregationDetabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationDetabularizer, LoadSerializationStructure)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	std::string jsonFile = CreateJSONFile(); 
-
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(jsonFile));
-
-	RemoveJSONFile(jsonFile);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, LoadSerializationStructureThrows)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	std::string jsonFile = (fs::path(JSON_ROOT) / JSON_FILE).string();
-	EXPECT_FALSE(fs::exists(jsonFile));
-
-	EXPECT_THROW(detabularizer->LoadSerializationStructure(jsonFile), std::runtime_error);
-}
-
-TEST(EntityAggregationDetabularizer, HasSerializationStructure)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	std::string jsonFile = CreateJSONFile(); 
-
-	EXPECT_FALSE(detabularizer->HasSerializationStructure());
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(jsonFile));
-	EXPECT_TRUE(detabularizer->HasSerializationStructure());
-
-	RemoveJSONFile(jsonFile);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, GetSerializationStructure)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	std::string jsonFile = CreateJSONFile();
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(jsonFile));
-
-	EXPECT_NO_THROW(detabularizer->GetSerializationStructure());
-	pt::ptree structure = detabularizer->GetSerializationStructure();
-	EXPECT_TRUE(!structure.empty());
-
-	RemoveJSONFile(jsonFile);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, GetSerializationStructureThrows)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_THROW(detabularizer->GetSerializationStructure(), std::runtime_error);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
 TEST_F(EntityAggregationDetabularizerF, DetabularizeRoot)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
@@ -302,7 +225,7 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeRoot)
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	// detabularize an entity
@@ -334,7 +257,7 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeIntermediate)
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	// detabularize an entity
@@ -360,7 +283,7 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeLeaf)
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	// detabularize an entity
@@ -411,7 +334,7 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeReturnsWithBadKey)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	TypeA badEntity;
@@ -431,7 +354,7 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntity)
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	// Create entity with unloaded member
@@ -455,7 +378,7 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntityWithoutTabularization)
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
-	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
+	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
 	// Create entity with unloaded member
@@ -526,6 +449,24 @@ TEST(EntityAggregationDetabularizer, CloseDatabaseWhenDatabaseIsClosed)
 
 	EXPECT_FALSE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_NO_THROW(detabularizer->CloseDatabase());
+
+	EntityAggregationDetabularizer::ResetInstance();
+}
+
+TEST(EntityAggregationDetabularizer, GetRegistry)
+{
+	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->GetRegistry());
+
+	EntityAggregationDetabularizer::ResetInstance();
+}
+
+TEST(EntityAggregationDetabularizer, GetHierarchy)
+{
+	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->GetHierarchy());
 
 	EntityAggregationDetabularizer::ResetInstance();
 }

@@ -19,6 +19,9 @@
     <ClCompile Include="test_entity_registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_entity_hierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">

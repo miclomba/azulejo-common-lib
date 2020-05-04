@@ -125,12 +125,14 @@
   <ItemGroup>
     <ClCompile Include="EntityAggregationDeserializer.cpp" />
     <ClCompile Include="EntityAggregationSerializer.cpp" />
+    <ClCompile Include="EntityHierarchy.cpp" />
     <ClCompile Include="ISerializableEntity.cpp" />
     <ClCompile Include="IStreamableEntity.cpp" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityAggregationDeserializer.h" />
     <ClInclude Include="EntityAggregationSerializer.h" />
+    <ClInclude Include="EntityHierarchy.h" />
     <ClInclude Include="EntityRegistry.h" />
     <ClInclude Include="EntityRegistry.hpp" />
     <ClInclude Include="ISerializableEntity.h" />

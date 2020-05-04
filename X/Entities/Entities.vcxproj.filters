@@ -33,6 +33,9 @@
     <ClCompile Include="ISerializableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EntityHierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="EntityRegistry.hpp">
       <Filter>Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityHierarchy.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
