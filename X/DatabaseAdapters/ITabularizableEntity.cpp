@@ -35,9 +35,9 @@ SharedEntity& ITabularizableEntity::GetAggregatedMember(const Key& key) const
 		return members[key];
 
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-	if (detabularizer->HasRegisteredKey(key))
+	if (detabularizer->GetRegistry().HasRegisteredKey(key))
 	{
-		std::unique_ptr<ITabularizableEntity> entity = detabularizer->GenerateEntity(key);
+		std::unique_ptr<ITabularizableEntity> entity = detabularizer->GetRegistry().GenerateEntity(key);
 
 		detabularizer->LoadEntity(*entity);
 		members[key] = std::move(entity);

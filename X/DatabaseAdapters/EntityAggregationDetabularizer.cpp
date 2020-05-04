@@ -81,6 +81,11 @@ void EntityAggregationDetabularizer::ResetInstance()
 	instance_ = nullptr;
 }
 
+entity::EntityRegistry<ITabularizableEntity>& EntityAggregationDetabularizer::GetRegistry()
+{
+	return registry_;
+}
+
 void EntityAggregationDetabularizer::LoadSerializationStructure(const std::string& pathToJSON)
 {
 	serializationPath_ = pathToJSON;
@@ -127,35 +132,6 @@ Sqlite& EntityAggregationDetabularizer::GetDatabase()
 	return databaseAdapter_;
 }
 
-bool EntityAggregationDetabularizer::HasRegisteredKey(const Key& key) const
-{
-	return keyToEntityMap_.find(key) != keyToEntityMap_.cend();
-}
-
-void EntityAggregationDetabularizer::UnregisterEntity(const Key& key)
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
-		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDetabularizer");
-
-	keyToEntityMap_.erase(key);
-}
-
-void EntityAggregationDetabularizer::UnregisterAll()
-{
-	keyToEntityMap_.clear();
-}
-
-std::unique_ptr<ITabularizableEntity> EntityAggregationDetabularizer::GenerateEntity(const Key& key) const
-{
-	if (!HasRegisteredKey(key))
-		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDetabularizer");
-
-	std::unique_ptr<ITabularizableEntity> entity = keyToEntityMap_[key]();
-	entity->SetKey(key);
-
-	return std::move(entity);
-}
-
 void EntityAggregationDetabularizer::LoadEntity(ITabularizableEntity& entity)
 {
 	if (!databaseAdapter_.IsOpen())
@@ -184,10 +160,10 @@ void EntityAggregationDetabularizer::LoadWithParentKey(ITabularizableEntity& ent
 	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{
 		std::string key = child.first;
-		if (!HasRegisteredKey(key))
+		if (!registry_.HasRegisteredKey(key))
 			continue;
 
-		std::unique_ptr<ITabularizableEntity> memberEntity = GenerateEntity(key);
+		std::unique_ptr<ITabularizableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
 		auto childEntity = std::static_pointer_cast<ITabularizableEntity>(entity.GetAggregatedMember(key));

@@ -130,8 +130,9 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityAggregationDeserializer.h" />
-    <ClInclude Include="EntityAggregationDeserializer.hpp" />
     <ClInclude Include="EntityAggregationSerializer.h" />
+    <ClInclude Include="EntityRegistry.h" />
+    <ClInclude Include="EntityRegistry.hpp" />
     <ClInclude Include="ISerializableEntity.h" />
     <ClCompile Include="Entity.cpp" />
     <ClInclude Include="IStreamableEntity.h" />

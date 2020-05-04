@@ -12,6 +12,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityRegistry.h"
 #include "ISerializableEntity.h"
 
 namespace entity {
@@ -24,21 +25,16 @@ public:
 	static EntityAggregationDeserializer* GetInstance();
 	static void ResetInstance();
 
+	//registration
+	EntityRegistry<ISerializableEntity>& GetRegistry();
+
 	// structure
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
 	boost::property_tree::ptree GetSerializationStructure() const;
 
-	// registration
-	template<typename T>
-	void RegisterEntity(const Entity::Key& key);
-	void UnregisterEntity(const Entity::Key& key);
-	void UnregisterAll();
-	bool HasRegisteredKey(const Entity::Key& key) const;
-
-	// deserialization & generation
+	// deserialization 
 	void LoadEntity(ISerializableEntity& entity);
-	std::unique_ptr<ISerializableEntity> GenerateEntity(const Entity::Key& key) const;
 
 private:
 	EntityAggregationDeserializer();
@@ -51,12 +47,11 @@ private:
 
 	static EntityAggregationDeserializer* instance_;
 
+	EntityRegistry<ISerializableEntity> registry_;
 	std::filesystem::path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
 	mutable std::map<Entity::Key, std::function<std::unique_ptr<ISerializableEntity>(void)>> keyToEntityMap_;
 };
-
-#include "EntityAggregationDeserializer.hpp"
 
 } // end namespace entity
 #endif // entity_entityaggregationdeserializer_h

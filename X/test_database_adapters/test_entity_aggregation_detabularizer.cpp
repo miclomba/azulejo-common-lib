@@ -294,122 +294,13 @@ TEST(EntityAggregationDetabularizer, GetSerializationStructureThrows)
 	EntityAggregationDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, HasRegisteredKeyFalse)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, HasRegisteredKeyTrue)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_NO_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(detabularizer->HasRegisteredKey(ENTITY_1A));
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, RegisterEntity)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(detabularizer->HasRegisteredKey(ENTITY_1A));
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, RegisterEntityThrowsUsingEmptyKey)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_THROW(detabularizer->RegisterEntity<TypeA>(""), std::runtime_error);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, RegisterEntityThrowsUsingDuplicateKey)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A), std::runtime_error);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, UnregisterEntity)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->UnregisterEntity(ENTITY_1A));
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, UnregisterEntityThrows)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_THROW(detabularizer->UnregisterEntity(ENTITY_1A), std::runtime_error);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, UnregisterAll)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->RegisterEntity<TypeA>(ENTITY_1A));
-	EXPECT_TRUE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_NO_THROW(detabularizer->UnregisterAll());
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, GenerateEntity)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	std::unique_ptr<ITabularizableEntity> entity = detabularizer->GenerateEntity(ENTITY_1A);
-	EXPECT_TRUE(entity);
-	EXPECT_TRUE(entity->GetKey() == ENTITY_1A);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
-TEST(EntityAggregationDetabularizer, GenerateEntityThrows)
-{
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
-
-	EXPECT_FALSE(detabularizer->HasRegisteredKey(ENTITY_1A));
-	EXPECT_THROW(detabularizer->GenerateEntity(ENTITY_1A), std::runtime_error);
-
-	EntityAggregationDetabularizer::ResetInstance();
-}
-
 TEST_F(EntityAggregationDetabularizerF, DetabularizeRoot)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_2A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1B);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
 	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
@@ -439,9 +330,9 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeIntermediate)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_2A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1B);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
 	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
@@ -465,9 +356,9 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeLeaf)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_2A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1B);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
 	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
@@ -536,9 +427,9 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntity)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_2A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1B);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
 	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
@@ -560,9 +451,9 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntityWithoutTabularization)
 {
 	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
 
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_2A);
-	detabularizer->RegisterEntity<TypeA>(ENTITY_1B);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
+	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1B);
 
 	EXPECT_NO_THROW(detabularizer->LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));

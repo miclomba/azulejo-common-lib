@@ -47,9 +47,6 @@
     <ClInclude Include="EntityAggregationDeserializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntityAggregationDeserializer.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
     <ClInclude Include="ISerializableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="IStreamableEntity.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityRegistry.hpp">
+      <Filter>Templates</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

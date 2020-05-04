@@ -39,6 +39,7 @@
     <ClCompile Include="test_entity.cpp" />
     <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
     <ClCompile Include="test_entity_aggregation_serializer.cpp" />
+    <ClCompile Include="test_entity_registry.cpp" />
     <ClCompile Include="test_iserializable_entity.cpp" />
     <ClCompile Include="test_istreamable_entity.cpp" />
   </ItemGroup>

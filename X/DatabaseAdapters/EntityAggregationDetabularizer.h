@@ -12,6 +12,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "Entities/EntityRegistry.h"
 #include "ITabularizableEntity.h"
 #include "Sqlite.h"
 
@@ -25,6 +26,9 @@ public:
 	static EntityAggregationDetabularizer* GetInstance();
 	static void ResetInstance();
 
+	//registration
+	entity::EntityRegistry<ITabularizableEntity>& GetRegistry();
+
 	// structure
 	void LoadSerializationStructure(const std::string& pathToJSON);
 	bool HasSerializationStructure() const;
@@ -35,16 +39,8 @@ public:
 	void OpenDatabase(const std::filesystem::path& dbPath);
 	Sqlite& GetDatabase();
 
-	// registration
-	template<typename T>
-	void RegisterEntity(const entity::Entity::Key& key);
-	void UnregisterEntity(const entity::Entity::Key& key);
-	void UnregisterAll();
-	bool HasRegisteredKey(const entity::Entity::Key& key) const;
-
-	// detabularization & generation
+	// detabularization
 	void LoadEntity(ITabularizableEntity& entity);
-	std::unique_ptr<ITabularizableEntity> GenerateEntity(const entity::Entity::Key& key) const;
 
 private:
 	EntityAggregationDetabularizer();
@@ -57,14 +53,13 @@ private:
 
 	static EntityAggregationDetabularizer* instance_;
 
+	entity::EntityRegistry<ITabularizableEntity> registry_;
 	Sqlite databaseAdapter_;
 
 	std::filesystem::path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
 	mutable std::map<entity::Entity::Key, std::function<std::unique_ptr<ITabularizableEntity>(void)>> keyToEntityMap_;
 };
-
-#include "EntityAggregationDetabularizer.hpp"
 
 } // end namespace database_adapters
 #endif // database_adapters_entityaggregationdetabularizer_h

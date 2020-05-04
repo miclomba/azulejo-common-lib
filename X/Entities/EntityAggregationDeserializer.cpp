@@ -9,12 +9,14 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityRegistry.h"
 #include "ISerializableEntity.h"
 
 namespace pt = boost::property_tree;
 
 using entity::Entity;
 using entity::EntityAggregationDeserializer;
+using entity::EntityRegistry;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
@@ -74,6 +76,11 @@ void EntityAggregationDeserializer::ResetInstance()
 	instance_ = nullptr;
 }
 
+EntityRegistry<ISerializableEntity>& EntityAggregationDeserializer::GetRegistry()
+{
+	return registry_;
+}
+
 void EntityAggregationDeserializer::LoadSerializationStructure(const std::string& pathToJSON)
 {
 	serializationPath_ = pathToJSON;
@@ -100,35 +107,6 @@ pt::ptree EntityAggregationDeserializer::GetSerializationStructure() const
 	if (HasSerializationStructure())
 		return serializationStructure_;
 	throw std::runtime_error("EntityAggregationDeserializer has no serialization structure");
-}
-
-bool EntityAggregationDeserializer::HasRegisteredKey(const Key& key) const
-{
-	return keyToEntityMap_.find(key) != keyToEntityMap_.cend();
-}
-
-void EntityAggregationDeserializer::UnregisterEntity(const Key& key)
-{
-	if (keyToEntityMap_.find(key) == keyToEntityMap_.cend())
-		throw std::runtime_error("Key=" + key + " not already registered with the EntityAggregationDeserializer");
-
-	keyToEntityMap_.erase(key);
-}
-
-void EntityAggregationDeserializer::UnregisterAll()
-{
-	keyToEntityMap_.clear();
-}
-
-std::unique_ptr<ISerializableEntity> EntityAggregationDeserializer::GenerateEntity(const Key& key) const
-{
-	if (!HasRegisteredKey(key))
-		throw std::runtime_error("Key=" + key + " is not registered with the EntityAggregationDeserializer");
-
-	std::unique_ptr<ISerializableEntity> entity = keyToEntityMap_[key]();
-	entity->SetKey(key);
-
-	return std::move(entity);
 }
 
 void EntityAggregationDeserializer::LoadEntity(ISerializableEntity& entity)
@@ -159,10 +137,10 @@ void EntityAggregationDeserializer::LoadWithParentKey(ISerializableEntity& entit
 	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{
 		std::string key = child.first;
-		if (!HasRegisteredKey(key))
+		if (!registry_.HasRegisteredKey(key))
 			continue;
 
-		std::unique_ptr<ISerializableEntity> memberEntity = GenerateEntity(key);
+		std::unique_ptr<ISerializableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
 		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));

@@ -34,9 +34,9 @@ SharedEntity& ISerializableEntity::GetAggregatedMember(const Key& key) const
 		return members[key];
 
 	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
-	if (deserializer->HasRegisteredKey(key))
+	if (deserializer->GetRegistry().HasRegisteredKey(key))
 	{
-		std::unique_ptr<ISerializableEntity> entity = deserializer->GenerateEntity(key);
+		std::unique_ptr<ISerializableEntity> entity = deserializer->GetRegistry().GenerateEntity(key);
 
 		deserializer->LoadEntity(*entity);
 		members[key] = std::move(entity);
