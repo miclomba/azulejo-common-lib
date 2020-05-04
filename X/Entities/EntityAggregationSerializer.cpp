@@ -8,12 +8,14 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityHierarchy.h"
 #include "ISerializableEntity.h"
 
 namespace pt = boost::property_tree;
 
 using entity::Entity;
 using entity::EntityAggregationSerializer;
+using entity::EntityHierarchy;
 using entity::ISerializableEntity;
 
 using Key = Entity::Key;
@@ -48,12 +50,12 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
-	pt::ptree& tree = serializationStructure_.put_child(searchPath, pt::ptree());
+	pt::ptree& tree = hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
 
 	std::string relativePath = searchPath;
 	std::replace(relativePath.begin(), relativePath.end(), '.', '/');
 
-	std::string absolutePath = (serializationPath_.parent_path() / relativePath).string();
+	std::string absolutePath = (hierarchy_.GetSerializationPath().parent_path() / relativePath).string();
 
 	entity.Save(tree, absolutePath);
 
@@ -66,16 +68,10 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 	}
 
 	if (parentKey.empty())
-		boost::property_tree::json_parser::write_json(serializationPath_.string(), serializationStructure_);
+		boost::property_tree::json_parser::write_json(hierarchy_.GetSerializationPath().string(), hierarchy_.GetSerializationStructure());
 }
 
-void EntityAggregationSerializer::SetSerializationPath(const std::string& pathToJSON)
+EntityHierarchy& EntityAggregationSerializer::GetHierarchy()
 {
-	serializationPath_ = pathToJSON;
+	return hierarchy_;
 }
-
-std::string EntityAggregationSerializer::GetSerializationPath() const
-{
-	return serializationPath_.string();
-}
-

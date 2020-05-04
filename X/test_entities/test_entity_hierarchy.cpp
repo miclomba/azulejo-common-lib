@@ -89,9 +89,17 @@ TEST(EntityHierarchy, GetSerializationStructure)
 	RemoveJSONFile(jsonFile);
 }
 
-TEST(EntityHierarchy, GetSerializationStructureThrows)
+TEST(EntityHierarchy, SetSerializationPath)
 {
 	EntityHierarchy hierarchy;
-	EXPECT_THROW(hierarchy.GetSerializationStructure(), std::runtime_error);
+	EXPECT_NO_THROW(hierarchy.SetSerializationPath(JSON_ROOT));
+	EXPECT_EQ(hierarchy.GetSerializationPath(), JSON_ROOT);
+}
+
+TEST(EntityHierarchy, GetSerializationPath)
+{
+	EntityHierarchy hierarchy;
+	EXPECT_NO_THROW(hierarchy.SetSerializationPath(JSON_ROOT));
+	EXPECT_EQ(hierarchy.GetSerializationPath(), JSON_ROOT);
 }
 

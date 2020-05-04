@@ -43,13 +43,16 @@ bool EntityHierarchy::HasSerializationStructure() const
 
 pt::ptree& EntityHierarchy::GetSerializationStructure()
 {
-	if (HasSerializationStructure())
-		return serializationStructure_;
-	throw std::runtime_error("EntityHierarchy has no serialization structure");
+	return serializationStructure_;
 }
 
 std::filesystem::path EntityHierarchy::GetSerializationPath() const
 {
 	return serializationPath_;
+}
+
+void EntityHierarchy::SetSerializationPath(const fs::path& pathToJSON)
+{
+	serializationPath_ = pathToJSON;
 }
 

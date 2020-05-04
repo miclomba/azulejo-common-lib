@@ -8,6 +8,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "Entities/EntityHierarchy.h"
 #include "ITabularizableEntity.h"
 
 namespace database_adapters {
@@ -22,8 +23,8 @@ public:
 
 	void Tabularize(const ITabularizableEntity& entity);
 
-	void SetSerializationPath(const std::string& pathToJSON);
-	std::string GetSerializationPath() const;
+	// structure
+	entity::EntityHierarchy& GetHierarchy();
 
 	// database
 	void CloseDatabase();
@@ -41,8 +42,7 @@ private:
 
 	static EntityAggregationTabularizer* instance_;
 
-	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
+	entity::EntityHierarchy hierarchy_;
 
 	Sqlite databaseAdapter_;
 };

@@ -8,6 +8,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "Entities/EntityHierarchy.h"
 #include "ITabularizableEntity.h"
 #include "Sqlite.h"
 
@@ -17,6 +18,7 @@ using database_adapters::EntityAggregationTabularizer;
 using database_adapters::ITabularizableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
+using entity::EntityHierarchy;
 
 using Key = Entity::Key;
 
@@ -57,7 +59,7 @@ void EntityAggregationTabularizer::TabularizeWithParentKey(const ITabularizableE
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
-	serializationStructure_.put_child(searchPath, pt::ptree());
+	hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
 
 	entity.Save(GetDatabase());
 
@@ -70,17 +72,7 @@ void EntityAggregationTabularizer::TabularizeWithParentKey(const ITabularizableE
 	}
 
 	if (parentKey.empty())
-		boost::property_tree::json_parser::write_json(serializationPath_.string(), serializationStructure_);
-}
-
-void EntityAggregationTabularizer::SetSerializationPath(const std::string& pathToJSON)
-{
-	serializationPath_ = pathToJSON;
-}
-
-std::string EntityAggregationTabularizer::GetSerializationPath() const
-{
-	return serializationPath_.string();
+		boost::property_tree::json_parser::write_json(hierarchy_.GetSerializationPath().string(), hierarchy_.GetSerializationStructure());
 }
 
 void EntityAggregationTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
@@ -99,5 +91,10 @@ void EntityAggregationTabularizer::CloseDatabase()
 Sqlite& EntityAggregationTabularizer::GetDatabase()
 {
 	return databaseAdapter_;
+}
+
+EntityHierarchy& EntityAggregationTabularizer::GetHierarchy()
+{
+	return hierarchy_;
 }
 

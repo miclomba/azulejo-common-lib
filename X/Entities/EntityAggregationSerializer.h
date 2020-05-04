@@ -8,6 +8,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "EntityHierarchy.h"
 #include "ISerializableEntity.h"
 
 namespace entity {
@@ -22,8 +23,8 @@ public:
 
 	void Serialize(const ISerializableEntity& entity);
 
-	void SetSerializationPath(const std::string& pathToJSON);
-	std::string GetSerializationPath() const;
+	// structure
+	EntityHierarchy& GetHierarchy();
 
 private:
 	EntityAggregationSerializer();
@@ -36,8 +37,7 @@ private:
 
 	static EntityAggregationSerializer* instance_;
 
-	std::filesystem::path serializationPath_;
-	boost::property_tree::ptree serializationStructure_;
+	EntityHierarchy hierarchy_;
 };
 
 } // end namespace entity

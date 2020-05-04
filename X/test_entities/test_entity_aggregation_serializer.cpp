@@ -156,27 +156,13 @@ TEST(EntityAggregationSerializer, ResetInstance)
 	EXPECT_NO_THROW(EntityAggregationSerializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, SetSerializationPath)
-{
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
-	EXPECT_NO_THROW(serializer->SetSerializationPath(JSON_ROOT));
-	EXPECT_TRUE(serializer->GetSerializationPath() == JSON_ROOT);
-}
-
-TEST(EntityAggregationSerializer, GetSerializationPath)
-{
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
-	serializer->SetSerializationPath(JSON_ROOT);
-	EXPECT_TRUE(serializer->GetSerializationPath() == JSON_ROOT);
-}
-
 TEST(EntityAggregationSerializer, SerializeFromRoot)
 {
 	EntityAggregationSerializerFixture fixture(ENTITY_1A, ENTITY_2A, ENTITY_1B);
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
-	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
@@ -191,7 +177,7 @@ TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
-	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
@@ -206,7 +192,7 @@ TEST(EntityAggregationSerializer, SerializeFromLeaf)
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
-	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
 	EXPECT_NO_THROW(serializer->Serialize(*fixture.GetEntity()));
 
@@ -221,7 +207,7 @@ TEST(EntityAggregationSerializer, SerializeThrows)
 
 	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
 
-	EXPECT_NO_THROW(serializer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
 	TypeA entity;
 	entity.SetKey("");

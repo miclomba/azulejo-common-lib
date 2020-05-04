@@ -24,6 +24,8 @@ public:
 	void LoadSerializationStructure(const std::filesystem::path& pathToJSON);
 	bool HasSerializationStructure() const;
 	boost::property_tree::ptree& GetSerializationStructure();
+
+	void SetSerializationPath(const std::filesystem::path& pathToJSON);
 	std::filesystem::path GetSerializationPath() const;
 
 private:

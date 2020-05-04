@@ -221,20 +221,6 @@ TEST(EntityAggregationTabularizer, ResetInstanceClosesDatabase)
 	EXPECT_NO_THROW(EntityAggregationTabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationTabularizer, SetSerializationPath)
-{
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(JSON_ROOT));
-	EXPECT_TRUE(tabularizer->GetSerializationPath() == JSON_ROOT);
-}
-
-TEST(EntityAggregationTabularizer, GetSerializationPath)
-{
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
-	tabularizer->SetSerializationPath(JSON_ROOT);
-	EXPECT_TRUE(tabularizer->GetSerializationPath() == JSON_ROOT);
-}
-
 TEST(EntityAggregationTabularizer, GetDatabase)
 {
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
@@ -302,7 +288,7 @@ TEST(EntityAggregationTabularizer, TabularizeFromRoot)
 
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
 	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()));
@@ -318,7 +304,7 @@ TEST(EntityAggregationTabularizer, TabularizeFromIntermediate)
 
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
 	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()->GetAggregateMember(fixture.GetIntermKey())));
@@ -334,7 +320,7 @@ TEST(EntityAggregationTabularizer, TabularizeFromLeaf)
 
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
 	std::shared_ptr<TypeA> intermEntity = fixture.GetEntity()->GetAggregateMember(fixture.GetIntermKey());
@@ -353,7 +339,7 @@ TEST(EntityAggregationTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
 
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
 	TypeA entity;
@@ -369,7 +355,7 @@ TEST(EntityAggregationTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
 
 	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->SetSerializationPath(fixture.GetJSONFilePath()));
+	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
 	TypeA entity;
