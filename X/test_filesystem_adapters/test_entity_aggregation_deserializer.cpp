@@ -13,15 +13,15 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entities/ISerializableEntity.h"
-#include "Entities/EntityAggregationDeserializer.h"
+#include "FilesystemAdapters/ISerializableEntity.h"
+#include "FilesystemAdapters/EntityAggregationDeserializer.h"
 
 namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using entity::Entity;
-using entity::EntityAggregationDeserializer;
-using entity::ISerializableEntity;
+using filesystem_adapters::EntityAggregationDeserializer;
+using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;

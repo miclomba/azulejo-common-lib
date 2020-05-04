@@ -1,5 +1,5 @@
-#ifndef entity_iserializableentity_h
-#define entity_iserializableentity_h
+#ifndef filesystem_adapters_iserializableentity_h
+#define filesystem_adapters_iserializableentity_h
 
 #include <map>
 #include <memory>
@@ -9,14 +9,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entity.h"
+#include "Entities/Entity.h"
 
-namespace entity {
+namespace filesystem_adapters {
 
 class EntityAggregationDeserializer;
 class EntityAggregationSerializer;
 
-class ENTITY_DLL_EXPORT ISerializableEntity : public Entity
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableEntity : public entity::Entity
 {
 public:
 	friend class EntityAggregationSerializer;
@@ -38,7 +38,7 @@ protected:
 	SharedEntity& GetAggregatedMember(const Key& key) const override;
 };
 
-} // end namespace entity
+} // end namespace filesystem_adapters
 
-#endif // entity_iserializableentity_h
+#endif // filesystem_adapters_iserializableentity_h
 

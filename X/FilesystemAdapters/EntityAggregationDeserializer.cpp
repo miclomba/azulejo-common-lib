@@ -9,17 +9,18 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "EntityHierarchy.h"
-#include "EntityRegistry.h"
+#include "Entities/Entity.h"
+#include "Entities/EntityHierarchy.h"
+#include "Entities/EntityRegistry.h"
 #include "ISerializableEntity.h"
 
 namespace pt = boost::property_tree;
 
 using entity::Entity;
-using entity::EntityAggregationDeserializer;
 using entity::EntityHierarchy;
 using entity::EntityRegistry;
-using entity::ISerializableEntity;
+using filesystem_adapters::EntityAggregationDeserializer;
+using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 

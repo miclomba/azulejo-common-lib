@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "EntityAggregationDeserializer.h"
-
 using entity::Entity;
 
 using Key = Entity::Key;

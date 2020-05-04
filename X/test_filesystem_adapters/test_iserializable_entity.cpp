@@ -7,12 +7,12 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "Entities/ISerializableEntity.h"
+#include "FilesystemAdapters/ISerializableEntity.h"
 
 namespace pt = boost::property_tree;
 
 using entity::Entity;
-using entity::ISerializableEntity;
+using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;

@@ -1,5 +1,5 @@
-#ifndef entity_entityaggregationdeserializer_h
-#define entity_entityaggregationdeserializer_h
+#ifndef filesystem_adapters_entityaggregationdeserializer_h
+#define filesystem_adapters_entityaggregationdeserializer_h
 
 #include <filesystem>
 #include <functional>
@@ -12,13 +12,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "EntityHierarchy.h"
-#include "EntityRegistry.h"
+#include "Entities/Entity.h"
+#include "Entities/EntityHierarchy.h"
+#include "Entities/EntityRegistry.h"
 #include "ISerializableEntity.h"
 
-namespace entity {
+namespace filesystem_adapters {
 
-class ENTITY_DLL_EXPORT EntityAggregationDeserializer
+class FILESYSTEM_ADAPTERS_DLL_EXPORT EntityAggregationDeserializer
 {
 public:
 	virtual ~EntityAggregationDeserializer();
@@ -27,10 +28,10 @@ public:
 	static void ResetInstance();
 
 	//registration
-	EntityRegistry<ISerializableEntity>& GetRegistry();
+	entity::EntityRegistry<ISerializableEntity>& GetRegistry();
 
 	// structure
-	EntityHierarchy& GetHierarchy();
+	entity::EntityHierarchy& GetHierarchy();
 
 	// deserialization 
 	void LoadEntity(ISerializableEntity& entity);
@@ -42,14 +43,14 @@ private:
 	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
 	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
 
-	void LoadWithParentKey(ISerializableEntity& entity, const Entity::Key& parentKey = "");
+	void LoadWithParentKey(ISerializableEntity& entity, const entity::Entity::Key& parentKey = "");
 
 	static EntityAggregationDeserializer* instance_;
 
-	EntityRegistry<ISerializableEntity> registry_;
-	EntityHierarchy hierarchy_;
+	entity::EntityRegistry<ISerializableEntity> registry_;
+	entity::EntityHierarchy hierarchy_;
 };
 
-} // end namespace entity
-#endif // entity_entityaggregationdeserializer_h
+} // end namespace filesystem_adapters
+#endif // filesystem_adapters_entityaggregationdeserializer_h
 

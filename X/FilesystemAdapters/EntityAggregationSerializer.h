@@ -1,5 +1,5 @@
-#ifndef entity_entityaggregationserializer_h
-#define entity_entityaggregationserializer_h
+#ifndef filesystem_adapters_entityaggregationserializer_h
+#define filesystem_adapters_entityaggregationserializer_h
 
 #include <filesystem>
 #include <string>
@@ -8,12 +8,12 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "EntityHierarchy.h"
+#include "Entities/EntityHierarchy.h"
 #include "ISerializableEntity.h"
 
-namespace entity {
+namespace filesystem_adapters {
 
-class ENTITY_DLL_EXPORT EntityAggregationSerializer
+class FILESYSTEM_ADAPTERS_DLL_EXPORT EntityAggregationSerializer
 {
 public:
 	virtual ~EntityAggregationSerializer();
@@ -24,7 +24,7 @@ public:
 	void Serialize(const ISerializableEntity& entity);
 
 	// structure
-	EntityHierarchy& GetHierarchy();
+	entity::EntityHierarchy& GetHierarchy();
 
 private:
 	EntityAggregationSerializer();
@@ -33,13 +33,13 @@ private:
 	EntityAggregationSerializer(EntityAggregationSerializer&&) = delete;
 	EntityAggregationSerializer& operator=(EntityAggregationSerializer&&) = delete;
 
-	void SerializeWithParentKey(const ISerializableEntity& entity, const Entity::Key& parentKey = "");
+	void SerializeWithParentKey(const ISerializableEntity& entity, const entity::Entity::Key& parentKey = "");
 
 	static EntityAggregationSerializer* instance_;
 
-	EntityHierarchy hierarchy_;
+	entity::EntityHierarchy hierarchy_;
 };
 
-} // end namespace entity
-#endif // entity_entityaggregationserializer_h
+} // end namespace filesystem_adapters
+#endif // filesystem_adapters_entityaggregationserializer_h
 

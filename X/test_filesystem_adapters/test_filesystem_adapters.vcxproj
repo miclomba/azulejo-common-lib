@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3d017588-8579-4c78-b56c-d8750d15f75d}</ProjectGuid>
+    <ProjectGuid>{5663d313-ab8e-4c89-93d5-c1194c330c4e}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,13 +33,12 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
+    <ClCompile Include="test_entity_aggregation_serializer.cpp" />
+    <ClCompile Include="test_iserializable_entity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_entity.cpp" />
-    <ClCompile Include="test_entity_hierarchy.cpp" />
-    <ClCompile Include="test_entity_registry.cpp" />
-    <ClCompile Include="test_istreamable_entity.cpp" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -75,15 +74,14 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(MSBuildThisFileDirectory)include;C:\Program Files\boost\boost_1_69_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Program Files\boost\boost_1_69_0;$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/FilesystemAdapters.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

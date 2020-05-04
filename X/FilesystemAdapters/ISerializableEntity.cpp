@@ -5,11 +5,12 @@
 #include <string>
 #include <utility>
 
+#include "Entities/Entity.h"
 #include "EntityAggregationDeserializer.h"
 
 using entity::Entity;
-using entity::EntityAggregationDeserializer;
-using entity::ISerializableEntity;
+using filesystem_adapters::EntityAggregationDeserializer;
+using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;

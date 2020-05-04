@@ -4,16 +4,7 @@
     <ClCompile Include="test_entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_entity_aggregation_deserializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_entity_aggregation_serializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_istreamable_entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_iserializable_entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_entity_registry.cpp">
