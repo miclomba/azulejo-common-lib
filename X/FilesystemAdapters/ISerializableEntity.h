@@ -16,7 +16,7 @@ namespace filesystem_adapters {
 class EntityAggregationDeserializer;
 class EntityAggregationSerializer;
 
-class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableEntity : public entity::Entity
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableEntity : public virtual entity::Entity
 {
 public:
 	friend class EntityAggregationSerializer;

@@ -67,7 +67,7 @@ void EntityAggregationTabularizer::TabularizeWithParentKey(const ITabularizableE
 	for (const std::string& key : keys)
 	{
 		Entity::SharedEntity& member = entity.GetAggregatedMember(key);
-		auto memberPtr = static_cast<ITabularizableEntity*>(member.get());
+		auto memberPtr = dynamic_cast<ITabularizableEntity*>(member.get());
 		TabularizeWithParentKey(*memberPtr,searchPath);
 	}
 

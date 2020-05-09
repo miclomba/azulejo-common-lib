@@ -9,7 +9,7 @@
 
 namespace entity {
 
-class ENTITY_DLL_EXPORT IStreamableEntity : public Entity
+class ENTITY_DLL_EXPORT IStreamableEntity : public virtual Entity
 {
 public:
 	IStreamableEntity();

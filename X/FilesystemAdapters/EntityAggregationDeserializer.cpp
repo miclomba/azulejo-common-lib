@@ -123,7 +123,7 @@ void EntityAggregationDeserializer::LoadWithParentKey(ISerializableEntity& entit
 		std::unique_ptr<ISerializableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
-		auto childEntity = std::static_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
+		auto childEntity = std::dynamic_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
 		LoadWithParentKey(*childEntity, searchPath);
 	}
 }

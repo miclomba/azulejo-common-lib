@@ -147,7 +147,7 @@ void EntityAggregationDetabularizer::LoadWithParentKey(ITabularizableEntity& ent
 		std::unique_ptr<ITabularizableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
-		auto childEntity = std::static_pointer_cast<ITabularizableEntity>(entity.GetAggregatedMember(key));
+		auto childEntity = std::dynamic_pointer_cast<ITabularizableEntity>(entity.GetAggregatedMember(key));
 		LoadWithParentKey(*childEntity, searchPath);
 	}
 }

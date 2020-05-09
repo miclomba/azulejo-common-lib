@@ -40,6 +40,6 @@ std::vector<Entity::Key> Entity::GetAggregatedMemberKeys() const
 template<typename T>
 void Entity::RegisterEntityConstructor(const Entity::Key& key)
 {
-	auto TFunction = [](const Entity& other)->std::unique_ptr<T> { return std::make_unique<T>(static_cast<const T&>(other)); };
+	auto TFunction = [](const Entity& other)->std::unique_ptr<T> { return std::make_unique<T>(dynamic_cast<const T&>(other)); };
 	keyToEntityConstructorMap_.insert(std::make_pair(key, TFunction));
 }

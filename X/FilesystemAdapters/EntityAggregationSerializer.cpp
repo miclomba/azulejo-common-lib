@@ -64,7 +64,7 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 	for (const std::string& key : keys)
 	{
 		Entity::SharedEntity& member = entity.GetAggregatedMember(key);
-		auto memberPtr = static_cast<ISerializableEntity*>(member.get());
+		auto memberPtr = dynamic_cast<ISerializableEntity*>(member.get());
 		SerializeWithParentKey(*memberPtr,searchPath);
 	}
 

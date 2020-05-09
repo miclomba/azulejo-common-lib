@@ -56,7 +56,7 @@ struct TypeA : public ISerializableEntity
 		for (const std::string& key : keys)
 		{
 			Entity::SharedEntity& member = GetAggregatedMember(key);
-			auto memberPtr = static_cast<ISerializableEntity*>(member.get());
+			auto memberPtr = dynamic_cast<ISerializableEntity*>(member.get());
 			serializableMemberMap.insert(std::make_pair(key,memberPtr));
 		}
 		return serializableMemberMap; 
@@ -196,13 +196,13 @@ TEST_F(EntityAggregationDeserializerF, DeserializeRoot)
 	// verify
 	std::map<Key, ISerializableEntity*> membersMap = entity1a.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.size() == size_t(1));
-	auto entity2a = std::static_pointer_cast<TypeA>(entity1a.GetAggregatedProtectedMember(ENTITY_2A));
+	auto entity2a = std::dynamic_pointer_cast<TypeA>(entity1a.GetAggregatedProtectedMember(ENTITY_2A));
 	EXPECT_TRUE(entity2a);
 	EXPECT_TRUE(entity2a->GetKey() == ENTITY_2A);
 
 	membersMap = entity2a->GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.size() == size_t(1));
-	auto entity1b = std::static_pointer_cast<TypeA>(entity2a->GetAggregatedProtectedMember(ENTITY_1B));
+	auto entity1b = std::dynamic_pointer_cast<TypeA>(entity2a->GetAggregatedProtectedMember(ENTITY_1B));
 	EXPECT_TRUE(entity1b);
 	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
@@ -227,7 +227,7 @@ TEST_F(EntityAggregationDeserializerF, DeserializeIntermediate)
 	// verify
 	std::map<Key, ISerializableEntity*> membersMap = entity2a.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.size() == size_t(1));
-	auto entity1b = std::static_pointer_cast<TypeA>(entity2a.GetAggregatedProtectedMember(ENTITY_1B));
+	auto entity1b = std::dynamic_pointer_cast<TypeA>(entity2a.GetAggregatedProtectedMember(ENTITY_1B));
 	EXPECT_TRUE(entity1b);
 	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
