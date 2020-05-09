@@ -9,18 +9,18 @@
 
 #include <gtest/gtest.h>
 
+#include "FilesystemAdapters/ResourceDeserializer.h"
+#include "FilesystemAdapters/ResourceSerializer.h"
 #include "Resources/Resource.h"
 #include "Resources/Resource2D.h"
-#include "Resources/ResourceDeserializer.h"
-#include "Resources/ResourceSerializer.h"
 
 namespace fs = std::filesystem;
 
+using filesystem_adapters::ResourceDeserializer;
+using filesystem_adapters::ResourceSerializer;
 using resource::IResource;
 using resource::Resource;
 using resource::Resource2D;
-using resource::ResourceDeserializer;
-using resource::ResourceSerializer;
 
 namespace
 {

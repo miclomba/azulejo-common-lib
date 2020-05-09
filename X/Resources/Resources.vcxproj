@@ -25,16 +25,10 @@
     <ClInclude Include="Resource.hpp" />
     <ClInclude Include="Resource2D.h" />
     <ClInclude Include="Resource2D.hpp" />
-    <ClInclude Include="ResourceDeserializer.h" />
-    <ClInclude Include="ResourceDeserializer.hpp" />
-    <ClInclude Include="ResourceSerializer.h" />
-    <ClInclude Include="ResourceSerializer.hpp" />
     <ClInclude Include="ResourceTypeTraits.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IResource.cpp" />
-    <ClCompile Include="ResourceDeserializer.cpp" />
-    <ClCompile Include="ResourceSerializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

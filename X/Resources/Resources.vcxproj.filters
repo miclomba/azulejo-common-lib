@@ -24,19 +24,7 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceDeserializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceTypeTraits.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceSerializer.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceDeserializer.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
@@ -53,12 +41,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ResourceSerializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceDeserializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

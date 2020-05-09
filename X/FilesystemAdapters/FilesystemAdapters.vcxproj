@@ -23,11 +23,19 @@
     <ClInclude Include="EntityAggregationDeserializer.h" />
     <ClInclude Include="EntityAggregationSerializer.h" />
     <ClInclude Include="ISerializableEntity.h" />
+    <ClInclude Include="ISerializableResource.h" />
+    <ClInclude Include="ResourceDeserializer.h" />
+    <ClInclude Include="ResourceDeserializer.hpp" />
+    <ClInclude Include="ResourceSerializer.h" />
+    <ClInclude Include="ResourceSerializer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EntityAggregationDeserializer.cpp" />
     <ClCompile Include="EntityAggregationSerializer.cpp" />
     <ClCompile Include="ISerializableEntity.cpp" />
+    <ClCompile Include="ISerializableResource.cpp" />
+    <ClCompile Include="ResourceDeserializer.cpp" />
+    <ClCompile Include="ResourceSerializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -110,7 +118,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/Resources.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

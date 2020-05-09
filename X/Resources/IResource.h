@@ -31,8 +31,8 @@ public:
 
 	virtual void Assign(const char* buff, const size_t n) = 0;
 
-protected:
 	bool IsDirty() const;
+protected:
 	virtual int Checksum() const = 0;
 
 private:

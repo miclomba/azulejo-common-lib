@@ -5,14 +5,14 @@
 #include <stdexcept>
 #include <string>
 
-#include "Resource.h"
+#include "Resources/Resource.h"
 
 namespace
 {
 const std::string RESOURCE_EXT = ".bin";
 } // end namespace anonymous
 
-namespace resource {
+using filesystem_adapters::ResourceDeserializer;
 
 ResourceDeserializer* ResourceDeserializer::instance_ = nullptr;
 
@@ -65,7 +65,7 @@ void ResourceDeserializer::UnregisterAll()
 	keyToResourceMap_.clear();
 }
 
-std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& key)
+std::unique_ptr<resource::IResource> ResourceDeserializer::Deserialize(const std::string& key)
 {
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
@@ -94,7 +94,7 @@ std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& 
 	if (size > dataOffset)
 		inFile.read(*buff + dataOffset, size - dataOffset);
 
-	std::unique_ptr<IResource> arithmeticContainer = GenerateResource(key);
+	std::unique_ptr<resource::IResource> arithmeticContainer = GenerateResource(key);
 
 	arithmeticContainer->SetColumnSize(*(*buff + colSizeOffset));
 	arithmeticContainer->SetRowSize(*(*buff + rowSizeOffset));
@@ -104,14 +104,14 @@ std::unique_ptr<IResource> ResourceDeserializer::Deserialize(const std::string& 
 	return arithmeticContainer;
 }
 
-std::unique_ptr<IResource> ResourceDeserializer::GenerateResource(const std::string& key) const
+std::unique_ptr<resource::IResource> ResourceDeserializer::GenerateResource(const std::string& key) const
 {
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDeserializer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDeserializer");
 
-	std::unique_ptr<IResource> resource = keyToResourceMap_[key]();
+	std::unique_ptr<resource::IResource> resource = keyToResourceMap_[key]();
 
 	return resource;
 }
@@ -121,4 +121,3 @@ std::string ResourceDeserializer::GetResourceExtension() const
 	return ".bin";
 }
 
-} // end namespace resource

@@ -9,6 +9,6 @@ void ResourceDeserializer::RegisterResource(const std::string& key)
 	if (keyToResourceMap_.find(key) != keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is already registered with the ResourceDeserializer");
 
-	auto TFunction = []()->std::unique_ptr<IResource> { return std::make_unique<Resource<T>>(); };
+	auto TFunction = []()->std::unique_ptr<resource::IResource> { return std::make_unique<resource::Resource<T>>(); };
 	keyToResourceMap_.insert(std::make_pair(key, TFunction));
 }

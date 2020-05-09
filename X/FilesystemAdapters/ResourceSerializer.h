@@ -1,5 +1,5 @@
-#ifndef resource_resourceserializer_h
-#define resource_resourceserializer_h
+#ifndef filesystem_adapters_resourceserializer_h
+#define filesystem_adapters_resourceserializer_h
 
 #include <filesystem>
 #include <fstream>
@@ -7,11 +7,11 @@
 #include <string>
 
 #include "config.h"
-#include "Resource.h"
+#include "Resources/Resource.h"
 
-namespace resource {
+namespace filesystem_adapters {
 
-class RESOURCE_DLL_EXPORT ResourceSerializer
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ResourceSerializer
 {
 public:
 	virtual ~ResourceSerializer();
@@ -23,7 +23,7 @@ public:
 	std::string GetSerializationPath() const;
 
 	template<typename T>
-	void Serialize(const Resource<T>& resource, const std::string& key);
+	void Serialize(const resource::Resource<T>& resource, const std::string& key);
 
 private:
 	ResourceSerializer();
@@ -37,7 +37,7 @@ private:
 };
 
 #include "ResourceSerializer.hpp"
-} // end namespace resource
+} // end namespace filesystem_adapters
 
-#endif // resource_resourceserializer_h
+#endif // filesystem_adapters_resourceserializer_h
 

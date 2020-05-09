@@ -1,5 +1,5 @@
-#ifndef resource_resourcedeserializer_h
-#define resource_resourcedeserializer_h
+#ifndef filesystem_adapters_resourcedeserializer_h
+#define filesystem_adapters_resourcedeserializer_h
 
 #include <filesystem>
 #include <fstream>
@@ -11,12 +11,12 @@
 #include <typeinfo>
 
 #include "config.h"
-#include "IResource.h"
-#include "Resource.h"
+#include "Resources/IResource.h"
+#include "Resources/Resource.h"
 
-namespace resource {
+namespace filesystem_adapters {
 
-class RESOURCE_DLL_EXPORT ResourceDeserializer
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ResourceDeserializer
 {
 public:
 	virtual ~ResourceDeserializer();
@@ -33,8 +33,8 @@ public:
 	void UnregisterAll();
 	bool HasSerializationKey(const std::string& key) const;
 
-	std::unique_ptr<IResource> Deserialize(const std::string& key);
-	std::unique_ptr<IResource> GenerateResource(const std::string& key) const;
+	std::unique_ptr<resource::IResource> Deserialize(const std::string& key);
+	std::unique_ptr<resource::IResource> GenerateResource(const std::string& key) const;
 private:
 	ResourceDeserializer();
 	ResourceDeserializer(const ResourceDeserializer&) = delete;
@@ -46,10 +46,10 @@ private:
 
 	static ResourceDeserializer* instance_;
 	std::filesystem::path serializationPath_;
-	mutable std::map<std::string, std::function<std::unique_ptr<IResource>(void)>> keyToResourceMap_;
+	mutable std::map<std::string, std::function<std::unique_ptr<resource::IResource>(void)>> keyToResourceMap_;
 };
 
 #include "ResourceDeserializer.hpp"
-} // end namespace resource
+} // end namespace filesystem_adapters
 
-#endif // resource_resourcedeserializer_h
+#endif // filesystem_adapters_resourcedeserializer_h

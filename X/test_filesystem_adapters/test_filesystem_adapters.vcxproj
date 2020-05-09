@@ -36,6 +36,8 @@
     <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
     <ClCompile Include="test_entity_aggregation_serializer.cpp" />
     <ClCompile Include="test_iserializable_entity.cpp" />
+    <ClCompile Include="test_resource_deserializer.cpp" />
+    <ClCompile Include="test_resource_serializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -81,7 +83,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/FilesystemAdapters.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/FilesystemAdapters.lib;$(OutDir)/Resources.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

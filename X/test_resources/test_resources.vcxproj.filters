@@ -4,12 +4,6 @@
     <ClCompile Include="test_resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_resource_deserializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_resource_serializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_resource2d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

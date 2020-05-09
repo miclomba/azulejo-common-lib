@@ -18,10 +18,19 @@
     <ClCompile Include="test_iserializable_entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_resource_deserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_resource_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

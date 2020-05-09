@@ -87,12 +87,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_database_adapters", "t
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FilesystemAdapters", "FilesystemAdapters\FilesystemAdapters.vcxproj", "{99862D06-B993-411E-A65F-4A55557F69EA}"
 	ProjectSection(ProjectDependencies) = postProject
+		{191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4} = {191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4}
 		{94B435D2-9DCA-42D2-8758-0D2CF9F95120} = {94B435D2-9DCA-42D2-8758-0D2CF9F95120}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_filesystem_adapters", "test_filesystem_adapters\test_filesystem_adapters.vcxproj", "{5663D313-AB8E-4C89-93D5-C1194C330C4E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{99862D06-B993-411E-A65F-4A55557F69EA} = {99862D06-B993-411E-A65F-4A55557F69EA}
+		{191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4} = {191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4}
 	EndProjectSection
 EndProject
 Global

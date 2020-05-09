@@ -7,15 +7,15 @@
 
 #include <gtest/gtest.h>
 
+#include "FilesystemAdapters/ResourceSerializer.h"
 #include "Resources/Resource.h"
 #include "Resources/Resource2D.h"
-#include "Resources/ResourceSerializer.h"
 
 namespace fs = std::filesystem;
 
+using filesystem_adapters::ResourceSerializer;
 using resource::Resource;
 using resource::Resource2D;
-using resource::ResourceSerializer;
 
 namespace
 {

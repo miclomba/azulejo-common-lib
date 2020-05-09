@@ -3,9 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "Resource.h"
-
-namespace resource {
+using filesystem_adapters::ResourceSerializer;
 
 ResourceSerializer* ResourceSerializer::instance_ = nullptr;
 
@@ -38,6 +36,4 @@ std::string ResourceSerializer::GetSerializationPath() const
 
 	return serializationPath_.string();
 }
-
-} // end namespace resource
 
