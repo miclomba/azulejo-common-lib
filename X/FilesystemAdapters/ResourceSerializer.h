@@ -7,7 +7,7 @@
 #include <string>
 
 #include "config.h"
-#include "Resources/Resource.h"
+#include "Resources/IResource.h"
 
 namespace filesystem_adapters {
 

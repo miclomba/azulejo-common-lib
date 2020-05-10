@@ -1,6 +1,6 @@
 
 template<typename T>
-void ResourceDeserializer::RegisterResource(const std::string& key)
+void ResourceDeserializer::RegisterResource(const std::string& key, std::function<std::unique_ptr<resource::IResource>(void)> constructor)
 {
 	if (!std::is_arithmetic<T>::value)
 		throw std::runtime_error("Type (" + std::string(typeid(T).name()) + ") is not an arithmetic container when registering resource with ResourceDeserializer");
@@ -9,6 +9,5 @@ void ResourceDeserializer::RegisterResource(const std::string& key)
 	if (keyToResourceMap_.find(key) != keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is already registered with the ResourceDeserializer");
 
-	auto TFunction = []()->std::unique_ptr<resource::IResource> { return std::make_unique<resource::Resource<T>>(); };
-	keyToResourceMap_.insert(std::make_pair(key, TFunction));
+	keyToResourceMap_.insert(std::make_pair(key, constructor));
 }

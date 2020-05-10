@@ -19,7 +19,7 @@ class Test_ResourcesModule(unittest.TestCase):
         vec.append(val)
         matrix.append(vec)
 
-        resource = Resource2DDouble(matrix)
+        #resource = Resource2DDouble(matrix)
         #qc_matrix(resource, val)
 
     def test_resources_matrix_float(self):
@@ -31,7 +31,7 @@ class Test_ResourcesModule(unittest.TestCase):
         vec.append(val)
         matrix.append(vec)
 
-        resource = Resource2DFloat(matrix)
+        #resource = Resource2DFloat(matrix)
         #qc_matrix(resource, val)
 
     def test_resources_matrix_int(self):
@@ -43,7 +43,7 @@ class Test_ResourcesModule(unittest.TestCase):
         vec.append(val)
         matrix.append(vec)
 
-        resource = Resource2DInt(matrix)
+        #resource = Resource2DInt(matrix)
         #qc_matrix(resource, val)
 
     def test_resources_matrix_uint(self):
@@ -55,5 +55,5 @@ class Test_ResourcesModule(unittest.TestCase):
         vec.append(val)
         matrix.append(vec)
 
-        resource = Resource2DUInt(matrix)
+        #resource = Resource2DUInt(matrix)
         #qc_matrix(resource, val)

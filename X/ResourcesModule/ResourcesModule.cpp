@@ -1,6 +1,4 @@
 #include "Resources/IResource.h"
-#include "Resources/Resource.h"
-#include "Resources/Resource2D.h"
 
 #include <vector>
 
@@ -43,43 +41,43 @@ BOOST_PYTHON_MODULE(ResourcesModule)
 	class_<VecInt>("VecInt").def(vector_indexing_suite<VecInt>());
 	class_<VecUInt>("VecUInt").def(vector_indexing_suite<VecUInt>());
 	
-	class_<resource::Resource2D<double>>("Resource2DDouble")
-		.def(init<const MatrixDouble&>())
+	//class_<resource::Resource2D<double>>("Resource2DDouble")
+	//	.def(init<const MatrixDouble&>())
 		//.def("data", f_ptr_vec_d, return_value_policy<reference_existing_object>())
-	;
+	//;
 
-	class_<resource::Resource2D<float>>("Resource2DFloat")
-		.def(init<const MatrixFloat&>())
+	//class_<resource::Resource2D<float>>("Resource2DFloat")
+		//.def(init<const MatrixFloat&>())
 		//.def("data", f_ptr_vec_f, return_value_policy<reference_existing_object>())
-	;
+	//;
 
-	class_<resource::Resource2D<int>>("Resource2DInt")
-		.def(init<const MatrixInt&>())
+	//class_<resource::Resource2D<int>>("Resource2DInt")
+		//.def(init<const MatrixInt&>())
 		//.def("data", f_ptr_vec_i, return_value_policy<reference_existing_object>())
-	;
+	//;
 
-	class_<resource::Resource2D<unsigned int>>("Resource2DUInt")
-		.def(init<const MatrixUInt&>())
+	//class_<resource::Resource2D<unsigned int>>("Resource2DUInt")
+		//.def(init<const MatrixUInt&>())
 		//.def("data", f_ptr_vec_ui, return_value_policy<reference_existing_object>())
-	;
+	//;
 
-	class_<resource::Resource<double>>("ResourceDouble")
-		.def(init<const VecDouble&>())
+	//class_<resource::Resource<double>>("ResourceDouble")
+		//.def(init<const VecDouble&>())
 		//.def("data", f_ptr_vec_d, return_value_policy<reference_existing_object>())
-		;
+	//;
 
-	class_<resource::Resource<float>>("ResourceFloat")
-		.def(init<const VecFloat&>())
+	//class_<resource::Resource<float>>("ResourceFloat")
+		//.def(init<const VecFloat&>())
 		//.def("data", f_ptr_vec_f, return_value_policy<reference_existing_object>())
-		;
+	//;
 
-	class_<resource::Resource<int>>("ResourceInt")
-		.def(init<const VecInt&>())
+	//class_<resource::Resource<int>>("ResourceInt")
+		//.def(init<const VecInt&>())
 		//.def("data", f_ptr_vec_i, return_value_policy<reference_existing_object>())
-		;
+	//;
 
-	class_<resource::Resource<unsigned int>>("ResourceUInt")
-		.def(init<const VecUInt&>())
+	//class_<resource::Resource<unsigned int>>("ResourceUInt")
+		//.def(init<const VecUInt&>())
 		//.def("data", f_ptr_vec_ui, return_value_policy<reference_existing_object>())
-		;
+	//;
 }

@@ -12,7 +12,6 @@
 
 #include "config.h"
 #include "Resources/IResource.h"
-#include "Resources/Resource.h"
 
 namespace filesystem_adapters {
 
@@ -28,7 +27,7 @@ public:
 	std::string GetSerializationPath() const;
 
 	template<typename T>
-	void RegisterResource(const std::string& key);
+	void RegisterResource(const std::string& key, std::function<std::unique_ptr<resource::IResource>(void)> constructor);
 	void UnregisterResource(const std::string& key);
 	void UnregisterAll();
 	bool HasSerializationKey(const std::string& key) const;

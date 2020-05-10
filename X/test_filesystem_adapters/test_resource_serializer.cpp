@@ -7,15 +7,15 @@
 
 #include <gtest/gtest.h>
 
+#include "ContainerResource.h"
+#include "ContainerResource2D.h"
 #include "FilesystemAdapters/ResourceSerializer.h"
-#include "Resources/Resource.h"
-#include "Resources/Resource2D.h"
 
 namespace fs = std::filesystem;
 
 using filesystem_adapters::ResourceSerializer;
-using resource::Resource;
-using resource::Resource2D;
+using Resource = ContainerResource<int>;
+using Resource2D = ContainerResource2D<int>;
 
 namespace
 {
@@ -24,23 +24,7 @@ const std::string RESOURCE_KEY = "resource";
 const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin");
 const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 const std::vector<int> INT_VALUES_ARRAY(1,1);
-
-class ContainerResource : public Resource2D<int>
-{
-public:
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
-};
-
-class ContainerResourceArray : public Resource<int>
-{
-public:
-	ContainerResourceArray(std::vector<int>&& values) : Resource(std::move(values)) {}
-	ContainerResourceArray(const std::vector<int>& values) : Resource(values) {}
-};
 } // end namespace 
-
-
 
 TEST(ResourceSerializer, GetInstance)
 {
@@ -92,7 +76,7 @@ TEST(ResourceSerializer, SerializeArray)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	// serialize
-	ContainerResourceArray resource(INT_VALUES_ARRAY);
+	Resource resource(INT_VALUES_ARRAY);
 	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY));
 
 	// verify serialization and clean up
@@ -112,7 +96,7 @@ TEST(ResourceSerializer, SerializeMatrix)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	// serialize
-	ContainerResource resource(INT_VALUES);
+	Resource2D resource(INT_VALUES);
 	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY));
 
 	// verify serialization and clean up
@@ -129,7 +113,7 @@ TEST(ResourceSerializer, SerializeThrowsUsingEmptyKey)
 
 	serializer->SetSerializationPath(RESOURCE_ROOT);
 
-	ContainerResource resource(INT_VALUES);
+	Resource2D resource(INT_VALUES);
 	EXPECT_THROW(serializer->Serialize(resource, ""), std::runtime_error);
 
 	ResourceSerializer::ResetInstance();
@@ -139,7 +123,7 @@ TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
 {
 	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
 
-	ContainerResource resource(INT_VALUES);
+	Resource2D resource(INT_VALUES);
 	EXPECT_THROW(serializer->Serialize(resource, RESOURCE_KEY), std::runtime_error);
 
 	ResourceSerializer::ResetInstance();

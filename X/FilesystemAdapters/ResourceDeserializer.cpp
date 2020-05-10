@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "Resources/Resource.h"
+#include "Resources/IResource.h"
 
 namespace
 {

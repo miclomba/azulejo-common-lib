@@ -6,9 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include "ContainerResource2D.h"
+#include "FilesystemAdapters/ISerializableResource.h"
 #include "Resources/IResource.h"
-#include "Resources/Resource.h"
-#include "Resources/Resource2D.h"
+
+using Resource2D = ContainerResource2D<int>;
 
 namespace
 {
@@ -17,26 +19,17 @@ const int GT_BYTE_SIZE = 257;
 const std::vector<std::vector<int>> MATRIX_1X1(1,std::vector<int>(1,1));
 const std::vector<int> BUFFER_2X2(4,GT_BYTE_SIZE);
 const std::vector<std::vector<int>> EMPTY_MATRIX_1X1;
-
-class ContainerResource : public resource::Resource2D<int>
-{
-public:
-	ContainerResource() = default;
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
-	int ChecksumProtected() { return Checksum(); }
-};
 } // end namespace
 
 TEST(Resource2D, Construct)
 {
-	EXPECT_NO_THROW(ContainerResource());
+	EXPECT_NO_THROW(Resource2D());
 }
 
 TEST(Resource2D, LValueParameterConstruct)
 {
-	EXPECT_NO_THROW(ContainerResource(MATRIX_1X1));
-	ContainerResource resource(MATRIX_1X1);
+	EXPECT_NO_THROW(Resource2D(MATRIX_1X1));
+	Resource2D resource(MATRIX_1X1);
 
 	EXPECT_EQ(resource.GetColumnSize(), MATRIX_1X1.size());
 	EXPECT_GT(MATRIX_1X1.size(), 0);
@@ -46,9 +39,9 @@ TEST(Resource2D, LValueParameterConstruct)
 TEST(Resource2D, RValueParameterConstruct)
 {
 	std::vector<std::vector<int>> moveable = MATRIX_1X1;
-	EXPECT_NO_THROW(ContainerResource(std::move(moveable)));
+	EXPECT_NO_THROW(Resource2D(std::move(moveable)));
 	std::vector<std::vector<int>> otherMoveable = MATRIX_1X1;
-	ContainerResource resource(std::move(otherMoveable));
+	Resource2D resource(std::move(otherMoveable));
 
 	EXPECT_EQ(resource.GetColumnSize(), MATRIX_1X1.size());
 	EXPECT_GT(MATRIX_1X1.size(), 0);
@@ -63,16 +56,16 @@ TEST(Resource2D, ConstructThrows)
 	variableRowsInput.push_back(std::vector<int>(rowSize));
 	variableRowsInput.push_back(std::vector<int>(rowSize+1));
 
-	EXPECT_THROW(ContainerResource resource(variableRowsInput), std::invalid_argument);
+	EXPECT_THROW(Resource2D resource(variableRowsInput), std::invalid_argument);
 }
 
 TEST(Resource2D, MoveConstruct)
 {
-	ContainerResource source(MATRIX_1X1);
+	Resource2D source(MATRIX_1X1);
 	int sourceChecksum = source.ChecksumProtected();
 
 	// move
-	ContainerResource target(std::move(source));
+	Resource2D target(std::move(source));
 
 	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
@@ -80,9 +73,9 @@ TEST(Resource2D, MoveConstruct)
 
 TEST(Resource2D, MoveAssign)
 {
-	ContainerResource source(MATRIX_1X1);
+	Resource2D source(MATRIX_1X1);
 	int sourceChecksum = source.ChecksumProtected();
-	ContainerResource target(EMPTY_MATRIX_1X1);
+	Resource2D target(EMPTY_MATRIX_1X1);
 
 	// move assign
 	EXPECT_NO_THROW(target = std::move(source));
@@ -93,18 +86,18 @@ TEST(Resource2D, MoveAssign)
 
 TEST(Resource2D, CopyConstruct)
 {
-	ContainerResource source(MATRIX_1X1);
+	Resource2D source(MATRIX_1X1);
 
 	// copy
-	ContainerResource target(source);
+	Resource2D target(source);
 	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource2D, CopyAssign)
 {
-	ContainerResource source(MATRIX_1X1);
-	ContainerResource target(EMPTY_MATRIX_1X1);
+	Resource2D source(MATRIX_1X1);
+	Resource2D target(EMPTY_MATRIX_1X1);
 
 	// copy assign
 	EXPECT_NO_THROW(target = source);
@@ -116,7 +109,7 @@ TEST(Resource2D, CopyAssign)
 TEST(Resource2D, GetDataIJ)
 {
 	std::vector<std::vector<int>> values = MATRIX_1X1;
-	ContainerResource ir(values);
+	Resource2D ir(values);
 
 	EXPECT_NO_THROW(ir.GetData(0,0) = VAL);
 	values[0][0] = VAL;
@@ -127,7 +120,7 @@ TEST(Resource2D, GetDataIJ)
 TEST(Resource2D, GetDataIJConst)
 {
 	std::vector<std::vector<int>> values = MATRIX_1X1;
-	const ContainerResource ir(values);
+	const Resource2D ir(values);
 
 	EXPECT_NO_THROW(ir.GetData(0, 0));
 	const int& val = ir.GetData(0,0);
@@ -137,7 +130,7 @@ TEST(Resource2D, GetDataIJConst)
 
 TEST(Resource2D, GetDataIJThrows)
 {
-	ContainerResource ir(MATRIX_1X1);
+	Resource2D ir(MATRIX_1X1);
 	EXPECT_NO_THROW(ir.GetData(0, 0));
 	EXPECT_THROW(ir.GetData(-1, 0), std::invalid_argument);
 	EXPECT_THROW(ir.GetData(0, -1), std::invalid_argument);
@@ -147,7 +140,7 @@ TEST(Resource2D, GetDataIJThrows)
 
 TEST(Resource2D, AssignArray)
 {
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(MATRIX_1X1.size(), 1);
 
 	ir.SetColumnSize(1);
@@ -159,7 +152,7 @@ TEST(Resource2D, AssignArray)
 
 TEST(Resource2D, AssignMatrix)
 {
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(BUFFER_2X2.size(), 4);
 	ir.SetColumnSize(2);
 	ir.SetRowSize(2);
@@ -171,7 +164,7 @@ TEST(Resource2D, AssignMatrix)
 
 TEST(Resource2D, AssignThrows)
 {
-	ContainerResource ir;
+	Resource2D ir;
 
 	// resource dimensions not set
 	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1.size() * MATRIX_1X1[0].size() * sizeof(int)), std::runtime_error);
@@ -191,7 +184,7 @@ TEST(Resource2D, AssignThrows)
 TEST(Resource2D, SetColumnSize)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(ir.GetColumnSize(), 0);
 	EXPECT_NO_THROW(ir.SetColumnSize(size));
 	EXPECT_EQ(ir.GetColumnSize(), size);
@@ -200,7 +193,7 @@ TEST(Resource2D, SetColumnSize)
 TEST(Resource2D, SetColumnSizeThrowsWhenChangingDimension)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_NO_THROW(ir.SetColumnSize(size));
 	EXPECT_NO_THROW(ir.SetColumnSize(size));
 	EXPECT_THROW(ir.SetColumnSize(size + 1), std::runtime_error);
@@ -209,7 +202,7 @@ TEST(Resource2D, SetColumnSizeThrowsWhenChangingDimension)
 TEST(Resource2D, SetRowSize)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(ir.GetRowSize(), 0);
 	EXPECT_NO_THROW(ir.SetRowSize(size));
 	EXPECT_EQ(ir.GetRowSize(), size);
@@ -218,7 +211,7 @@ TEST(Resource2D, SetRowSize)
 TEST(Resource2D, SetRowSizeThrowsWhenChangingDimension)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_NO_THROW(ir.SetRowSize(size));
 	EXPECT_NO_THROW(ir.SetRowSize(size));
 	EXPECT_THROW(ir.SetRowSize(size + 1), std::runtime_error);
@@ -227,7 +220,7 @@ TEST(Resource2D, SetRowSizeThrowsWhenChangingDimension)
 TEST(Resource2D, GetColumnSize)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(ir.GetColumnSize(), 0);
 	EXPECT_NO_THROW(ir.SetColumnSize(size));
 	EXPECT_EQ(ir.GetColumnSize(), size);
@@ -236,7 +229,7 @@ TEST(Resource2D, GetColumnSize)
 TEST(Resource2D, GetRowSize)
 {
 	const size_t size = 1;
-	ContainerResource ir;
+	Resource2D ir;
 	EXPECT_EQ(ir.GetRowSize(), 0);
 	EXPECT_NO_THROW(ir.SetRowSize(size));
 	EXPECT_EQ(ir.GetRowSize(), size);

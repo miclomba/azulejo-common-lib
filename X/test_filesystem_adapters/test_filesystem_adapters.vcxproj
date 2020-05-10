@@ -36,6 +36,8 @@
     <ClCompile Include="test_entity_aggregation_deserializer.cpp" />
     <ClCompile Include="test_entity_aggregation_serializer.cpp" />
     <ClCompile Include="test_iserializable_entity.cpp" />
+    <ClCompile Include="test_iserializable_resource.cpp" />
+    <ClCompile Include="test_iserializable_resource_2d.cpp" />
     <ClCompile Include="test_resource_deserializer.cpp" />
     <ClCompile Include="test_resource_serializer.cpp" />
   </ItemGroup>
@@ -44,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="ContainerResource2D.h" />
+    <ClInclude Include="ContainerResource.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

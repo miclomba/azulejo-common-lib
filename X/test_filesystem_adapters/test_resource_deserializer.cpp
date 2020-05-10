@@ -9,18 +9,19 @@
 
 #include <gtest/gtest.h>
 
+#include "ContainerResource.h"
+#include "ContainerResource2D.h"
 #include "FilesystemAdapters/ResourceDeserializer.h"
 #include "FilesystemAdapters/ResourceSerializer.h"
-#include "Resources/Resource.h"
-#include "Resources/Resource2D.h"
 
 namespace fs = std::filesystem;
 
 using filesystem_adapters::ResourceDeserializer;
 using filesystem_adapters::ResourceSerializer;
 using resource::IResource;
-using resource::Resource;
-using resource::Resource2D;
+
+using Resource = ContainerResource<int>;
+using Resource2D = ContainerResource2D<int>;
 
 namespace
 {
@@ -31,21 +32,8 @@ const fs::path RESOURCE_FILE = fs::path(RESOURCE_ROOT) / (RESOURCE_KEY + ".bin")
 const std::vector<std::vector<int>> INT_VALUES(1, std::vector<int>(1,1));
 const std::vector<int> INT_VALUES_ARRAY(1,1);
 
-class ContainerResource : public Resource2D<int>
-{
-public:
-	ContainerResource() : Resource2D() {};
-	ContainerResource(std::vector<std::vector<int>>&& values) : Resource2D(std::move(values)) {}
-	ContainerResource(const std::vector<std::vector<int>>& values) : Resource2D(values) {}
-};
-
-class ContainerResourceArray : public Resource<int>
-{
-public:
-	ContainerResourceArray() : Resource() {};
-	ContainerResourceArray(std::vector<int>&& values) : Resource(std::move(values)) {}
-	ContainerResourceArray(const std::vector<int>& values) : Resource(values) {}
-};
+auto RESOURCE_CONSTRUCTOR = []()->std::unique_ptr<resource::IResource> { return std::make_unique<Resource>(); };
+auto RESOURCE_2D_CONSTRUCTOR = []()->std::unique_ptr<resource::IResource> { return std::make_unique<Resource2D>(); };
 } // end namespace 
 
 TEST(ResourceDeserializer, GetInstance)
@@ -93,7 +81,7 @@ TEST(ResourceDeserializer, RegisterResource)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
 
 	ResourceDeserializer::ResetInstance();
 }
@@ -102,7 +90,7 @@ TEST(ResourceDeserializer, RegisterResourceThrowsOnEmptyKey)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	EXPECT_THROW(deserializer->RegisterResource<int>(""), std::runtime_error);
+	EXPECT_THROW(deserializer->RegisterResource<int>("", RESOURCE_CONSTRUCTOR), std::runtime_error);
 
 	ResourceDeserializer::ResetInstance();
 }
@@ -111,8 +99,8 @@ TEST(ResourceDeserializer, RegisterResourceThrowsOnExistingKey)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY));
-	EXPECT_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY), std::runtime_error);
+	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+	EXPECT_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR), std::runtime_error);
 
 	ResourceDeserializer::ResetInstance();
 }
@@ -121,7 +109,7 @@ TEST(ResourceDeserializer, UnregisterResource)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
 	EXPECT_NO_THROW(deserializer->UnregisterResource(RESOURCE_KEY));
 
 	ResourceDeserializer::ResetInstance();
@@ -150,7 +138,7 @@ TEST(ResourceDeserializer, UnregisterAll)
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	EXPECT_FALSE(deserializer->HasSerializationKey(RESOURCE_KEY));
-	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
 	EXPECT_TRUE(deserializer->HasSerializationKey(RESOURCE_KEY));
 	EXPECT_NO_THROW(deserializer->UnregisterAll());
 	EXPECT_FALSE(deserializer->HasSerializationKey(RESOURCE_KEY));
@@ -171,7 +159,7 @@ TEST(ResourceDeserializer, HasSerializationKeyTrue)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY));
+	EXPECT_NO_THROW(deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
 	EXPECT_TRUE(deserializer->HasSerializationKey(RESOURCE_KEY));
 
 	ResourceDeserializer::ResetInstance();
@@ -181,7 +169,7 @@ TEST(ResourceDeserializer, GenerateResource)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	std::unique_ptr<IResource> resource = deserializer->GenerateResource(RESOURCE_KEY);
 	EXPECT_TRUE(resource);
 
@@ -216,14 +204,14 @@ TEST(ResourceDeserializer, DeserializeArray)
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
-	ContainerResourceArray resource(INT_VALUES_ARRAY);
+	Resource resource(INT_VALUES_ARRAY);
 	serializer->Serialize(resource, RESOURCE_KEY);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(*static_cast<int*>(vecIntResource->Data()), *static_cast<int*>(resource.Data()));
 	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
@@ -247,14 +235,14 @@ TEST(ResourceDeserializer, DeserializeMatrix)
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
-	ContainerResource resource(INT_VALUES);
+	Resource2D resource(INT_VALUES);
 	serializer->Serialize(resource, RESOURCE_KEY);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 	
 	// deserialize
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_2D_CONSTRUCTOR);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource2D<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource2D*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(*static_cast<int*>(vecIntResource->Data()), *static_cast<int*>(resource.Data()));
 	EXPECT_EQ(vecIntResource->GetColumnSize(), resource.GetColumnSize());
@@ -278,14 +266,14 @@ TEST(ResourceDeserializer, DeserializeEmptyArrayResource)
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
-	ContainerResourceArray resource;
+	Resource resource;
 	serializer->Serialize(resource, RESOURCE_KEY);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(vecIntResource->Data(), resource.Data());
 	EXPECT_EQ(vecIntResource->Data(), static_cast<int*>(nullptr));
@@ -310,14 +298,14 @@ TEST(ResourceDeserializer, DeserializeEmptyMatrixResource)
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
-	ContainerResource resource;
+	Resource2D resource;
 	serializer->Serialize(resource, RESOURCE_KEY);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_2D_CONSTRUCTOR);
 	std::unique_ptr<IResource> rsrc = deserializer->Deserialize(RESOURCE_KEY);
-	auto vecIntResource = static_cast<Resource2D<int>*>(rsrc.get());
+	auto vecIntResource = static_cast<Resource2D*>(rsrc.get());
 	EXPECT_TRUE(vecIntResource);
 	EXPECT_EQ(vecIntResource->Data(), resource.Data());
 	EXPECT_EQ(vecIntResource->Data(), static_cast<int*>(nullptr));
@@ -336,7 +324,7 @@ TEST(ResourceDeserializer, DeserializeThrowsWithoutSerializationPath)
 {
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	EXPECT_THROW(deserializer->Deserialize(RESOURCE_KEY), std::runtime_error);
 
 	ResourceDeserializer::ResetInstance();
@@ -347,7 +335,7 @@ TEST(ResourceDeserializer, DeserializeThrowsWithBadSerializationPath)
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	deserializer->SetSerializationPath(BAD_PATH);
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	EXPECT_THROW(deserializer->Deserialize(RESOURCE_KEY), std::runtime_error);
 
 	ResourceDeserializer::ResetInstance();
@@ -358,7 +346,7 @@ TEST(ResourceDeserializer, DeserializeThrowsWithEmptyKey)
 	ResourceDeserializer* deserializer = ResourceDeserializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
-	deserializer->RegisterResource<int>(RESOURCE_KEY);
+	deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	EXPECT_THROW(deserializer->Deserialize(""), std::runtime_error);
 
 	ResourceDeserializer::ResetInstance();

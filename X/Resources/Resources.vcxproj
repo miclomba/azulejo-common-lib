@@ -21,10 +21,6 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="IResource.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="Resource.hpp" />
-    <ClInclude Include="Resource2D.h" />
-    <ClInclude Include="Resource2D.hpp" />
     <ClInclude Include="ResourceTypeTraits.hpp" />
   </ItemGroup>
   <ItemGroup>
