@@ -8,7 +8,6 @@
 
 #include "ContainerResource2D.h"
 #include "FilesystemAdapters/ISerializableResource.h"
-#include "Resources/IResource.h"
 
 using Resource2D = ContainerResource2D<int>;
 

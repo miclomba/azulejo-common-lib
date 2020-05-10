@@ -7,7 +7,7 @@
 #include <string>
 
 #include "config.h"
-#include "Resources/IResource.h"
+#include "ISerializableResource.h"
 
 namespace filesystem_adapters {
 
@@ -22,7 +22,7 @@ public:
 	void SetSerializationPath(const std::string& binaryFilePath);
 	std::string GetSerializationPath() const;
 
-	void Serialize(const resource::IResource& resource, const std::string& key);
+	void Serialize(const ISerializableResource& resource, const std::string& key);
 
 private:
 	ResourceSerializer();

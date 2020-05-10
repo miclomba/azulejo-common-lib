@@ -16,9 +16,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Resources", "Resources\Resources.vcxproj", "{191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_resources", "test_resources\test_resources.vcxproj", "{5BE006F3-645B-4A18-A17C-0E339D23748D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{99862D06-B993-411E-A65F-4A55557F69EA} = {99862D06-B993-411E-A65F-4A55557F69EA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Events", "Events\Events.vcxproj", "{FA9DE200-085D-4769-AADF-BDEF22CA0077}"
 EndProject
@@ -97,7 +94,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_filesystem_adapters", "test_filesystem_adapters\test_filesystem_adapters.vcxproj", "{5663D313-AB8E-4C89-93D5-C1194C330C4E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{99862D06-B993-411E-A65F-4A55557F69EA} = {99862D06-B993-411E-A65F-4A55557F69EA}
-		{191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4} = {191CCC0E-4C7D-4ADD-94C9-B9E66AFCCBD4}
 	EndProjectSection
 EndProject
 Global

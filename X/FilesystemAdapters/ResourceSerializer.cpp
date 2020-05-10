@@ -1,8 +1,11 @@
 #include "ResourceSerializer.h"
 
+#include "ISerializableResource.h"
+
 #include <stdexcept>
 #include <string>
 
+using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
 
 ResourceSerializer* ResourceSerializer::instance_ = nullptr;
@@ -37,7 +40,7 @@ std::string ResourceSerializer::GetSerializationPath() const
 	return serializationPath_.string();
 }
 
-void ResourceSerializer::Serialize(const resource::IResource& resource, const std::string& key)
+void ResourceSerializer::Serialize(const ISerializableResource& resource, const std::string& key)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");

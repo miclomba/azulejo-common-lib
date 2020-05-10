@@ -24,21 +24,14 @@ public:
 	size_t GetColumnSize() const;
 	size_t GetRowSize() const;
 
+	virtual size_t GetElementSize() const = 0;
 	virtual void* Data() = 0;
 	virtual const void* Data() const = 0;
-	virtual size_t GetElementSize() const = 0;
 	virtual void Assign(const char* buff, const size_t n) = 0;
 
-	bool IsDirty() const;
-protected:
-	virtual int Checksum() const = 0;
-
 private:
-
 	size_t M_{ 0 };
 	size_t N_{ 0 };
-
-	mutable int checkSum_{-1};
 };
 
 } // end resource

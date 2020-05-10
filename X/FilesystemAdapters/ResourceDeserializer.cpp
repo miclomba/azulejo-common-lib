@@ -5,13 +5,14 @@
 #include <stdexcept>
 #include <string>
 
-#include "Resources/IResource.h"
+#include "ISerializableResource.h"
 
 namespace
 {
 const std::string RESOURCE_EXT = ".bin";
 } // end namespace anonymous
 
+using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceDeserializer;
 
 ResourceDeserializer* ResourceDeserializer::instance_ = nullptr;
@@ -65,7 +66,7 @@ void ResourceDeserializer::UnregisterAll()
 	keyToResourceMap_.clear();
 }
 
-std::unique_ptr<resource::IResource> ResourceDeserializer::Deserialize(const std::string& key)
+std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const std::string& key)
 {
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
@@ -94,7 +95,7 @@ std::unique_ptr<resource::IResource> ResourceDeserializer::Deserialize(const std
 	if (size > dataOffset)
 		inFile.read(*buff + dataOffset, size - dataOffset);
 
-	std::unique_ptr<resource::IResource> arithmeticContainer = GenerateResource(key);
+	std::unique_ptr<ISerializableResource> arithmeticContainer = GenerateResource(key);
 
 	arithmeticContainer->SetColumnSize(*(*buff + colSizeOffset));
 	arithmeticContainer->SetRowSize(*(*buff + rowSizeOffset));
@@ -104,14 +105,14 @@ std::unique_ptr<resource::IResource> ResourceDeserializer::Deserialize(const std
 	return arithmeticContainer;
 }
 
-std::unique_ptr<resource::IResource> ResourceDeserializer::GenerateResource(const std::string& key) const
+std::unique_ptr<ISerializableResource> ResourceDeserializer::GenerateResource(const std::string& key) const
 {
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDeserializer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDeserializer");
 
-	std::unique_ptr<resource::IResource> resource = keyToResourceMap_[key]();
+	std::unique_ptr<ISerializableResource> resource = keyToResourceMap_[key]();
 
 	return resource;
 }

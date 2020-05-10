@@ -1,6 +1,6 @@
 
 template<typename T>
-void ResourceDeserializer::RegisterResource(const std::string& key, std::function<std::unique_ptr<resource::IResource>(void)> constructor)
+void ResourceDeserializer::RegisterResource(const std::string& key, std::function<std::unique_ptr<ISerializableResource>(void)> constructor)
 {
 	if (!std::is_arithmetic<T>::value)
 		throw std::runtime_error("Type (" + std::string(typeid(T).name()) + ") is not an arithmetic container when registering resource with ResourceDeserializer");

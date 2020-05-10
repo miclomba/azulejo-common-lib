@@ -10,16 +10,6 @@ IResource& IResource::operator=(const IResource&) = default;
 IResource::IResource(IResource&&) = default;
 IResource& IResource::operator=(IResource&&) = default;
 
-bool IResource::IsDirty() const
-{
-	int check = Checksum();
-	if (check == checkSum_)
-		return false;
-
-	checkSum_ = check;
-	return true;
-}
-
 void IResource::SetColumnSize(const size_t size)
 {
 	if (M_ != 0 && M_ != size)
