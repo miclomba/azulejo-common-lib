@@ -14,7 +14,7 @@
 namespace resource
 {
 template<typename T>
-class RESOURCE_DLL_EXPORT Resource2D : public Resource<T>
+class RESOURCE_DLL_EXPORT Resource2D : public IResource
 {
 public:
 	Resource2D();
@@ -31,10 +31,18 @@ public:
 	const T& GetData(const size_t i, const size_t j) const;
 	T& GetData(const size_t i, const size_t j);
 
+	void* Data() override;
+	const void* Data() const override;
+	size_t GetElementSize() const override;
 	void Assign(const char* buff, const size_t n) override;
+
+protected:
+	int Checksum() const override;
 
 private:
 	void LoadInput(const std::vector<std::vector<T>>& data);
+
+	std::vector<T> data_;
 };
 
 #include "Resource2D.hpp"

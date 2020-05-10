@@ -59,7 +59,7 @@ TEST(Resource, MoveConstruct)
 	// move
 	ContainerResource target(std::move(source));
 
-	EXPECT_EQ(*target.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), ARRAY_1[0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
@@ -72,7 +72,7 @@ TEST(Resource, MoveAssign)
 	// move assign
 	EXPECT_NO_THROW(target = std::move(source));
 
-	EXPECT_EQ(*target.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), ARRAY_1[0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
@@ -82,7 +82,7 @@ TEST(Resource, CopyConstruct)
 
 	// copy
 	ContainerResource target(source);
-	EXPECT_EQ(*target.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), ARRAY_1[0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
@@ -94,20 +94,20 @@ TEST(Resource, CopyAssign)
 	// copy assign
 	EXPECT_NO_THROW(target = source);
 
-	EXPECT_EQ(*target.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), ARRAY_1[0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
 TEST(Resource, GetData)
 {
 	ContainerResource ir(ARRAY_1);
-	EXPECT_EQ(*ir.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(ir.Data()), ARRAY_1[0]);
 }
 
 TEST(Resource, GetDataConst)
 {
 	const ContainerResource ir(ARRAY_1);
-	EXPECT_EQ(*ir.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<const int*>(ir.Data()), ARRAY_1[0]);
 }
 
 TEST(Resource, IsDirty)
@@ -118,7 +118,7 @@ TEST(Resource, IsDirty)
 	EXPECT_TRUE(ir.IsDirtyProtected());
 	EXPECT_FALSE(ir.IsDirtyProtected());
 
-	*ir.Data() = VAL;
+	*static_cast<int*>(ir.Data()) = VAL;
 	EXPECT_TRUE(ir.IsDirtyProtected());
 }
 
@@ -129,7 +129,7 @@ TEST(Resource, Checksum)
 	int checksum = ir.ChecksumProtected();
 	EXPECT_EQ(ir.ChecksumProtected(), checksum);
 
-	*ir.Data() = VAL;
+	*static_cast<int*>(ir.Data()) = VAL;
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
 }
 
@@ -139,7 +139,7 @@ TEST(Resource, AssignArray)
 	EXPECT_EQ(ARRAY_1.size(), 1);
 
 	ir.Assign(reinterpret_cast<const char*>(ARRAY_1.data()), ARRAY_1.size() * sizeof(int));
-	EXPECT_EQ(*ir.Data(), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<int*>(ir.Data()), ARRAY_1[0]);
 }
 
 TEST(Resource, AssignThrows)

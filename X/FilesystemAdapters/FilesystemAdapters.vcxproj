@@ -27,7 +27,6 @@
     <ClInclude Include="ResourceDeserializer.h" />
     <ClInclude Include="ResourceDeserializer.hpp" />
     <ClInclude Include="ResourceSerializer.h" />
-    <ClInclude Include="ResourceSerializer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EntityAggregationDeserializer.cpp" />

@@ -23,13 +23,9 @@ bool ISerializableResource::IsDirty() const
 
 int ISerializableResource::Checksum() const
 {
-	/*
-	size_t size = sizeof(double) * data_.size();
+	size_t size = GetElementSize() * GetColumnSize() * GetRowSize();
 	boost::crc_32_type crc;
-	crc.process_bytes(data_.data(), size);
+	crc.process_bytes(Data(), size);
 	return crc.checksum();
-	*/
-
-	return 0;
 }
 

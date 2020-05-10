@@ -37,14 +37,18 @@ public:
 
 	virtual ~Resource();
 
-	const T* Data() const;
-	T* Data();
+	//const T* Data() const;
+	//T* Data();
 
+	void* Data() override;
+	const void* Data() const override;
+	size_t GetElementSize() const override;
 	void Assign(const char* buff, const size_t n) override;
 
 protected:
 	int Checksum() const override;
 
+private:
 	std::vector<T> data_;
 };
 

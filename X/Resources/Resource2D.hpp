@@ -89,4 +89,31 @@ void Resource2D<T>::Assign(const char* buff, const size_t n)
 	}
 }
 
+TEMPLATE_T
+void* Resource2D<T>::Data()
+{
+	return data_.data();
+}
+
+TEMPLATE_T
+const void* Resource2D<T>::Data() const
+{
+	return data_.data();
+}
+
+TEMPLATE_T
+size_t Resource2D<T>::GetElementSize() const
+{
+	return sizeof(T);
+}
+
+TEMPLATE_T
+int Resource2D<T>::Checksum() const
+{
+	size_t size = sizeof(T) * data_.size();
+	boost::crc_32_type crc;
+	crc.process_bytes(data_.data(), size);
+	return crc.checksum();
+}
+
 #undef TEMPLATE_T

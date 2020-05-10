@@ -22,8 +22,7 @@ public:
 	void SetSerializationPath(const std::string& binaryFilePath);
 	std::string GetSerializationPath() const;
 
-	template<typename T>
-	void Serialize(const resource::Resource<T>& resource, const std::string& key);
+	void Serialize(const resource::IResource& resource, const std::string& key);
 
 private:
 	ResourceSerializer();
@@ -36,7 +35,6 @@ private:
 	std::filesystem::path serializationPath_;
 };
 
-#include "ResourceSerializer.hpp"
 } // end namespace filesystem_adapters
 
 #endif // filesystem_adapters_resourceserializer_h

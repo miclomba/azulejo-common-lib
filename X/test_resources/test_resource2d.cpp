@@ -74,7 +74,7 @@ TEST(Resource2D, MoveConstruct)
 	// move
 	ContainerResource target(std::move(source));
 
-	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
@@ -87,7 +87,7 @@ TEST(Resource2D, MoveAssign)
 	// move assign
 	EXPECT_NO_THROW(target = std::move(source));
 
-	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
 }
 
@@ -97,7 +97,7 @@ TEST(Resource2D, CopyConstruct)
 
 	// copy
 	ContainerResource target(source);
-	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
@@ -109,7 +109,7 @@ TEST(Resource2D, CopyAssign)
 	// copy assign
 	EXPECT_NO_THROW(target = source);
 
-	EXPECT_EQ(*target.Data(), MATRIX_1X1[0][0]);
+	EXPECT_EQ(*static_cast<int*>(target.Data()), MATRIX_1X1[0][0]);
 	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
 }
 
@@ -121,7 +121,7 @@ TEST(Resource2D, GetDataIJ)
 	EXPECT_NO_THROW(ir.GetData(0,0) = VAL);
 	values[0][0] = VAL;
 
-	EXPECT_EQ(*ir.Data(), values[0][0]);
+	EXPECT_EQ(*static_cast<int*>(ir.Data()), values[0][0]);
 }
 
 TEST(Resource2D, GetDataIJConst)
@@ -132,7 +132,7 @@ TEST(Resource2D, GetDataIJConst)
 	EXPECT_NO_THROW(ir.GetData(0, 0));
 	const int& val = ir.GetData(0,0);
 
-	EXPECT_EQ(*ir.Data(), val);
+	EXPECT_EQ(*static_cast<const int*>(ir.Data()), val);
 }
 
 TEST(Resource2D, GetDataIJThrows)
@@ -154,7 +154,7 @@ TEST(Resource2D, AssignArray)
 	ir.SetRowSize(MATRIX_1X1[0].size());
 
 	ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1[0].size() * sizeof(int));
-	EXPECT_EQ(*ir.Data(), MATRIX_1X1[0][0]);
+	EXPECT_EQ(*static_cast<int*>(ir.Data()), MATRIX_1X1[0][0]);
 }
 
 TEST(Resource2D, AssignMatrix)
@@ -166,7 +166,7 @@ TEST(Resource2D, AssignMatrix)
 
 	ir.Assign(reinterpret_cast<const char*>(BUFFER_2X2.data()), BUFFER_2X2.size() * sizeof(int));
 	for (int i = 0; i < 4; ++i)
-		EXPECT_EQ(*(ir.Data() + i), *(BUFFER_2X2.data() + i));
+		EXPECT_EQ(*(static_cast<int*>(ir.Data()) + i), *(BUFFER_2X2.data() + i));
 }
 
 TEST(Resource2D, AssignThrows)

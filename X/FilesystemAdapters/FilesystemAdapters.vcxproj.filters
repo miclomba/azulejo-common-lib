@@ -39,9 +39,6 @@
     <ClInclude Include="ResourceDeserializer.hpp">
       <Filter>Templates</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceSerializer.hpp">
-      <Filter>Templates</Filter>
-    </ClInclude>
     <ClInclude Include="ISerializableResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>

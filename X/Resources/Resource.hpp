@@ -32,6 +32,7 @@ TEMPLATE_T Resource<T>& Resource<T>::operator=(Resource<T>&&) = default;
 TEMPLATE_T
 Resource<T>::~Resource() = default;
 
+/*
 TEMPLATE_T
 const T* Resource<T>::Data() const
 {
@@ -43,6 +44,7 @@ T* Resource<T>::Data()
 {
 	return data_.data();
 }
+*/
 
 TEMPLATE_T
 void Resource<T>::Assign(const char* buff, const size_t n)
@@ -68,6 +70,24 @@ int Resource<T>::Checksum() const
 	boost::crc_32_type crc;
 	crc.process_bytes(data_.data(), size);
 	return crc.checksum();
+}
+
+TEMPLATE_T
+void* Resource<T>::Data()
+{
+	return data_.data();
+}
+
+TEMPLATE_T
+const void* Resource<T>::Data() const
+{
+	return data_.data();
+}
+
+TEMPLATE_T
+size_t Resource<T>::GetElementSize() const
+{
+	return sizeof(T);
 }
 
 #undef ENABLE_IF_CONTAINER_TEMPLATE_DEF

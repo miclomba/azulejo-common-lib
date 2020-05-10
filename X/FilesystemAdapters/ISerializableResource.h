@@ -3,10 +3,12 @@
 
 #include "config.h"
 
+#include "Resources/IResource.h"
+
 namespace filesystem_adapters
 {
 
-class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableResource 
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableResource : public resource::IResource 
 {
 public:
 	friend class ResourceSerializer;

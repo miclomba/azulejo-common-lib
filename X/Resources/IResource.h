@@ -7,15 +7,10 @@
 
 namespace resource
 {
-class ResourceSerializer;
-class ResourceDeserializer;
 
 class RESOURCE_DLL_EXPORT IResource
 {
 public:
-	friend class ResourceSerializer;
-	friend class ResourceDeserializer;
-
 	IResource();
 	virtual ~IResource();
 
@@ -29,6 +24,9 @@ public:
 	size_t GetColumnSize() const;
 	size_t GetRowSize() const;
 
+	virtual void* Data() = 0;
+	virtual const void* Data() const = 0;
+	virtual size_t GetElementSize() const = 0;
 	virtual void Assign(const char* buff, const size_t n) = 0;
 
 	bool IsDirty() const;
