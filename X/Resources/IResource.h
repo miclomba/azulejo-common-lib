@@ -19,8 +19,6 @@ public:
 	IResource(IResource&&);
 	IResource& operator=(IResource&&);
 
-	void SetColumnSize(const size_t size);
-	void SetRowSize(const size_t size);
 	size_t GetColumnSize() const;
 	size_t GetRowSize() const;
 
@@ -28,6 +26,10 @@ public:
 	virtual void* Data() = 0;
 	virtual const void* Data() const = 0;
 	virtual void Assign(const char* buff, const size_t n) = 0;
+
+protected:
+	void SetColumnSize(const size_t size);
+	void SetRowSize(const size_t size);
 
 private:
 	size_t M_{ 0 };

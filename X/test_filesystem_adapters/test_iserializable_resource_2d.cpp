@@ -9,7 +9,29 @@
 #include "ContainerResource2D.h"
 #include "FilesystemAdapters/ISerializableResource.h"
 
-using Resource2D = ContainerResource2D<int>;
+struct Resource2D : public ContainerResource2D<int>
+{
+	Resource2D() = default;
+	Resource2D(const std::vector<std::vector<int>>& values) :
+		ContainerResource2D(values)
+	{
+	}
+
+	Resource2D(std::vector<std::vector<int>>&& values) :
+		ContainerResource2D(std::move(values))
+	{
+	}
+
+	void SetColumnSizeProtected(const size_t size)
+	{
+		SetColumnSize(size);
+	}
+
+	void SetRowSizeProtected(const size_t size)
+	{
+		SetRowSize(size);
+	}
+};
 
 namespace
 {
@@ -142,8 +164,8 @@ TEST(Resource2D, AssignArray)
 	Resource2D ir;
 	EXPECT_EQ(MATRIX_1X1.size(), 1);
 
-	ir.SetColumnSize(1);
-	ir.SetRowSize(MATRIX_1X1[0].size());
+	ir.SetColumnSizeProtected(1);
+	ir.SetRowSizeProtected(MATRIX_1X1[0].size());
 
 	ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1[0].size() * sizeof(int));
 	EXPECT_EQ(*static_cast<int*>(ir.Data()), MATRIX_1X1[0][0]);
@@ -153,8 +175,8 @@ TEST(Resource2D, AssignMatrix)
 {
 	Resource2D ir;
 	EXPECT_EQ(BUFFER_2X2.size(), 4);
-	ir.SetColumnSize(2);
-	ir.SetRowSize(2);
+	ir.SetColumnSizeProtected(2);
+	ir.SetRowSizeProtected(2);
 
 	ir.Assign(reinterpret_cast<const char*>(BUFFER_2X2.data()), BUFFER_2X2.size() * sizeof(int));
 	for (int i = 0; i < 4; ++i)
@@ -168,9 +190,9 @@ TEST(Resource2D, AssignThrows)
 	// resource dimensions not set
 	EXPECT_THROW(ir.Assign(reinterpret_cast<const char*>(MATRIX_1X1[0].data()), MATRIX_1X1.size() * MATRIX_1X1[0].size() * sizeof(int)), std::runtime_error);
 
-	ir.SetColumnSize(MATRIX_1X1.size());
+	ir.SetColumnSizeProtected(MATRIX_1X1.size());
 	EXPECT_GT(MATRIX_1X1.size(), 0);
-	ir.SetRowSize(MATRIX_1X1[0].size());
+	ir.SetRowSizeProtected(MATRIX_1X1[0].size());
 
 	// resource buffer not set
 	EXPECT_THROW(ir.Assign(nullptr, MATRIX_1X1.size() * MATRIX_1X1[0].size() * sizeof(int)), std::runtime_error);
@@ -185,7 +207,7 @@ TEST(Resource2D, SetColumnSize)
 	const size_t size = 1;
 	Resource2D ir;
 	EXPECT_EQ(ir.GetColumnSize(), 0);
-	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_NO_THROW(ir.SetColumnSizeProtected(size));
 	EXPECT_EQ(ir.GetColumnSize(), size);
 }
 
@@ -193,9 +215,9 @@ TEST(Resource2D, SetColumnSizeThrowsWhenChangingDimension)
 {
 	const size_t size = 1;
 	Resource2D ir;
-	EXPECT_NO_THROW(ir.SetColumnSize(size));
-	EXPECT_NO_THROW(ir.SetColumnSize(size));
-	EXPECT_THROW(ir.SetColumnSize(size + 1), std::runtime_error);
+	EXPECT_NO_THROW(ir.SetColumnSizeProtected(size));
+	EXPECT_NO_THROW(ir.SetColumnSizeProtected(size));
+	EXPECT_THROW(ir.SetColumnSizeProtected(size + 1), std::runtime_error);
 }
 
 TEST(Resource2D, SetRowSize)
@@ -203,7 +225,7 @@ TEST(Resource2D, SetRowSize)
 	const size_t size = 1;
 	Resource2D ir;
 	EXPECT_EQ(ir.GetRowSize(), 0);
-	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_NO_THROW(ir.SetRowSizeProtected(size));
 	EXPECT_EQ(ir.GetRowSize(), size);
 }
 
@@ -211,9 +233,9 @@ TEST(Resource2D, SetRowSizeThrowsWhenChangingDimension)
 {
 	const size_t size = 1;
 	Resource2D ir;
-	EXPECT_NO_THROW(ir.SetRowSize(size));
-	EXPECT_NO_THROW(ir.SetRowSize(size));
-	EXPECT_THROW(ir.SetRowSize(size + 1), std::runtime_error);
+	EXPECT_NO_THROW(ir.SetRowSizeProtected(size));
+	EXPECT_NO_THROW(ir.SetRowSizeProtected(size));
+	EXPECT_THROW(ir.SetRowSizeProtected(size + 1), std::runtime_error);
 }
 
 TEST(Resource2D, GetColumnSize)
@@ -221,7 +243,7 @@ TEST(Resource2D, GetColumnSize)
 	const size_t size = 1;
 	Resource2D ir;
 	EXPECT_EQ(ir.GetColumnSize(), 0);
-	EXPECT_NO_THROW(ir.SetColumnSize(size));
+	EXPECT_NO_THROW(ir.SetColumnSizeProtected(size));
 	EXPECT_EQ(ir.GetColumnSize(), size);
 }
 
@@ -230,6 +252,6 @@ TEST(Resource2D, GetRowSize)
 	const size_t size = 1;
 	Resource2D ir;
 	EXPECT_EQ(ir.GetRowSize(), 0);
-	EXPECT_NO_THROW(ir.SetRowSize(size));
+	EXPECT_NO_THROW(ir.SetRowSizeProtected(size));
 	EXPECT_EQ(ir.GetRowSize(), size);
 }

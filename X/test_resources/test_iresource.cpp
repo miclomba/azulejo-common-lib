@@ -11,6 +11,16 @@ const size_t SIZE = 1;
 
 struct Resource : resource::IResource
 {
+	void SetColumnSizeProtected(const size_t size)
+	{
+		SetColumnSize(size);
+	}
+
+	void SetRowSizeProtected(const size_t size)
+	{
+		SetRowSize(size);
+	}
+
 	size_t GetElementSize() const override
 	{
 		return SIZE;
@@ -40,28 +50,28 @@ TEST(IResource, Construct)
 TEST(IResource, SetColumnSize)
 {
 	Resource resource;
-	EXPECT_NO_THROW(resource.SetColumnSize(SIZE));
+	EXPECT_NO_THROW(resource.SetColumnSizeProtected(SIZE));
 	EXPECT_EQ(resource.GetColumnSize(), SIZE);
 }
 
 TEST(IResource, GetColumnSize)
 {
 	Resource resource;
-	resource.SetColumnSize(SIZE);
+	resource.SetColumnSizeProtected(SIZE);
 	EXPECT_EQ(resource.GetColumnSize(), SIZE);
 }
 
 TEST(IResource, SetRowSize)
 {
 	Resource resource;
-	EXPECT_NO_THROW(resource.SetRowSize(SIZE));
+	EXPECT_NO_THROW(resource.SetRowSizeProtected(SIZE));
 	EXPECT_EQ(resource.GetRowSize(), SIZE);
 }
 
 TEST(IResource, GetRowSize)
 {
 	Resource resource;
-	resource.SetRowSize(SIZE);
+	resource.SetRowSizeProtected(SIZE);
 	EXPECT_EQ(resource.GetRowSize(), SIZE);
 }
 
