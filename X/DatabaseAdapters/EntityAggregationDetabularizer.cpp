@@ -1,5 +1,6 @@
 #include "EntityAggregationDetabularizer.h"
 
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <stdexcept>

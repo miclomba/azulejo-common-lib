@@ -8,7 +8,7 @@
 namespace filesystem_adapters
 {
 
-class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableResource : public resource::IResource 
+class FILESYSTEM_ADAPTERS_DLL_EXPORT ISerializableResource : public virtual resource::IResource 
 {
 public:
 	friend class ResourceSerializer;

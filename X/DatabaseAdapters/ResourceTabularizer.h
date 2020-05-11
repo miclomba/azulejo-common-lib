@@ -1,0 +1,42 @@
+#ifndef database_adapters_resourcetabularizer_h
+#define database_adapters_resourcetabularizer_h
+
+#include <filesystem>
+
+#include "config.h"
+
+#include "ITabularizableResource.h"
+#include "Sqlite.h"
+
+namespace database_adapters {
+
+class DATABASE_ADAPTERS_DLL_EXPORT ResourceTabularizer
+{
+public:
+	virtual ~ResourceTabularizer();
+
+	static ResourceTabularizer* GetInstance();
+	static void ResetInstance();
+
+	void Tabularize(const ITabularizableResource& resource);
+
+	// database
+	void CloseDatabase();
+	void OpenDatabase(const std::filesystem::path& dbPath);
+	Sqlite& GetDatabase();
+
+private:
+	ResourceTabularizer();
+	ResourceTabularizer(const ResourceTabularizer&) = delete;
+	ResourceTabularizer& operator=(const ResourceTabularizer&) = delete;
+	ResourceTabularizer(ResourceTabularizer&&) = delete;
+	ResourceTabularizer& operator=(ResourceTabularizer&&) = delete;
+
+	static ResourceTabularizer* instance_;
+
+	Sqlite databaseAdapter_;
+};
+
+} // end namespace database_adapters
+#endif // database_adapters_resourcetabularizer_h
+

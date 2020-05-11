@@ -8,12 +8,12 @@
 #include "config.h"
 
 #include "Entities/Entity.h"
-#include "Sqlite.h"
 
 namespace database_adapters {
 
 class EntityAggregationDetabularizer;
 class EntityAggregationTabularizer;
+class Sqlite;
 
 class DATABASE_ADAPTERS_DLL_EXPORT ITabularizableEntity : public virtual entity::Entity
 {

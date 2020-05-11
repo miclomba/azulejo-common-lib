@@ -36,7 +36,10 @@
     <ClCompile Include="test_entity_aggregation_detabularizer.cpp" />
     <ClCompile Include="test_entity_aggregation_tabularizer.cpp" />
     <ClCompile Include="test_itabularizable_entity.cpp" />
+    <ClCompile Include="test_resource_detabularizer.cpp" />
+    <ClCompile Include="test_resource_tabularizer.cpp" />
     <ClCompile Include="test_sqlite.cpp" />
+    <ClCompile Include="test_itabularizable_resource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -82,7 +85,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_69_0\stage\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/DatabaseAdapters.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutDir)/Entities.lib;$(OutDir)/Resources.lib;$(OutDir)/DatabaseAdapters.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

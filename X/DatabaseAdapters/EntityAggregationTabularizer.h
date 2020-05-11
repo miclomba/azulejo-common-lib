@@ -1,5 +1,5 @@
-#ifndef entity_entityaggregationtabularizer_h
-#define entity_entityaggregationtabularizer_h
+#ifndef database_adapters_entityaggregationtabularizer_h
+#define database_adapters_entityaggregationtabularizer_h
 
 #include <filesystem>
 #include <string>
@@ -10,6 +10,7 @@
 
 #include "Entities/EntityHierarchy.h"
 #include "ITabularizableEntity.h"
+#include "Sqlite.h"
 
 namespace database_adapters {
 
