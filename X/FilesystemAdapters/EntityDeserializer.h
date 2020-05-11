@@ -1,5 +1,5 @@
-#ifndef filesystem_adapters_entityaggregationdeserializer_h
-#define filesystem_adapters_entityaggregationdeserializer_h
+#ifndef filesystem_adapters_entitydeserializer_h
+#define filesystem_adapters_entitydeserializer_h
 
 #include <filesystem>
 #include <functional>
@@ -19,12 +19,12 @@
 
 namespace filesystem_adapters {
 
-class FILESYSTEM_ADAPTERS_DLL_EXPORT EntityAggregationDeserializer
+class FILESYSTEM_ADAPTERS_DLL_EXPORT EntityDeserializer
 {
 public:
-	virtual ~EntityAggregationDeserializer();
+	virtual ~EntityDeserializer();
 
-	static EntityAggregationDeserializer* GetInstance();
+	static EntityDeserializer* GetInstance();
 	static void ResetInstance();
 
 	//registration
@@ -37,20 +37,20 @@ public:
 	void LoadEntity(ISerializableEntity& entity);
 
 private:
-	EntityAggregationDeserializer();
-	EntityAggregationDeserializer(const EntityAggregationDeserializer&) = delete;
-	EntityAggregationDeserializer& operator=(const EntityAggregationDeserializer&) = delete;
-	EntityAggregationDeserializer(EntityAggregationDeserializer&&) = delete;
-	EntityAggregationDeserializer& operator=(EntityAggregationDeserializer&&) = delete;
+	EntityDeserializer();
+	EntityDeserializer(const EntityDeserializer&) = delete;
+	EntityDeserializer& operator=(const EntityDeserializer&) = delete;
+	EntityDeserializer(EntityDeserializer&&) = delete;
+	EntityDeserializer& operator=(EntityDeserializer&&) = delete;
 
 	void LoadWithParentKey(ISerializableEntity& entity, const entity::Entity::Key& parentKey = "");
 
-	static EntityAggregationDeserializer* instance_;
+	static EntityDeserializer* instance_;
 
 	entity::EntityRegistry<ISerializableEntity> registry_;
 	entity::EntityHierarchy hierarchy_;
 };
 
 } // end namespace filesystem_adapters
-#endif // filesystem_adapters_entityaggregationdeserializer_h
+#endif // filesystem_adapters_entitydeserializer_h
 

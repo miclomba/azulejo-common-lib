@@ -44,7 +44,7 @@ void ResourceTabularizer::Tabularize(const ITabularizableResource& resource)
 void ResourceTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
-		throw std::runtime_error("EntityAggregationDetabularizer already has a database open");
+		throw std::runtime_error("ResourceTabularizer already has a database open");
 	databaseAdapter_.Open(dbPath);
 }
 

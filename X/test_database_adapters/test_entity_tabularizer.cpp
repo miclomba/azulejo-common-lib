@@ -16,14 +16,14 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "DatabaseAdapters/ITabularizableEntity.h"
-#include "DatabaseAdapters/EntityAggregationTabularizer.h"
+#include "DatabaseAdapters/EntityTabularizer.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "Entities/Entity.h"
 
 namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
-using database_adapters::EntityAggregationTabularizer;
+using database_adapters::EntityTabularizer;
 using database_adapters::ITabularizableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
@@ -108,9 +108,9 @@ struct SqliteRemover
 	}
 };
 
-struct EntityAggregationTabularizerFixture 
+struct EntityTabularizerFixture 
 {
-	EntityAggregationTabularizerFixture(const bool hasRoot, const bool hasIntermediate, const bool hasLeaf)
+	EntityTabularizerFixture(const bool hasRoot, const bool hasIntermediate, const bool hasLeaf)
 	{
 		entityMask_ = { hasRoot, hasIntermediate, hasLeaf };
 
@@ -156,7 +156,7 @@ struct EntityAggregationTabularizerFixture
 		};
 
 
-		EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+		EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 		for (size_t i = 0; i < entityMask_.size(); ++i)
 		{
 			if (!entityMask_[i])
@@ -197,42 +197,42 @@ private:
 };
 } // end namespace entity
 
-TEST(EntityAggregationTabularizer, GetInstance)
+TEST(EntityTabularizer, GetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationTabularizer::GetInstance());
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EXPECT_NO_THROW(EntityTabularizer::GetInstance());
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 	EXPECT_TRUE(tabularizer);
-	EXPECT_NO_THROW(EntityAggregationTabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityTabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationTabularizer, ResetInstance)
+TEST(EntityTabularizer, ResetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationTabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityTabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationTabularizer, ResetInstanceClosesDatabase)
+TEST(EntityTabularizer, ResetInstanceClosesDatabase)
 {
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 	tabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(tabularizer->GetDatabase().IsOpen());
-	EXPECT_NO_THROW(EntityAggregationTabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityTabularizer::ResetInstance());
 
-	tabularizer = EntityAggregationTabularizer::GetInstance();
+	tabularizer = EntityTabularizer::GetInstance();
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
-	EXPECT_NO_THROW(EntityAggregationTabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityTabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationTabularizer, GetDatabase)
+TEST(EntityTabularizer, GetDatabase)
 {
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 	EXPECT_NO_THROW(tabularizer->GetDatabase());
 }
 
-TEST(EntityAggregationTabularizer, OpenDatabase)
+TEST(EntityTabularizer, OpenDatabase)
 {
 	SqliteRemover remover;
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_FALSE(tabularizer->GetDatabase().IsOpen());
 	EXPECT_FALSE(fs::exists(DB_PATH));
@@ -240,28 +240,28 @@ TEST(EntityAggregationTabularizer, OpenDatabase)
 	EXPECT_TRUE(tabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, OpenDatabaseThrowsIfAlreadyOpen)
+TEST(EntityTabularizer, OpenDatabaseThrowsIfAlreadyOpen)
 {
 	SqliteRemover remover;
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	tabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(tabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 	EXPECT_THROW(tabularizer->OpenDatabase(DB_PATH), std::runtime_error);
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, CloseDatabaseWhenDatabaseIsOpen)
+TEST(EntityTabularizer, CloseDatabaseWhenDatabaseIsOpen)
 {
 	SqliteRemover remover;
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	tabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(tabularizer->GetDatabase().IsOpen());
@@ -270,24 +270,24 @@ TEST(EntityAggregationTabularizer, CloseDatabaseWhenDatabaseIsOpen)
 	EXPECT_FALSE(tabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, CloseDatabaseWhenDatabaseIsClosed)
+TEST(EntityTabularizer, CloseDatabaseWhenDatabaseIsClosed)
 {
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_FALSE(tabularizer->GetDatabase().IsOpen());
 	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, TabularizeFromRoot)
+TEST(EntityTabularizer, TabularizeFromRoot)
 {
-	EntityAggregationTabularizerFixture fixture(HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
+	EntityTabularizerFixture fixture(HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
@@ -296,14 +296,14 @@ TEST(EntityAggregationTabularizer, TabularizeFromRoot)
 
 	fixture.VerifyTabularization();
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, TabularizeFromIntermediate)
+TEST(EntityTabularizer, TabularizeFromIntermediate)
 {
-	EntityAggregationTabularizerFixture fixture(!HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
+	EntityTabularizerFixture fixture(!HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
@@ -312,14 +312,14 @@ TEST(EntityAggregationTabularizer, TabularizeFromIntermediate)
 
 	fixture.VerifyTabularization();
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, TabularizeFromLeaf)
+TEST(EntityTabularizer, TabularizeFromLeaf)
 {
-	EntityAggregationTabularizerFixture fixture(!HAS_ROOT, !HAS_INTERMEDIATE, HAS_LEAF);
+	EntityTabularizerFixture fixture(!HAS_ROOT, !HAS_INTERMEDIATE, HAS_LEAF);
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
@@ -331,14 +331,14 @@ TEST(EntityAggregationTabularizer, TabularizeFromLeaf)
 
 	fixture.VerifyTabularization();
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
+TEST(EntityTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
 {
-	EntityAggregationTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
+	EntityTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
@@ -347,14 +347,14 @@ TEST(EntityAggregationTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
 	entity.SetKey("");
 	EXPECT_THROW(tabularizer->Tabularize(entity), std::runtime_error);
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
+TEST(EntityTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
 {
-	EntityAggregationTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
+	EntityTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
 
-	EntityAggregationTabularizer* tabularizer = EntityAggregationTabularizer::GetInstance();
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
 	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->CloseDatabase());
@@ -363,6 +363,6 @@ TEST(EntityAggregationTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
 	entity.SetKey(ENTITY_1A);
 	EXPECT_THROW(tabularizer->Tabularize(entity), std::runtime_error);
 
-	EntityAggregationTabularizer::ResetInstance();
+	EntityTabularizer::ResetInstance();
 }
 

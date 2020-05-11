@@ -20,12 +20,6 @@
     <ClCompile Include="test_sqlite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_entity_aggregation_detabularizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_entity_aggregation_tabularizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_itabularizable_entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,6 +30,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_itabularizable_resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_entity_detabularizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_entity_tabularizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

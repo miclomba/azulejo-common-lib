@@ -1,5 +1,5 @@
-#ifndef database_adapters_entityaggregationdetabularizer_h
-#define database_adapters_entityaggregationdetabularizer_h
+#ifndef database_adapters_entitydetabularizer_h
+#define database_adapters_dntitydetabularizer_h
 
 #include <filesystem>
 #include <functional>
@@ -19,12 +19,12 @@
 
 namespace database_adapters {
 
-class DATABASE_ADAPTERS_DLL_EXPORT EntityAggregationDetabularizer
+class DATABASE_ADAPTERS_DLL_EXPORT EntityDetabularizer
 {
 public:
-	virtual ~EntityAggregationDetabularizer();
+	virtual ~EntityDetabularizer();
 
-	static EntityAggregationDetabularizer* GetInstance();
+	static EntityDetabularizer* GetInstance();
 	static void ResetInstance();
 
 	//registration
@@ -42,15 +42,15 @@ public:
 	void LoadEntity(ITabularizableEntity& entity);
 
 private:
-	EntityAggregationDetabularizer();
-	EntityAggregationDetabularizer(const EntityAggregationDetabularizer&) = delete;
-	EntityAggregationDetabularizer& operator=(const EntityAggregationDetabularizer&) = delete;
-	EntityAggregationDetabularizer(EntityAggregationDetabularizer&&) = delete;
-	EntityAggregationDetabularizer& operator=(EntityAggregationDetabularizer&&) = delete;
+	EntityDetabularizer();
+	EntityDetabularizer(const EntityDetabularizer&) = delete;
+	EntityDetabularizer& operator=(const EntityDetabularizer&) = delete;
+	EntityDetabularizer(EntityDetabularizer&&) = delete;
+	EntityDetabularizer& operator=(EntityDetabularizer&&) = delete;
 
 	void LoadWithParentKey(ITabularizableEntity& entity, const entity::Entity::Key& parentKey = "");
 
-	static EntityAggregationDetabularizer* instance_;
+	static EntityDetabularizer* instance_;
 
 	entity::EntityRegistry<ITabularizableEntity> registry_;
 	entity::EntityHierarchy hierarchy_;
@@ -58,5 +58,5 @@ private:
 };
 
 } // end namespace database_adapters
-#endif // database_adapters_entityaggregationdetabularizer_h
+#endif // database_adapters_entitydetabularizer_h
 

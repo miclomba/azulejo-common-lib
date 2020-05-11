@@ -156,8 +156,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EntityAggregationDetabularizer.cpp" />
-    <ClCompile Include="EntityAggregationTabularizer.cpp" />
+    <ClCompile Include="EntityDetabularizer.cpp" />
+    <ClCompile Include="EntityTabularizer.cpp" />
     <ClCompile Include="ITabularizableEntity.cpp" />
     <ClCompile Include="ITabularizableResource.cpp" />
     <ClCompile Include="ResourceDetabularizer.cpp" />
@@ -168,8 +168,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
-    <ClInclude Include="EntityAggregationDetabularizer.h" />
-    <ClInclude Include="EntityAggregationTabularizer.h" />
+    <ClInclude Include="EntityDetabularizer.h" />
+    <ClInclude Include="EntityTabularizer.h" />
     <ClInclude Include="ITabularizableEntity.h" />
     <ClInclude Include="ITabularizableResource.h" />
     <ClInclude Include="ResourceDetabularizer.h" />

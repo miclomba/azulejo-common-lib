@@ -6,9 +6,9 @@
 #include <utility>
 
 #include "Entities/Entity.h"
-#include "EntityAggregationDetabularizer.h"
+#include "EntityDetabularizer.h"
 
-using database_adapters::EntityAggregationDetabularizer;
+using database_adapters::EntityDetabularizer;
 using database_adapters::ITabularizableEntity;
 using entity::Entity;
 
@@ -34,7 +34,7 @@ SharedEntity& ITabularizableEntity::GetAggregatedMember(const Key& key) const
 	if (members[key])
 		return members[key];
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	if (detabularizer->GetRegistry().HasRegisteredKey(key))
 	{
 		std::unique_ptr<ITabularizableEntity> entity = detabularizer->GetRegistry().GenerateEntity(key);

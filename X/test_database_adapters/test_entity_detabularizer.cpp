@@ -14,7 +14,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "DatabaseAdapters/EntityAggregationDetabularizer.h"
+#include "DatabaseAdapters/EntityDetabularizer.h"
 #include "DatabaseAdapters/ITabularizableEntity.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "Entities/Entity.h"
@@ -22,7 +22,7 @@
 namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
-using database_adapters::EntityAggregationDetabularizer;
+using database_adapters::EntityDetabularizer;
 using database_adapters::ITabularizableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
@@ -144,7 +144,7 @@ struct SqliteRemover
 
 void CreateDatabaseTable()
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	Sqlite& database = detabularizer->GetDatabase();
 
 	database.Open(DB_PATH);
@@ -161,9 +161,9 @@ void CreateDatabaseTable()
 	database.Close();
 }
 
-struct EntityAggregationDetabularizerF : public testing::Test
+struct EntityDetabularizerF : public testing::Test
 {
-	EntityAggregationDetabularizerF()
+	EntityDetabularizerF()
 	{
 		// create tabularization structure
 		jsonFile_ = (fs::path(JSON_ROOT) / JSON_FILE).string();
@@ -175,7 +175,7 @@ struct EntityAggregationDetabularizerF : public testing::Test
 		EXPECT_TRUE(fs::exists(DB_PATH));
 	}
 
-	~EntityAggregationDetabularizerF()
+	~EntityDetabularizerF()
 	{
 		// cleanup tabularization
 		fs::remove(jsonFile_);
@@ -193,34 +193,34 @@ private:
 };
 } // end namespace anonymous
 
-TEST(EntityAggregationDetabularizer, GetInstance)
+TEST(EntityDetabularizer, GetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationDetabularizer::GetInstance());
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EXPECT_NO_THROW(EntityDetabularizer::GetInstance());
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	EXPECT_TRUE(detabularizer);
-	EXPECT_NO_THROW(EntityAggregationDetabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityDetabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationDetabularizer, ResetInstance)
+TEST(EntityDetabularizer, ResetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationDetabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityDetabularizer::ResetInstance());
 }
 
-TEST(EntityAggregationDetabularizer, ResetInstanceClosesDatabase)
+TEST(EntityDetabularizer, ResetInstanceClosesDatabase)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	detabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(detabularizer->GetDatabase().IsOpen());
-	EXPECT_NO_THROW(EntityAggregationDetabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityDetabularizer::ResetInstance());
 
-	detabularizer = EntityAggregationDetabularizer::GetInstance();
+	detabularizer = EntityDetabularizer::GetInstance();
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
-	EXPECT_NO_THROW(EntityAggregationDetabularizer::ResetInstance());
+	EXPECT_NO_THROW(EntityDetabularizer::ResetInstance());
 }
 
-TEST_F(EntityAggregationDetabularizerF, DetabularizeRoot)
+TEST_F(EntityDetabularizerF, DetabularizeRoot)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
@@ -247,12 +247,12 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeRoot)
 	EXPECT_TRUE(entity1b);
 	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDetabularizerF, DetabularizeIntermediate)
+TEST_F(EntityDetabularizerF, DetabularizeIntermediate)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
@@ -273,12 +273,12 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeIntermediate)
 	EXPECT_TRUE(entity1b);
 	EXPECT_TRUE(entity1b->GetKey() == ENTITY_1B);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDetabularizerF, DetabularizeLeaf)
+TEST_F(EntityDetabularizerF, DetabularizeLeaf)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
@@ -296,14 +296,14 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeLeaf)
 	std::map<Key, ITabularizableEntity*> membersMap = entity1b.GetAggregatedProtectedMembers();
 	EXPECT_TRUE(membersMap.empty());
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, DetabularizeThrowsWhenDatabaseIsNotOpen)
+TEST(EntityDetabularizer, DetabularizeThrowsWhenDatabaseIsNotOpen)
 {
 	SqliteRemover remover;
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	detabularizer->CloseDatabase();
 
 	TypeA typeA;
@@ -312,14 +312,14 @@ TEST(EntityAggregationDetabularizer, DetabularizeThrowsWhenDatabaseIsNotOpen)
 	EXPECT_THROW(detabularizer->LoadEntity(typeA), std::runtime_error);
 	EXPECT_EQ(typeA.GetKey(), BAD_KEY);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, DetabularizeReturnsWithoutTabularizationStructure)
+TEST(EntityDetabularizer, DetabularizeReturnsWithoutTabularizationStructure)
 {
 	SqliteRemover remover;
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	detabularizer->OpenDatabase(DB_PATH);
 
 	TypeA typeA;
@@ -328,12 +328,12 @@ TEST(EntityAggregationDetabularizer, DetabularizeReturnsWithoutTabularizationStr
 	EXPECT_NO_THROW(detabularizer->LoadEntity(typeA));
 	EXPECT_EQ(typeA.GetKey(), BAD_KEY);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDetabularizerF, DetabularizeReturnsWithBadKey)
+TEST_F(EntityDetabularizerF, DetabularizeReturnsWithBadKey)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	EXPECT_NO_THROW(detabularizer->GetHierarchy().LoadSerializationStructure(GetJSONFile()));
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
@@ -344,12 +344,12 @@ TEST_F(EntityAggregationDetabularizerF, DetabularizeReturnsWithBadKey)
 	EXPECT_NO_THROW(detabularizer->LoadEntity(badEntity));
 	EXPECT_EQ(badEntity.GetKey(), BAD_KEY);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDetabularizerF, LazyLoadEntity)
+TEST_F(EntityDetabularizerF, LazyLoadEntity)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
@@ -368,12 +368,12 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntity)
 	members = entity->GetAggregatedProtectedMembers();
 	EXPECT_TRUE(&(*members[ENTITY_2A]) == &(*lazyLoaded));
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST_F(EntityAggregationDetabularizerF, LazyLoadEntityWithoutTabularization)
+TEST_F(EntityDetabularizerF, LazyLoadEntityWithoutTabularization)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_1A);
 	detabularizer->GetRegistry().RegisterEntity<TypeA>(ENTITY_2A);
@@ -390,20 +390,20 @@ TEST_F(EntityAggregationDetabularizerF, LazyLoadEntityWithoutTabularization)
 	SharedEntity lazyLoaded = entity.GetAggregatedProtectedMemberPtr(BAD_KEY);
 	EXPECT_TRUE(lazyLoaded == nullptr);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, GetDatabase)
+TEST(EntityDetabularizer, GetDatabase)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 	EXPECT_NO_THROW(detabularizer->GetDatabase());
 }
 
-TEST(EntityAggregationDetabularizer, OpenDatabase)
+TEST(EntityDetabularizer, OpenDatabase)
 {
 	SqliteRemover remover;
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	EXPECT_FALSE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_FALSE(fs::exists(DB_PATH));
@@ -411,28 +411,28 @@ TEST(EntityAggregationDetabularizer, OpenDatabase)
 	EXPECT_TRUE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, OpenDatabaseThrowsIfAlreadyOpen)
+TEST(EntityDetabularizer, OpenDatabaseThrowsIfAlreadyOpen)
 {
 	SqliteRemover remover;
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 	EXPECT_THROW(detabularizer->OpenDatabase(DB_PATH), std::runtime_error);
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, CloseDatabaseWhenDatabaseIsOpen)
+TEST(EntityDetabularizer, CloseDatabaseWhenDatabaseIsOpen)
 {
 	SqliteRemover remover;
 
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	detabularizer->OpenDatabase(DB_PATH);
 	EXPECT_TRUE(detabularizer->GetDatabase().IsOpen());
@@ -441,33 +441,33 @@ TEST(EntityAggregationDetabularizer, CloseDatabaseWhenDatabaseIsOpen)
 	EXPECT_FALSE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_TRUE(fs::exists(DB_PATH));
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, CloseDatabaseWhenDatabaseIsClosed)
+TEST(EntityDetabularizer, CloseDatabaseWhenDatabaseIsClosed)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	EXPECT_FALSE(detabularizer->GetDatabase().IsOpen());
 	EXPECT_NO_THROW(detabularizer->CloseDatabase());
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, GetRegistry)
+TEST(EntityDetabularizer, GetRegistry)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	EXPECT_NO_THROW(detabularizer->GetRegistry());
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }
 
-TEST(EntityAggregationDetabularizer, GetHierarchy)
+TEST(EntityDetabularizer, GetHierarchy)
 {
-	EntityAggregationDetabularizer* detabularizer = EntityAggregationDetabularizer::GetInstance();
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
 
 	EXPECT_NO_THROW(detabularizer->GetHierarchy());
 
-	EntityAggregationDetabularizer::ResetInstance();
+	EntityDetabularizer::ResetInstance();
 }

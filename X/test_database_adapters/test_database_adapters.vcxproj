@@ -33,8 +33,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClCompile Include="test_entity_aggregation_detabularizer.cpp" />
-    <ClCompile Include="test_entity_aggregation_tabularizer.cpp" />
+    <ClCompile Include="test_entity_detabularizer.cpp" />
+    <ClCompile Include="test_entity_tabularizer.cpp" />
     <ClCompile Include="test_itabularizable_entity.cpp" />
     <ClCompile Include="test_resource_detabularizer.cpp" />
     <ClCompile Include="test_resource_tabularizer.cpp" />

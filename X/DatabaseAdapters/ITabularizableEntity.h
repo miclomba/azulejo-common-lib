@@ -11,15 +11,15 @@
 
 namespace database_adapters {
 
-class EntityAggregationDetabularizer;
-class EntityAggregationTabularizer;
+class EntityDetabularizer;
+class EntityTabularizer;
 class Sqlite;
 
 class DATABASE_ADAPTERS_DLL_EXPORT ITabularizableEntity : public virtual entity::Entity
 {
 public:
-	friend class EntityAggregationTabularizer;
-	friend class EntityAggregationDetabularizer;
+	friend class EntityTabularizer;
+	friend class EntityDetabularizer;
 
 public:
 	ITabularizableEntity();

@@ -6,10 +6,10 @@
 #include <utility>
 
 #include "Entities/Entity.h"
-#include "EntityAggregationDeserializer.h"
+#include "EntityDeserializer.h"
 
 using entity::Entity;
-using filesystem_adapters::EntityAggregationDeserializer;
+using filesystem_adapters::EntityDeserializer;
 using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
@@ -34,7 +34,7 @@ SharedEntity& ISerializableEntity::GetAggregatedMember(const Key& key) const
 	if (members[key])
 		return members[key];
 
-	EntityAggregationDeserializer* deserializer = EntityAggregationDeserializer::GetInstance();
+	EntityDeserializer* deserializer = EntityDeserializer::GetInstance();
 	if (deserializer->GetRegistry().HasRegisteredKey(key))
 	{
 		std::unique_ptr<ISerializableEntity> entity = deserializer->GetRegistry().GenerateEntity(key);

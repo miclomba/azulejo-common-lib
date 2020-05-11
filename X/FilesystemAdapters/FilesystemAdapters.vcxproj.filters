@@ -18,12 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EntityAggregationDeserializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityAggregationSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ISerializableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,14 +36,14 @@
     <ClInclude Include="ISerializableResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityDeserializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EntityAggregationDeserializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityAggregationSerializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ISerializableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +54,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ISerializableResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityDeserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

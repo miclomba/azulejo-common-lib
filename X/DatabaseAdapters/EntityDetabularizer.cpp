@@ -1,5 +1,6 @@
-#include "EntityAggregationDeserializer.h"
+#include "EntityDetabularizer.h"
 
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
@@ -12,15 +13,17 @@
 #include "Entities/Entity.h"
 #include "Entities/EntityHierarchy.h"
 #include "Entities/EntityRegistry.h"
-#include "ISerializableEntity.h"
+#include "ITabularizableEntity.h"
+#include "Sqlite.h"
 
 namespace pt = boost::property_tree;
 
+using database_adapters::EntityDetabularizer;
+using database_adapters::ITabularizableEntity;
+using database_adapters::Sqlite;
 using entity::Entity;
 using entity::EntityHierarchy;
 using entity::EntityRegistry;
-using filesystem_adapters::EntityAggregationDeserializer;
-using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 
@@ -60,37 +63,62 @@ std::string GetParentKeyPath(const std::string& keyPath)
 }
 } // end namespace anonymous
 
-EntityAggregationDeserializer* EntityAggregationDeserializer::instance_ = nullptr;
+EntityDetabularizer* EntityDetabularizer::instance_ = nullptr;
 
-EntityAggregationDeserializer::EntityAggregationDeserializer() = default;
-EntityAggregationDeserializer::~EntityAggregationDeserializer() = default;
+EntityDetabularizer::EntityDetabularizer() = default;
+EntityDetabularizer::~EntityDetabularizer()
+{
+	if (databaseAdapter_.IsOpen())
+		databaseAdapter_.Close();
+}
 
-EntityAggregationDeserializer* EntityAggregationDeserializer::GetInstance()
+EntityDetabularizer* EntityDetabularizer::GetInstance()
 {
 	if (!instance_)
-		instance_ = new EntityAggregationDeserializer();
+		instance_ = new EntityDetabularizer();
 	return instance_;
 }
 
-void EntityAggregationDeserializer::ResetInstance()
+void EntityDetabularizer::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-EntityRegistry<ISerializableEntity>& EntityAggregationDeserializer::GetRegistry()
+EntityRegistry<ITabularizableEntity>& EntityDetabularizer::GetRegistry()
 {
 	return registry_;
 }
 
-EntityHierarchy& EntityAggregationDeserializer::GetHierarchy()
+EntityHierarchy& EntityDetabularizer::GetHierarchy()
 {
 	return hierarchy_;
 }
 
-void EntityAggregationDeserializer::LoadEntity(ISerializableEntity& entity)
+void EntityDetabularizer::CloseDatabase()
 {
+	if (databaseAdapter_.IsOpen())
+		databaseAdapter_.Close();
+}
+
+void EntityDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+{
+	if (databaseAdapter_.IsOpen())
+		throw std::runtime_error("EntityDetabularizer already has a database set");
+	databaseAdapter_.Open(dbPath);
+}
+
+Sqlite& EntityDetabularizer::GetDatabase()
+{
+	return databaseAdapter_;
+}
+
+void EntityDetabularizer::LoadEntity(ITabularizableEntity& entity)
+{
+	if (!databaseAdapter_.IsOpen())
+		throw std::runtime_error("Cannot detabularize entity because the database is not open");
+
 	if (!hierarchy_.HasSerializationStructure())
 		return;
 
@@ -101,18 +129,15 @@ void EntityAggregationDeserializer::LoadEntity(ISerializableEntity& entity)
 	LoadWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
-void EntityAggregationDeserializer::LoadWithParentKey(ISerializableEntity& entity, const Key& parentKey)
+void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity& entity, const Key& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 
 	boost::optional<pt::ptree&> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)
-		throw std::runtime_error("Cannot locate entity key in the deserialization json structure");
+		throw std::runtime_error("Cannot locate entity key in the detabularization json structure");
 
-	std::string relativePath = searchPath;
-	std::replace(relativePath.begin(), relativePath.end(), '.', '/');
-	std::string absolutePath = (hierarchy_.GetSerializationPath().parent_path() / relativePath).string();
-	entity.Load(*tree, absolutePath);
+	entity.Load(GetDatabase());
 
 	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{
@@ -120,10 +145,10 @@ void EntityAggregationDeserializer::LoadWithParentKey(ISerializableEntity& entit
 		if (!registry_.HasRegisteredKey(key))
 			continue;
 
-		std::unique_ptr<ISerializableEntity> memberEntity = registry_.GenerateEntity(key);
+		std::unique_ptr<ITabularizableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
-		auto childEntity = std::dynamic_pointer_cast<ISerializableEntity>(entity.GetAggregatedMember(key));
+		auto childEntity = std::dynamic_pointer_cast<ITabularizableEntity>(entity.GetAggregatedMember(key));
 		LoadWithParentKey(*childEntity, searchPath);
 	}
 }

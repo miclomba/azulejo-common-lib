@@ -1,4 +1,4 @@
-#include "EntityAggregationTabularizer.h"
+#include "EntityTabularizer.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -15,7 +15,7 @@
 
 namespace pt = boost::property_tree;
 
-using database_adapters::EntityAggregationTabularizer;
+using database_adapters::EntityTabularizer;
 using database_adapters::ITabularizableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
@@ -23,31 +23,31 @@ using entity::EntityHierarchy;
 
 using Key = Entity::Key;
 
-EntityAggregationTabularizer* EntityAggregationTabularizer::instance_ = nullptr;
+EntityTabularizer* EntityTabularizer::instance_ = nullptr;
 
-EntityAggregationTabularizer::EntityAggregationTabularizer() = default;
+EntityTabularizer::EntityTabularizer() = default;
 
-EntityAggregationTabularizer::~EntityAggregationTabularizer()
+EntityTabularizer::~EntityTabularizer()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-EntityAggregationTabularizer* EntityAggregationTabularizer::GetInstance()
+EntityTabularizer* EntityTabularizer::GetInstance()
 {
 	if (!instance_)
-		instance_ = new EntityAggregationTabularizer();
+		instance_ = new EntityTabularizer();
 	return instance_;
 }
 
-void EntityAggregationTabularizer::ResetInstance()
+void EntityTabularizer::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-void EntityAggregationTabularizer::Tabularize(const ITabularizableEntity& entity)
+void EntityTabularizer::Tabularize(const ITabularizableEntity& entity)
 {
 	if (!databaseAdapter_.IsOpen())
 		throw std::runtime_error("Cannot tabularize entity because the database is not open");
@@ -56,7 +56,7 @@ void EntityAggregationTabularizer::Tabularize(const ITabularizableEntity& entity
 	TabularizeWithParentKey(entity, "");
 }
 
-void EntityAggregationTabularizer::TabularizeWithParentKey(const ITabularizableEntity& entity, const Key& parentKey)
+void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity& entity, const Key& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
@@ -76,25 +76,25 @@ void EntityAggregationTabularizer::TabularizeWithParentKey(const ITabularizableE
 		boost::property_tree::json_parser::write_json(hierarchy_.GetSerializationPath().string(), hierarchy_.GetSerializationStructure());
 }
 
-void EntityAggregationTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+void EntityTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
-		throw std::runtime_error("EntityAggregationDetabularizer already has a database open");
+		throw std::runtime_error("EntityTabularizer already has a database open");
 	databaseAdapter_.Open(dbPath);
 }
 
-void EntityAggregationTabularizer::CloseDatabase()
+void EntityTabularizer::CloseDatabase()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-Sqlite& EntityAggregationTabularizer::GetDatabase()
+Sqlite& EntityTabularizer::GetDatabase()
 {
 	return databaseAdapter_;
 }
 
-EntityHierarchy& EntityAggregationTabularizer::GetHierarchy()
+EntityHierarchy& EntityTabularizer::GetHierarchy()
 {
 	return hierarchy_;
 }

@@ -14,13 +14,13 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "FilesystemAdapters/ISerializableEntity.h"
-#include "FilesystemAdapters/EntityAggregationSerializer.h"
+#include "FilesystemAdapters/EntitySerializer.h"
 
 namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using entity::Entity;
-using filesystem_adapters::EntityAggregationSerializer;
+using filesystem_adapters::EntitySerializer;
 using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
@@ -94,9 +94,9 @@ std::vector<std::string> LocalSerializationPaths(const std::string& root, const 
 	return directories;
 }
 
-struct EntityAggregationSerializerFixture 
+struct EntitySerializerFixture 
 {
-	EntityAggregationSerializerFixture(const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
+	EntitySerializerFixture(const std::string& root, const std::string& intermediate = "", const std::string& leaf = "")
 	{
 		// get serialization paths
 		jsonFile_ = (fs::path(JSON_ROOT) / JSON_FILE).string();
@@ -143,24 +143,24 @@ private:
 };
 } // end namespace entity
 
-TEST(EntityAggregationSerializer, GetInstance)
+TEST(EntitySerializer, GetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationSerializer::GetInstance());
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EXPECT_NO_THROW(EntitySerializer::GetInstance());
+	EntitySerializer* serializer = EntitySerializer::GetInstance();
 	EXPECT_TRUE(serializer);
-	EXPECT_NO_THROW(EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(EntitySerializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, ResetInstance)
+TEST(EntitySerializer, ResetInstance)
 {
-	EXPECT_NO_THROW(EntityAggregationSerializer::ResetInstance());
+	EXPECT_NO_THROW(EntitySerializer::ResetInstance());
 }
 
-TEST(EntityAggregationSerializer, SerializeFromRoot)
+TEST(EntitySerializer, SerializeFromRoot)
 {
-	EntityAggregationSerializerFixture fixture(ENTITY_1A, ENTITY_2A, ENTITY_1B);
+	EntitySerializerFixture fixture(ENTITY_1A, ENTITY_2A, ENTITY_1B);
 
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EntitySerializer* serializer = EntitySerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -168,14 +168,14 @@ TEST(EntityAggregationSerializer, SerializeFromRoot)
 
 	fixture.VerifySerialization();
 
-	EntityAggregationSerializer::ResetInstance();
+	EntitySerializer::ResetInstance();
 }
 
-TEST(EntityAggregationSerializer, SerializeFromIntermediate)
+TEST(EntitySerializer, SerializeFromIntermediate)
 {
-	EntityAggregationSerializerFixture fixture(ENTITY_2A, ENTITY_1B);
+	EntitySerializerFixture fixture(ENTITY_2A, ENTITY_1B);
 
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EntitySerializer* serializer = EntitySerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -183,14 +183,14 @@ TEST(EntityAggregationSerializer, SerializeFromIntermediate)
 
 	fixture.VerifySerialization();
 
-	EntityAggregationSerializer::ResetInstance();
+	EntitySerializer::ResetInstance();
 }
 
-TEST(EntityAggregationSerializer, SerializeFromLeaf)
+TEST(EntitySerializer, SerializeFromLeaf)
 {
-	EntityAggregationSerializerFixture fixture(ENTITY_1B);
+	EntitySerializerFixture fixture(ENTITY_1B);
 
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EntitySerializer* serializer = EntitySerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -198,14 +198,14 @@ TEST(EntityAggregationSerializer, SerializeFromLeaf)
 
 	fixture.VerifySerialization();
 
-	EntityAggregationSerializer::ResetInstance();
+	EntitySerializer::ResetInstance();
 }
 
-TEST(EntityAggregationSerializer, SerializeThrows)
+TEST(EntitySerializer, SerializeThrows)
 {
-	EntityAggregationSerializerFixture fixture(ENTITY_1B);
+	EntitySerializerFixture fixture(ENTITY_1B);
 
-	EntityAggregationSerializer* serializer = EntityAggregationSerializer::GetInstance();
+	EntitySerializer* serializer = EntitySerializer::GetInstance();
 
 	EXPECT_NO_THROW(serializer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 
@@ -213,5 +213,5 @@ TEST(EntityAggregationSerializer, SerializeThrows)
 	entity.SetKey("");
 	EXPECT_THROW(serializer->Serialize(entity), std::runtime_error);
 
-	EntityAggregationSerializer::ResetInstance();
+	EntitySerializer::ResetInstance();
 }

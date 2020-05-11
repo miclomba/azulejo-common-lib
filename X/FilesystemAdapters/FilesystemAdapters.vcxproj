@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
-    <ClInclude Include="EntityAggregationDeserializer.h" />
-    <ClInclude Include="EntityAggregationSerializer.h" />
+    <ClInclude Include="EntityDeserializer.h" />
+    <ClInclude Include="EntitySerializer.h" />
     <ClInclude Include="ISerializableEntity.h" />
     <ClInclude Include="ISerializableResource.h" />
     <ClInclude Include="ResourceDeserializer.h" />
@@ -29,8 +29,8 @@
     <ClInclude Include="ResourceSerializer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EntityAggregationDeserializer.cpp" />
-    <ClCompile Include="EntityAggregationSerializer.cpp" />
+    <ClCompile Include="EntityDeserializer.cpp" />
+    <ClCompile Include="EntitySerializer.cpp" />
     <ClCompile Include="ISerializableEntity.cpp" />
     <ClCompile Include="ISerializableResource.cpp" />
     <ClCompile Include="ResourceDeserializer.cpp" />

@@ -1,4 +1,4 @@
-#include "EntityAggregationSerializer.h"
+#include "EntitySerializer.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -16,38 +16,38 @@ namespace pt = boost::property_tree;
 
 using entity::Entity;
 using entity::EntityHierarchy;
-using filesystem_adapters::EntityAggregationSerializer;
+using filesystem_adapters::EntitySerializer;
 using filesystem_adapters::ISerializableEntity;
 
 using Key = Entity::Key;
 
-EntityAggregationSerializer* EntityAggregationSerializer::instance_ = nullptr;
+EntitySerializer* EntitySerializer::instance_ = nullptr;
 
-EntityAggregationSerializer::EntityAggregationSerializer() = default;
-EntityAggregationSerializer::~EntityAggregationSerializer() = default;
+EntitySerializer::EntitySerializer() = default;
+EntitySerializer::~EntitySerializer() = default;
 
-EntityAggregationSerializer* EntityAggregationSerializer::GetInstance()
+EntitySerializer* EntitySerializer::GetInstance()
 {
 	if (!instance_)
-		instance_ = new EntityAggregationSerializer();
+		instance_ = new EntitySerializer();
 	return instance_;
 }
 
-void EntityAggregationSerializer::ResetInstance()
+void EntitySerializer::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-void EntityAggregationSerializer::Serialize(const ISerializableEntity& entity)
+void EntitySerializer::Serialize(const ISerializableEntity& entity)
 {
 	if (entity.GetKey().empty())
 		throw std::runtime_error("Cannot serialize entity because key=" + entity.GetKey() + " is not present in the loaded serialization structure");
 	SerializeWithParentKey(entity, "");
 }
 
-void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEntity& entity, const Key& parentKey)
+void EntitySerializer::SerializeWithParentKey(const ISerializableEntity& entity, const Key& parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
@@ -72,7 +72,7 @@ void EntityAggregationSerializer::SerializeWithParentKey(const ISerializableEnti
 		boost::property_tree::json_parser::write_json(hierarchy_.GetSerializationPath().string(), hierarchy_.GetSerializationStructure());
 }
 
-EntityHierarchy& EntityAggregationSerializer::GetHierarchy()
+EntityHierarchy& EntitySerializer::GetHierarchy()
 {
 	return hierarchy_;
 }
