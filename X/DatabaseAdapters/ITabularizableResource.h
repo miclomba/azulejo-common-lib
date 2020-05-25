@@ -9,7 +9,6 @@ namespace database_adapters {
 
 class ResourceDetabularizer;
 class ResourceTabularizer;
-class Sqlite;
 
 class DATABASE_ADAPTERS_DLL_EXPORT ITabularizableResource : public virtual resource::IResource
 {
@@ -25,9 +24,6 @@ public:
 	ITabularizableResource& operator=(const ITabularizableResource&);
 	ITabularizableResource(ITabularizableResource&&);
 	ITabularizableResource& operator=(ITabularizableResource&&);
-
-	virtual void Save(Sqlite& database) const = 0;
-	virtual void Load(Sqlite& database) = 0;
 };
 
 } // end namespace database_adapters

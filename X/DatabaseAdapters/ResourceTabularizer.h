@@ -2,6 +2,7 @@
 #define database_adapters_resourcetabularizer_h
 
 #include <filesystem>
+#include <string>
 
 #include "config.h"
 
@@ -18,7 +19,7 @@ public:
 	static ResourceTabularizer* GetInstance();
 	static void ResetInstance();
 
-	void Tabularize(const ITabularizableResource& resource);
+	void Tabularize(const ITabularizableResource& resource, const std::string& key);
 
 	// database
 	void CloseDatabase();

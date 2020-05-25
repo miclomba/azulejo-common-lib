@@ -40,6 +40,7 @@
     <ClCompile Include="test_resource_tabularizer.cpp" />
     <ClCompile Include="test_sqlite.cpp" />
     <ClCompile Include="test_itabularizable_resource.cpp" />
+    <ClCompile Include="test_sqlite_blob.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

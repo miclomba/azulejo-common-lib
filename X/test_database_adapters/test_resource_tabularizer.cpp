@@ -8,44 +8,29 @@
 
 #include <gtest/gtest.h>
 
+#include "ContainerResource.h"
 #include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/ResourceDetabularizer.h"
 #include "DatabaseAdapters/ResourceTabularizer.h"
-#include "DatabaseAdapters/Sqlite.h"
-#include "Entities/Entity.h"
 
 namespace fs = std::filesystem;
 
 using database_adapters::ResourceTabularizer;
+using database_adapters::ResourceDetabularizer;
 using database_adapters::ITabularizableResource;
-using database_adapters::Sqlite;
 
 namespace
 {
 const fs::path ROOT_DIR = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY; 
 const std::string DB_NAME = "db.sqlite";
 const fs::path DB_PATH = ROOT_DIR / DB_NAME;
-const std::string TABLE_NAME = "tbl";
-const std::vector<std::string> COLUMN_NAMES{ "pkey","resourceVal" };
-const std::string VALUE = "1.0";
-const std::string PKEY = "1";
+const std::string RESOURCE_KEY = "resource";
+const int VAL = 1;
+const std::vector<int> ARRAY_1(2, VAL);
 
-struct TypeA : public ITabularizableResource
-{
-	size_t GetElementSize() const override { return 0; }
-	void* Data() override { return nullptr; }
-	const void* Data() const override { return nullptr; }
-	void Assign(const char* buff, const size_t n) override {}
-	void Load(Sqlite& database) override {}
+using Resource = ContainerResource<int>;
 
-	void Save(Sqlite& database) const override
-	{
-		std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAMES[0] + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAMES[1] + " TEXT NOT NULL);";
-		database.Execute(sql);
-
-		sql = "INSERT INTO " + TABLE_NAME + " (" + COLUMN_NAMES.at(1) + ") VALUES ('" + VALUE + "');";
-		database.Execute(sql);
-	}
-};
+auto RESOURCE_CONSTRUCTOR = []()->std::unique_ptr<ITabularizableResource> { return std::make_unique<Resource>(); };
 
 struct SqliteRemover 
 {
@@ -64,40 +49,44 @@ struct SqliteRemover
 
 struct ResourceTabularizerFixture 
 {
-	void VerifyTabularization()
+	ResourceTabularizerFixture() :
+		resource_(ARRAY_1)
 	{
-		EXPECT_TRUE(fs::exists(DB_PATH));
-
-		std::function<int(int, char**, char**)> rowHandler =
-			[this](int numCols, char** colValues, char** colNames)
-		{
-			EXPECT_EQ(COLUMN_NAMES.size(), numCols);
-			for (int i = 0; i < numCols; ++i)
-			{
-				std::string colName = colNames[i];
-				EXPECT_EQ(colName, COLUMN_NAMES[i]);
-				std::string colValue = colValues[i];
-				EXPECT_EQ(colValue, colNames[i] == COLUMN_NAMES[0] ? PKEY : VALUE);
-			}
-			return 0;
-		};
-
-		ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
-
-		std::string sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAMES[1] + "='" + VALUE + "';";
-		tabularizer->GetDatabase().Execute(sql, rowHandler);
+		ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+		detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
 	}
 
-	TypeA& GetResource()
+	~ResourceTabularizerFixture()
+	{
+		ResourceDetabularizer::ResetInstance();
+	}
+
+	void VerifyTabularization()
+	{
+		ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+		detabularizer->OpenDatabase(DB_PATH);
+		std::unique_ptr<ITabularizableResource> resource = detabularizer->Detabularize(RESOURCE_KEY);
+		detabularizer->CloseDatabase();
+
+		// verify
+		EXPECT_EQ(ARRAY_1.size(), resource->GetColumnSize());
+		EXPECT_EQ(size_t(1), resource->GetRowSize());
+		EXPECT_EQ(sizeof(int), resource->GetElementSize());
+		EXPECT_EQ(sizeof(int) * ARRAY_1.size(), resource->GetColumnSize() * resource->GetRowSize() * resource->GetElementSize());
+		EXPECT_EQ(ARRAY_1[0], reinterpret_cast<const int*>(resource->Data())[0]);
+		EXPECT_EQ(ARRAY_1[1], reinterpret_cast<const int*>(resource->Data())[1]);
+	}
+
+	Resource& GetResource()
 	{
 		return resource_;
 	}
 
 private:
 	SqliteRemover dbRemover_;
-	TypeA resource_;
+	Resource resource_;
 };
-} // end namespace entity
+} // end namespace anonymous 
 
 TEST(ResourceTabularizer, GetInstance)
 {
@@ -193,9 +182,19 @@ TEST(ResourceTabularizer, Tabularize)
 
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
-	EXPECT_NO_THROW(tabularizer->Tabularize(fixture.GetResource()));
+	EXPECT_NO_THROW(tabularizer->Tabularize(fixture.GetResource(), RESOURCE_KEY));
 
 	fixture.VerifyTabularization();
+
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(ResourceTabularizer, TabularizeThrowsUsingEmptyKey)
+{
+	ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+
+	Resource resource;
+	EXPECT_THROW(tabularizer->Tabularize(resource, ""), std::runtime_error);
 
 	ResourceTabularizer::ResetInstance();
 }
@@ -208,8 +207,22 @@ TEST(ResourceTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
 
 	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	TypeA resource;
-	EXPECT_THROW(tabularizer->Tabularize(resource), std::runtime_error);
+	Resource resource;
+	EXPECT_THROW(tabularizer->Tabularize(resource, RESOURCE_KEY), std::runtime_error);
+
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(ResourceTabularizer, TabularizeThrowsIfResourceDataIsEmpty)
+{
+	ResourceTabularizerFixture fixture;
+
+	ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+
+	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
+
+	Resource resource;
+	EXPECT_THROW(tabularizer->Tabularize(resource, RESOURCE_KEY), std::runtime_error);
 
 	ResourceTabularizer::ResetInstance();
 }

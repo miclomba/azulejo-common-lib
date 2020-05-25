@@ -21,13 +21,6 @@ public:
 	ISerializableResource& operator=(const ISerializableResource&);
 	ISerializableResource(ISerializableResource&&);
 	ISerializableResource& operator=(ISerializableResource&&);
-
-protected:
-	bool IsDirty() const;
-	int Checksum() const;
-
-private:
-	mutable int checkSum_{-1};
 };
 
 } // end filesystem_adapters

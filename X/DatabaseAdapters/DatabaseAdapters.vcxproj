@@ -165,6 +165,7 @@
     <ClCompile Include="shell.c" />
     <ClCompile Include="Sqlite.cpp" />
     <ClCompile Include="sqlite3.c" />
+    <ClCompile Include="SqliteBlob.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -173,10 +174,12 @@
     <ClInclude Include="ITabularizableEntity.h" />
     <ClInclude Include="ITabularizableResource.h" />
     <ClInclude Include="ResourceDetabularizer.h" />
+    <ClInclude Include="ResourceDetabularizer.hpp" />
     <ClInclude Include="ResourceTabularizer.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="Sqlite.h" />
     <ClInclude Include="sqlite3ext.h" />
+    <ClInclude Include="SqliteBlob.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

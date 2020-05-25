@@ -1,5 +1,6 @@
-
 #include "IResource.h"
+
+#include <boost/crc.hpp>
 
 using resource::IResource;
 
@@ -32,4 +33,22 @@ size_t IResource::GetColumnSize() const
 size_t IResource::GetRowSize() const
 {
 	return N_;
+}
+
+bool IResource::IsDirty() const
+{
+	int check = Checksum();
+	if (check == checkSum_)
+		return false;
+
+	checkSum_ = check;
+	return true;
+}
+
+int IResource::Checksum() const
+{
+	size_t size = GetElementSize() * GetColumnSize() * GetRowSize();
+	boost::crc_32_type crc;
+	crc.process_bytes(Data(), size);
+	return crc.checksum();
 }

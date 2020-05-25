@@ -1,6 +1,7 @@
 
 #include "config.h"
 
+#include <vector>
 #include <gtest/gtest.h>
 
 #include "Resources/IResource.h"
@@ -8,9 +9,20 @@
 namespace
 {
 const size_t SIZE = 1;
+const int VAL = 1;
+const std::vector<int> ARRAY_1(1, VAL);
 
 struct Resource : resource::IResource
 {
+	Resource() = default;
+
+	Resource(const std::vector<int>& values) :
+		data_(values)
+	{
+		SetRowSize(data_.size());
+		SetColumnSize(1);
+	}
+
 	void SetColumnSizeProtected(const size_t size)
 	{
 		SetColumnSize(size);
@@ -28,17 +40,23 @@ struct Resource : resource::IResource
 
 	void* Data() override
 	{
-		return nullptr;
+		return data_.data();
 	}
 
 	const void* Data() const override
 	{
-		return nullptr;
+		return data_.data();
 	}
 
 	void Assign(const char* buff, const size_t n) override
 	{
 	}
+
+	bool IsDirtyProtected() { return IsDirty(); }
+	int ChecksumProtected() { return Checksum(); }
+
+private:
+	std::vector<int> data_;
 };
 } // end namespace
 
@@ -83,14 +101,14 @@ TEST(IResource, GetElementSize)
 
 TEST(IResource, Data)
 {
-	Resource resource;
-	EXPECT_EQ(resource.Data(), static_cast<void*>(nullptr));
+	Resource resource(ARRAY_1);
+	EXPECT_EQ(*static_cast<int*>(resource.Data()), VAL);
 }
 
 TEST(IResource, DataConst)
 {
-	const Resource resource;
-	EXPECT_EQ(resource.Data(), static_cast<void*>(nullptr));
+	const Resource resource(ARRAY_1);
+	EXPECT_EQ(*static_cast<const int*>(resource.Data()), VAL);
 }
 
 TEST(IResource, Assign)
@@ -98,3 +116,26 @@ TEST(IResource, Assign)
 	Resource resource;
 	EXPECT_NO_THROW(resource.Assign(nullptr,SIZE));
 }
+
+TEST(IResource, IsDirty)
+{
+	Resource ir(ARRAY_1);
+
+	EXPECT_TRUE(ir.IsDirtyProtected());
+	EXPECT_FALSE(ir.IsDirtyProtected());
+
+	*static_cast<int*>(ir.Data()) = 2*ARRAY_1[0];
+	EXPECT_TRUE(ir.IsDirtyProtected());
+}
+
+TEST(IResource, Checksum)
+{
+	Resource ir(ARRAY_1);
+
+	int checksum = ir.ChecksumProtected();
+	EXPECT_EQ(ir.ChecksumProtected(), checksum);
+
+	*static_cast<int*>(ir.Data()) = 2*ARRAY_1[0];
+	EXPECT_NE(ir.ChecksumProtected(), checksum);
+}
+

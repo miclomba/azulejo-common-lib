@@ -31,9 +31,14 @@ protected:
 	void SetColumnSize(const size_t size);
 	void SetRowSize(const size_t size);
 
+	bool IsDirty() const;
+	int Checksum() const;
+
 private:
 	size_t M_{ 0 };
 	size_t N_{ 0 };
+
+	mutable int checkSum_{ -1 };
 };
 
 } // end resource

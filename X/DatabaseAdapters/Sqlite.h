@@ -32,6 +32,9 @@ public:
 	void Open(const std::filesystem::path& dbPath);
 	void Close();
 
+	// TODO control access of this
+	sqlite3* GetSqlite3();
+
 private:
 	void FreeErrorMessage(char* const ec);
 

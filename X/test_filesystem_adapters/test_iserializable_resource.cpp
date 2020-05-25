@@ -102,29 +102,6 @@ TEST(Resource, GetDataConst)
 	EXPECT_EQ(*static_cast<const int*>(ir.Data()), ARRAY_1[0]);
 }
 
-TEST(Resource, IsDirty)
-{
-	std::vector<int> values = ARRAY_1;
-	Resource ir(ARRAY_1);
-
-	EXPECT_TRUE(ir.IsDirtyProtected());
-	EXPECT_FALSE(ir.IsDirtyProtected());
-
-	*static_cast<int*>(ir.Data()) = VAL;
-	EXPECT_TRUE(ir.IsDirtyProtected());
-}
-
-TEST(Resource, Checksum)
-{
-	Resource ir(ARRAY_1);
-
-	int checksum = ir.ChecksumProtected();
-	EXPECT_EQ(ir.ChecksumProtected(), checksum);
-
-	*static_cast<int*>(ir.Data()) = VAL;
-	EXPECT_NE(ir.ChecksumProtected(), checksum);
-}
-
 TEST(Resource, AssignArray)
 {
 	Resource ir;

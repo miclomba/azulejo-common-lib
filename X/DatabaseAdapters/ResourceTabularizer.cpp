@@ -2,13 +2,27 @@
 
 #include <filesystem>
 #include <stdexcept>
+#include <string>
 
 #include "ITabularizableResource.h"
 #include "Sqlite.h"
+#include "SqliteBlob.h"
 
 using database_adapters::ResourceTabularizer;
 using database_adapters::ITabularizableResource;
 using database_adapters::Sqlite;
+using database_adapters::SqliteBlob;
+
+namespace
+{
+const std::string TABLE_NAME = "resources";
+const std::string ROW_KEY = "row";
+const std::string P_KEY = "resource_key";
+const std::string M_KEY = "m";
+const std::string N_KEY = "n";
+const std::string SIZE_OF_KEY = "sizeof";
+const std::string DATA_KEY = "data";
+}
 
 ResourceTabularizer* ResourceTabularizer::instance_ = nullptr;
 
@@ -34,18 +48,21 @@ void ResourceTabularizer::ResetInstance()
 	instance_ = nullptr;
 }
 
-void ResourceTabularizer::Tabularize(const ITabularizableResource& resource)
-{
-	if (!databaseAdapter_.IsOpen())
-		throw std::runtime_error("Cannot tabularize resource because the database is not open");
-	resource.Save(GetDatabase());
-}
-
 void ResourceTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("ResourceTabularizer already has a database open");
 	databaseAdapter_.Open(dbPath);
+
+	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+		ROW_KEY + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		P_KEY + " TEXT NOT NULL, " +
+		M_KEY + " INTEGER, " +
+		N_KEY + " INTEGER, " +
+		SIZE_OF_KEY + " INTEGER, " +
+		DATA_KEY + " BLOB);";
+
+	databaseAdapter_.Execute(sql);
 }
 
 void ResourceTabularizer::CloseDatabase()
@@ -58,4 +75,26 @@ Sqlite& ResourceTabularizer::GetDatabase()
 {
 	return databaseAdapter_;
 }
+
+void ResourceTabularizer::Tabularize(const ITabularizableResource& resource, const std::string& key)
+{
+	if (key.empty())
+		throw std::runtime_error("Cannot tabularize resource with empty key");
+
+	if (!resource.IsDirty())
+		return;
+
+	if (!databaseAdapter_.IsOpen())
+		throw std::runtime_error("Cannot tabularize resource because the database is not open");
+
+	const std::string M = std::to_string(resource.GetColumnSize());
+	const std::string N = std::to_string(resource.GetRowSize());
+	const std::string SIZE_OF = std::to_string(resource.GetElementSize());
+
+	const std::string sql = "INSERT INTO " + TABLE_NAME + " (" + P_KEY + "," + M_KEY + "," + N_KEY + "," + SIZE_OF_KEY + "," + DATA_KEY + ") VALUES ('" + key + "'," + M + "," + N + "," + SIZE_OF + ",?);";
+	const size_t size = resource.GetElementSize() * resource.GetColumnSize() * resource.GetRowSize();
+
+	SqliteBlob::InsertBlob(databaseAdapter_, sql, resource.Data(), size);
+}
+
 

@@ -8,65 +8,29 @@
 
 #include <gtest/gtest.h>
 
+#include "ContainerResource.h"
 #include "DatabaseAdapters/ITabularizableResource.h"
 #include "DatabaseAdapters/ResourceDetabularizer.h"
-#include "DatabaseAdapters/Sqlite.h"
+#include "DatabaseAdapters/ResourceTabularizer.h"
 
 namespace fs = std::filesystem;
 
 using database_adapters::ITabularizableResource;
 using database_adapters::ResourceDetabularizer;
-using database_adapters::Sqlite;
+using database_adapters::ResourceTabularizer;
 
 namespace
 {
 const fs::path ROOT_DIR = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY;
 const std::string DB_NAME = "db.sqlite";
 const fs::path DB_PATH = ROOT_DIR / DB_NAME;
-const std::string TABLE_NAME = "tbl";
-const std::vector<std::string> COLUMN_NAMES{ "pkey","resourceVal" };
-const std::string PKEY = "1";
-const std::string VALUE = "1.0";
+const std::string RESOURCE_KEY = "resource";
+const int VAL = 1;
+const std::vector<int> ARRAY_1(2, VAL);
 
-struct TypeA : public ITabularizableResource
-{
-	size_t GetElementSize() const override { return 0; }
-	void* Data() override { return nullptr; }
-	const void* Data() const override { return nullptr; }
-	void Assign(const char* buff, const size_t n) override {}
-	void Save(Sqlite& database) const override {}
+using Resource = ContainerResource<int>;
 
-	void Load(Sqlite& database) override
-	{
-		std::function<int(int, char**, char**)> rowHandler =
-			[this](int numCols, char** colValues, char** colNames)
-		{
-			EXPECT_EQ(COLUMN_NAMES.size(), numCols);
-			for (int i = 0; i < numCols; ++i)
-			{
-				std::string colName = colNames[i];
-				EXPECT_EQ(colName, COLUMN_NAMES[i]);
-				std::string colValue = colValues[i];
-				EXPECT_EQ(colValue, i == 0 ? PKEY : VALUE);
-
-				if (colName == COLUMN_NAMES[1])
-					value_ = colValue;
-			}
-			return 0;
-		};
-
-		std::string sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAMES[1] + "='" + VALUE + "';";
-		database.Execute(sql, rowHandler);
-	}
-
-	std::string GetValue() const
-	{
-		return value_;
-	}
-
-private:
-	std::string value_;
-};
+auto RESOURCE_CONSTRUCTOR = []()->std::unique_ptr<ITabularizableResource> { return std::make_unique<Resource>(); };
 
 struct SqliteRemover
 {
@@ -83,31 +47,34 @@ struct SqliteRemover
 	}
 };
 
-void CreateDatabaseTable(const std::string& value)
-{
-	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
-	Sqlite& database = detabularizer->GetDatabase();
-
-	database.Open(DB_PATH);
-
-	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAMES[0] + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAMES[1] + " TEXT NOT NULL);";
-	database.Execute(sql);
-
-	sql = "INSERT INTO " + TABLE_NAME + " (" + COLUMN_NAMES.at(1) + ") VALUES ('" + value + "');";
-	database.Execute(sql);
-
-	database.Close();
-}
-
 struct ResourceDetabularizerFixture
 {
-	ResourceDetabularizerFixture(const std::string& value)
+	ResourceDetabularizerFixture(const std::string& key, const std::vector<int>& blob)
 	{
-		CreateDatabaseTable(value);
+		CreateDatabaseTable(blob);
+		RegisterResource(key);
+
 		EXPECT_TRUE(fs::exists(DB_PATH));
 	}
 
 private:
+	void CreateDatabaseTable(const std::vector<int>& blob)
+	{
+		ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+		tabularizer->OpenDatabase(DB_PATH);
+
+		Resource resource(ARRAY_1);
+		tabularizer->Tabularize(resource, RESOURCE_KEY);
+
+		tabularizer->CloseDatabase();
+	}
+
+	void RegisterResource(const std::string& key)
+	{
+		ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+		detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
+	}
+
 	SqliteRemover dbRemover_;
 };
 } // end namespace anonymous
@@ -141,17 +108,21 @@ TEST(ResourceDetabularizer, Detabularize)
 {
 	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
 
-	ResourceDetabularizerFixture fixture(VALUE);
+	ResourceDetabularizerFixture fixture(RESOURCE_KEY, ARRAY_1);
 
 	EXPECT_NO_THROW(detabularizer->OpenDatabase(DB_PATH));
 
-	// detabularize an resource
-	TypeA resource;
-	EXPECT_TRUE(resource.GetValue().empty());
-	EXPECT_NO_THROW(detabularizer->LoadResource(resource));
+	// detabularize a resource
+	std::unique_ptr<ITabularizableResource> resource;
+	EXPECT_NO_THROW(resource = detabularizer->Detabularize(RESOURCE_KEY));
 
 	// verify
-	EXPECT_EQ(resource.GetValue(), VALUE);
+	EXPECT_EQ(ARRAY_1.size(), resource->GetColumnSize());
+	EXPECT_EQ(size_t(1), resource->GetRowSize());
+	EXPECT_EQ(sizeof(int), resource->GetElementSize());
+	EXPECT_EQ(sizeof(int) * ARRAY_1.size(), resource->GetColumnSize() * resource->GetRowSize() * resource->GetElementSize());
+	EXPECT_EQ(ARRAY_1[0], reinterpret_cast<const int*>(resource->Data())[0]);
+	EXPECT_EQ(ARRAY_1[1], reinterpret_cast<const int*>(resource->Data())[1]);
 
 	ResourceDetabularizer::ResetInstance();
 }
@@ -163,9 +134,17 @@ TEST(ResourceDetabularizer, DetabularizeThrowsWhenDatabaseIsNotOpen)
 	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
 	detabularizer->CloseDatabase();
 
-	TypeA typeA;
+	EXPECT_THROW(detabularizer->Detabularize("Foo"), std::runtime_error);
 
-	EXPECT_THROW(detabularizer->LoadResource(typeA), std::runtime_error);
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, DetabularizeThrowsWithEmptyKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
+	EXPECT_THROW(detabularizer->Detabularize(""), std::runtime_error);
 
 	ResourceDetabularizer::ResetInstance();
 }
@@ -230,3 +209,121 @@ TEST(ResourceDetabularizer, CloseDatabaseWhenDatabaseIsClosed)
 
 	ResourceDetabularizer::ResetInstance();
 }
+
+TEST(ResourceDetabularizer, RegisterResource)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, RegisterResourceThrowsOnEmptyKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_THROW(detabularizer->RegisterResource<int>("", RESOURCE_CONSTRUCTOR), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, RegisterResourceThrowsOnExistingKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+	EXPECT_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, UnregisterResource)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+	EXPECT_NO_THROW(detabularizer->UnregisterResource(RESOURCE_KEY));
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, UnregisterResourceThrowsOnEmptyKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_THROW(detabularizer->UnregisterResource(""), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, UnregisterResourceThrowsOnUnregisteredKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_THROW(detabularizer->UnregisterResource(RESOURCE_KEY), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, UnregisterAll)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_FALSE(detabularizer->HasTabularizationKey(RESOURCE_KEY));
+	EXPECT_NO_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+	EXPECT_TRUE(detabularizer->HasTabularizationKey(RESOURCE_KEY));
+	EXPECT_NO_THROW(detabularizer->UnregisterAll());
+	EXPECT_FALSE(detabularizer->HasTabularizationKey(RESOURCE_KEY));
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, HasTabularizationKeyFalse)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_FALSE(detabularizer->HasTabularizationKey(RESOURCE_KEY));
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, HasTabularizationKeyTrue)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_NO_THROW(detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR));
+	EXPECT_TRUE(detabularizer->HasTabularizationKey(RESOURCE_KEY));
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, GenerateResource)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	detabularizer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_CONSTRUCTOR);
+	std::unique_ptr<ITabularizableResource> resource = detabularizer->GenerateResource(RESOURCE_KEY);
+	EXPECT_TRUE(resource);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, GenerateResourceThrowsOnEmptyKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_THROW(detabularizer->GenerateResource(""), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+
+TEST(ResourceDetabularizer, GenerateResourceThrowsOnUnregisteredKey)
+{
+	ResourceDetabularizer* detabularizer = ResourceDetabularizer::GetInstance();
+
+	EXPECT_THROW(detabularizer->GenerateResource(RESOURCE_KEY), std::runtime_error);
+
+	ResourceDetabularizer::ResetInstance();
+}
+

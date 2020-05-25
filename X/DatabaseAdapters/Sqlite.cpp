@@ -82,3 +82,7 @@ void Sqlite::Execute(const std::string& sql, boost::optional<Sqlite::RowCallback
 	}
 }
 
+sqlite3* Sqlite::GetSqlite3()
+{
+	return db_;
+}
