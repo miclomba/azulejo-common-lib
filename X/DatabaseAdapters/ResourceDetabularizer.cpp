@@ -60,6 +60,16 @@ void ResourceDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("ResourceDetabularizer already has a database set");
 	databaseAdapter_.Open(dbPath);
+
+	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+		ROW_KEY + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		P_KEY + " TEXT NOT NULL, " +
+		M_KEY + " INTEGER, " +
+		N_KEY + " INTEGER, " +
+		SIZE_OF_KEY + " INTEGER, " +
+		DATA_KEY + " BLOB);";
+
+	databaseAdapter_.Execute(sql);
 }
 
 Sqlite& ResourceDetabularizer::GetDatabase()

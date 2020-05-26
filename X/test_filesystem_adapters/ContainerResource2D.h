@@ -4,10 +4,13 @@
 #include <stdexcept>
 #include <vector>
 
+#include "DatabaseAdapters/ITabularizableResource.h"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 template<typename T = int>
-class ContainerResource2D : public filesystem_adapters::ISerializableResource
+class ContainerResource2D : 
+	public filesystem_adapters::ISerializableResource,
+	public database_adapters::ITabularizableResource
 {
 public:
 	ContainerResource2D() = default;

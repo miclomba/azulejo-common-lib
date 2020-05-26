@@ -95,6 +95,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_filesystem_adapters", "test_filesystem_adapters\test_filesystem_adapters.vcxproj", "{5663D313-AB8E-4C89-93D5-C1194C330C4E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{99862D06-B993-411E-A65F-4A55557F69EA} = {99862D06-B993-411E-A65F-4A55557F69EA}
+		{9A269E09-7695-4342-A7C2-88ED5E29C907} = {9A269E09-7695-4342-A7C2-88ED5E29C907}
 	EndProjectSection
 EndProject
 Global
