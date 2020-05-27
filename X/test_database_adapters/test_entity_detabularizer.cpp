@@ -71,11 +71,11 @@ struct TypeA : public ITabularizableEntity
 	SharedEntity GetAggregatedProtectedMember(const Key& key) { return GetAggregatedMember(key); }
 	SharedEntity GetAggregatedProtectedMemberPtr(const Key& key) { return GetAggregatedMember(key); }
 
-	void Save(Sqlite& database) const override
+	void Save(pt::ptree& tree, Sqlite& database) const override
 	{
 	}
 
-	void Load(Sqlite& database) override
+	void Load(pt::ptree& tree, Sqlite& database) override
 	{
 		size_t row = GetKey() == ENTITY_KEY_ROW_VALUES[0] ? 
 			1 : GetKey() == ENTITY_KEY_ROW_VALUES[1] ?

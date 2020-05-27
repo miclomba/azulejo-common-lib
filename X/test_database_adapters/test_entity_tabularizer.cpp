@@ -62,7 +62,7 @@ struct TypeA : public ITabularizableEntity
 		return std::dynamic_pointer_cast<TypeA>(entity::Entity::GetAggregatedMember(key)); 
 	}
 
-	void Save(Sqlite& database) const override
+	void Save(pt::ptree& tree, Sqlite& database) const override
 	{
 		std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAMES[0] + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAMES[1] + " TEXT NOT NULL);";
 		database.Execute(sql);
@@ -71,7 +71,7 @@ struct TypeA : public ITabularizableEntity
 		database.Execute(sql);
 	}
 
-	void Load(Sqlite& database) override {}
+	void Load(pt::ptree& tree, Sqlite& database) override {}
 
 private:
 	std::string value_;

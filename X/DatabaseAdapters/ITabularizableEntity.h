@@ -7,6 +7,8 @@
 
 #include "config.h"
 
+#include <boost/property_tree/ptree.hpp>
+
 #include "Entities/Entity.h"
 
 namespace database_adapters {
@@ -30,8 +32,8 @@ public:
 	ITabularizableEntity(ITabularizableEntity&&);
 	ITabularizableEntity& operator=(ITabularizableEntity&&);
 
-	virtual void Save(Sqlite& database) const = 0;
-	virtual void Load(Sqlite& database) = 0;
+	virtual void Save(boost::property_tree::ptree& tree, Sqlite& database) const = 0;
+	virtual void Load(boost::property_tree::ptree& tree, Sqlite& database) = 0;
 
 protected:
 	SharedEntity& GetAggregatedMember(const Key& key) const override;

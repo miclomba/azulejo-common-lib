@@ -137,7 +137,7 @@ void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity& entity, const 
 	if (!tree)
 		throw std::runtime_error("Cannot locate entity key in the detabularization json structure");
 
-	entity.Load(GetDatabase());
+	entity.Load(*tree, GetDatabase());
 
 	for (const std::pair<std::string, pt::ptree>& child : *tree)
 	{

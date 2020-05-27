@@ -31,8 +31,8 @@ struct TypeA : public ITabularizableEntity
 	TypeA(const Key& key) { SetKey(key); }
 	void AggregateProtectedMember(SharedEntity obj) { AggregateMember(obj); };
 
-	void Save(Sqlite& tree) const override {}
-	void Load(Sqlite& tree) override {}
+	void Save(pt::ptree& tree, Sqlite& db) const override {}
+	void Load(pt::ptree& tree, Sqlite& db) override {}
 };
 } // end namespace
 

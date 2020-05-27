@@ -60,9 +60,9 @@ void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity& enti
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
 	
-	hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
+	pt::ptree& tree = hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
 
-	entity.Save(GetDatabase());
+	entity.Save(tree, GetDatabase());
 
 	std::vector<std::string> keys = entity.GetAggregatedMemberKeys<ITabularizableEntity>();
 	for (const std::string& key : keys)
