@@ -6,22 +6,50 @@
 #include <string>
 #include <utility>
 
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "Entities/EntityHierarchy.h"
+#include "EntityHierarchyBlob.h"
 #include "ITabularizableEntity.h"
+#include "ResourceTabularizer.h"
 #include "Sqlite.h"
 
 namespace pt = boost::property_tree;
 
+using database_adapters::EntityHierarchyBlob;
 using database_adapters::EntityTabularizer;
 using database_adapters::ITabularizableEntity;
+using database_adapters::ResourceTabularizer;
 using database_adapters::Sqlite;
 using entity::Entity;
 using entity::EntityHierarchy;
 
 using Key = Entity::Key;
+
+namespace
+{
+const std::string ENTITY_HIERARCHY_BLOB_KEY = "entity_hierarchy_blob";
+
+void SendEntityHierarchyTreeToDatabase(const pt::ptree& hierarchyTree, Sqlite& database)
+{
+	EntityHierarchyBlob hierarchyBlob(hierarchyTree);
+
+	ResourceTabularizer* resourceTabularizer = ResourceTabularizer::GetInstance();
+
+	bool resourceTabularizerIsOpen = resourceTabularizer->GetDatabase().IsOpen();
+
+	if (!resourceTabularizerIsOpen)
+	{
+		resourceTabularizer->OpenDatabase(database.GetPath());
+		resourceTabularizer->Tabularize(hierarchyBlob, ENTITY_HIERARCHY_BLOB_KEY);
+		resourceTabularizer->CloseDatabase();
+	}
+	else
+	{
+		resourceTabularizer->Tabularize(hierarchyBlob, ENTITY_HIERARCHY_BLOB_KEY);
+	}
+}
+}
 
 EntityTabularizer* EntityTabularizer::instance_ = nullptr;
 
@@ -73,7 +101,7 @@ void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity& enti
 	}
 
 	if (parentKey.empty())
-		boost::property_tree::json_parser::write_json(hierarchy_.GetSerializationPath().string(), hierarchy_.GetSerializationStructure());
+		SendEntityHierarchyTreeToDatabase(hierarchy_.GetSerializationStructure(), GetDatabase());
 }
 
 void EntityTabularizer::OpenDatabase(const std::filesystem::path& dbPath)

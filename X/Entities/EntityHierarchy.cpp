@@ -38,7 +38,7 @@ void EntityHierarchy::LoadSerializationStructure(const fs::path& pathToJSON)
 
 bool EntityHierarchy::HasSerializationStructure() const
 {
-	return !serializationPath_.empty() && !serializationStructure_.empty();
+	return !serializationPath_.empty() || !serializationStructure_.empty();
 }
 
 pt::ptree& EntityHierarchy::GetSerializationStructure()

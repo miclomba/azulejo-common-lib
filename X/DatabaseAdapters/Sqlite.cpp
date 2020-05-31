@@ -40,9 +40,14 @@ bool Sqlite::IsOpen() const
 
 void Sqlite::Open(const fs::path& dbPath)
 {
+	if (dbPath.empty())
+		throw std::runtime_error("Could not create (open) SQLite3 DB from empty path");
+
 	int result = sqlite3_open(dbPath.string().c_str(), &db_);
 	if (result != SQLITE_OK)
 		throw std::runtime_error("Could not create (open) SQLite3 DB at " + dbPath.string());
+
+	dbPath_ = dbPath;
 }
 
 void Sqlite::Close()
@@ -55,6 +60,11 @@ void Sqlite::Close()
 		throw std::runtime_error("Could not create (close) SQLite3 DB");
 
 	db_ = nullptr;
+}
+
+fs::path Sqlite::GetPath() const
+{
+	return dbPath_;
 }
 
 void Sqlite::FreeErrorMessage(char* const ec)

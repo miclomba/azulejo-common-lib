@@ -74,9 +74,11 @@ void SqliteBlob::Write(const char* buff, const size_t size, const int offset)
 void SqliteBlob::InsertBlob(Sqlite& db, const std::string& sql, const void* data, const size_t size)
 {
 	if (!data)
-		throw std::runtime_error("Sqlite could not insert blob because data pointer is nullptr");
+		throw std::runtime_error("SqliteBlob could not insert blob because data pointer is nullptr");
 	if (size == 0)
-		throw std::runtime_error("Sqlite could not insert blob because data size is 0");
+		throw std::runtime_error("SqliteBlob could not insert blob because data size is 0");
+	if (!db.IsOpen())
+		throw std::runtime_error("SqliteBlob could not insert blob because data database is not open");
 
 	sqlite3_stmt* stmt = nullptr;
 	int rc = sqlite3_prepare_v2(db.GetSqlite3(), sql.c_str(), -1, &stmt, nullptr);

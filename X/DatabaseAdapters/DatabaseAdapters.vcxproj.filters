@@ -57,6 +57,9 @@
     <ClInclude Include="SqliteBlob.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityHierarchyBlob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shell.c">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SqliteBlob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityHierarchyBlob.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

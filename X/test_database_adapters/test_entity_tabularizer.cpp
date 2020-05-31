@@ -2,9 +2,6 @@
 
 #include <array>
 #include <filesystem>
-#include <fstream>
-#include <functional>
-#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -12,11 +9,12 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "DatabaseAdapters/ITabularizableEntity.h"
+#include "DatabaseAdapters/EntityDetabularizer.h"
 #include "DatabaseAdapters/EntityTabularizer.h"
+#include "DatabaseAdapters/ResourceTabularizer.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "Entities/Entity.h"
 
@@ -24,64 +22,70 @@ namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using database_adapters::EntityTabularizer;
+using database_adapters::EntityDetabularizer;
 using database_adapters::ITabularizableEntity;
+using database_adapters::ResourceTabularizer;
 using database_adapters::Sqlite;
 using entity::Entity;
 
 using Key = Entity::Key;
+using SharedEntity = Entity::SharedEntity;
 
 namespace
 {
 const fs::path ROOT_DIR = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY; 
-const std::string JSON_ROOT = ROOT_DIR.string(); 
-const std::string JSON_FILE = "test.json";
 const std::string ENTITY_1A = "entity_1a";
 const std::string ENTITY_2A = "entity_2a";
 const std::string ENTITY_1B = "entity_1b";
 const std::string DB_NAME = "db.sqlite";
 const fs::path DB_PATH = ROOT_DIR / DB_NAME;
-const std::string TABLE_NAME = "tbl";
-const std::vector<std::string> COLUMN_NAMES{ "pkey","entityKey" };
-const std::vector<std::string> ENTITY_KEY_ROW_VALUES{ ENTITY_1A, ENTITY_2A, ENTITY_1B };
+const std::vector<std::string> ENTITY_KEYS{ ENTITY_1A, ENTITY_2A, ENTITY_1B };
 const bool HAS_ROOT = true;
 const bool HAS_INTERMEDIATE = true;
 const bool HAS_LEAF = true;
+const std::string KEY = "key";
+const std::string VAL = "val";
+const std::string LOADED_SUFFIX = "_loaded";
+const std::string VAL_AFTER_LOAD = VAL + LOADED_SUFFIX; 
 
-struct TypeA : public ITabularizableEntity
+struct TabEntity : public ITabularizableEntity
 {
-	TypeA() = default;
-	~TypeA() = default;
+	TabEntity() = default;
+	~TabEntity() = default;
 
 	void AggregateMember(SharedEntity entity) 
 	{ 
-		entity::Entity::AggregateMember(std::move(entity)); 
+		ITabularizableEntity::AggregateMember(std::move(entity)); 
 	}
 
-	std::shared_ptr<TypeA> GetAggregateMember(const std::string& key) 
+	std::shared_ptr<TabEntity> GetAggregateMember(const std::string& key) 
 	{ 
-		return std::dynamic_pointer_cast<TypeA>(entity::Entity::GetAggregatedMember(key)); 
+		return std::dynamic_pointer_cast<TabEntity>(ITabularizableEntity::GetAggregatedMember(key)); 
 	}
 
-	void Save(pt::ptree& tree, Sqlite& database) const override
+	void Save(pt::ptree& tree, Sqlite& database) const override 
 	{
-		std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAMES[0] + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAMES[1] + " TEXT NOT NULL);";
-		database.Execute(sql);
-
-		sql = "INSERT INTO " + TABLE_NAME + " (" + COLUMN_NAMES.at(1) + ") VALUES ('" + GetKey() + "');";
-		database.Execute(sql);
+		tree.put(KEY, value_);
+	}
+	void Load(pt::ptree& tree, Sqlite& database) override 
+	{
+		value_ = tree.get_child(KEY).data() + LOADED_SUFFIX;
 	}
 
-	void Load(pt::ptree& tree, Sqlite& database) override {}
+	std::string GetValue() const
+	{
+		return value_;
+	}
 
 private:
-	std::string value_;
+	std::string value_ = VAL;
 };
 
-std::shared_ptr<TypeA> CreateEntity(const Key& root, const std::string& intermediate, const Key& leaf)
+std::shared_ptr<TabEntity> CreateEntity(const Key& root, const std::string& intermediate, const Key& leaf)
 {
-	auto rootEntity = std::make_shared<TypeA>();
-	auto leafEntity = std::make_shared<TypeA>();
-	auto intermediateEntity = std::make_shared<TypeA>();
+	auto rootEntity = std::make_shared<TabEntity>();
+	auto leafEntity = std::make_shared<TabEntity>();
+	auto intermediateEntity = std::make_shared<TabEntity>();
 
 	rootEntity->SetKey(root);
 	intermediateEntity->SetKey(intermediate);
@@ -91,6 +95,14 @@ std::shared_ptr<TypeA> CreateEntity(const Key& root, const std::string& intermed
 	rootEntity->AggregateMember(intermediateEntity);
 
 	return rootEntity;
+}
+
+void RegisterEntities(const Key& root, const std::string& intermediate, const Key& leaf)
+{
+	EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
+	detabularizer->GetRegistry().RegisterEntity<TabEntity>(root);
+	detabularizer->GetRegistry().RegisterEntity<TabEntity>(intermediate);
+	detabularizer->GetRegistry().RegisterEntity<TabEntity>(leaf);
 }
 
 struct SqliteRemover 
@@ -114,86 +126,58 @@ struct EntityTabularizerFixture
 	{
 		entityMask_ = { hasRoot, hasIntermediate, hasLeaf };
 
-		// get expected output ready
-		size_t row = 1;
-		for (size_t i = 0; i < entityMask_.size(); ++i)
-		{
-			if (!entityMask_[i])
-				continue;
-			pkeyValues_.push_back(std::to_string(row++));
-			entityKeyValues_.push_back(ENTITY_KEY_ROW_VALUES[i]);
-		}
-
-		// get tabularization paths
-		jsonFile_ = (fs::path(JSON_ROOT) / JSON_FILE).string();
-
 		// validate tabularization
-		EXPECT_FALSE(fs::exists(jsonFile_));
 		EXPECT_FALSE(fs::exists(DB_PATH));
 
-		entity_ = CreateEntity(ENTITY_KEY_ROW_VALUES[0], ENTITY_KEY_ROW_VALUES[1], ENTITY_KEY_ROW_VALUES[2]);
+		entity_ = CreateEntity(ENTITY_KEYS[0], ENTITY_KEYS[1], ENTITY_KEYS[2]);
 	}
 
-	void VerifyTabularization()
+	void VerifyTabularization(const std::string& key)
 	{
-		EXPECT_TRUE(fs::exists(jsonFile_));
 		EXPECT_TRUE(fs::exists(DB_PATH));
 
-		size_t row = 0;
-		std::function<int(int, char**, char**)> rowHandler =
-			[this, &row](int numCols, char** colValues, char** colNames)
+		auto toLoadEntity = std::make_shared<TabEntity>();
+		toLoadEntity->SetKey(key);
+
+		RegisterEntities(ENTITY_KEYS[0], ENTITY_KEYS[1], ENTITY_KEYS[2]);
+
+		EntityDetabularizer* detabularizer = EntityDetabularizer::GetInstance();
+		detabularizer->OpenDatabase(DB_PATH);
+
+		EXPECT_EQ(toLoadEntity->GetValue(), VAL);
+		EXPECT_NO_THROW(detabularizer->LoadEntity(*toLoadEntity));
+		EXPECT_EQ(toLoadEntity->GetValue(), VAL_AFTER_LOAD);
+
+		if (entityMask_[0])
 		{
-			EXPECT_EQ(COLUMN_NAMES.size(), numCols);
-			for (int i = 0; i < numCols; ++i)
-			{
-				std::string colName = colNames[i];
-				EXPECT_EQ(colName, COLUMN_NAMES[i]);
-				std::string colValue = colValues[i];
-				EXPECT_EQ(colValue, colNames[i] == COLUMN_NAMES[0] ? pkeyValues_[row] : entityKeyValues_[row]);
-			}
-			++row;
-			return 0;
-		};
-
-
-		EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
-		for (size_t i = 0; i < entityMask_.size(); ++i)
+			std::shared_ptr<TabEntity> child = toLoadEntity->GetAggregateMember(ENTITY_KEYS[1]);
+			EXPECT_EQ(child->GetValue(), VAL_AFTER_LOAD);
+			std::shared_ptr<TabEntity> grandChild = child->GetAggregateMember(ENTITY_KEYS[2]);
+			EXPECT_EQ(grandChild->GetValue(), VAL_AFTER_LOAD);
+		}
+		else if (entityMask_[1])
 		{
-			if (!entityMask_[i])
-				continue;
-
-			std::string sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAMES[1] + "='" + ENTITY_KEY_ROW_VALUES[i] + "';";
-			tabularizer->GetDatabase().Execute(sql, rowHandler);
+			std::shared_ptr<TabEntity> grandChild = toLoadEntity->GetAggregateMember(ENTITY_KEYS[2]);
+			EXPECT_EQ(grandChild->GetValue(), VAL_AFTER_LOAD);
 		}
 
-		// cleanup tabularization
-		fs::remove(jsonFile_);
-		EXPECT_FALSE(fs::exists(jsonFile_));
+		EntityDetabularizer::ResetInstance();
 	}
 
-	std::string GetJSONFilePath() const
-	{
-		return jsonFile_;
-	}
-
-	std::shared_ptr<TypeA> GetEntity()
+	std::shared_ptr<TabEntity> GetEntity()
 	{
 		return entity_;
 	}
 
-	std::string GetIntermKey() { return ENTITY_KEY_ROW_VALUES[1]; }
-	std::string GetLeafKey() { return ENTITY_KEY_ROW_VALUES[2]; }
+	std::string GetRootKey() { return ENTITY_KEYS[0]; }
+	std::string GetIntermKey() { return ENTITY_KEYS[1]; }
+	std::string GetLeafKey() { return ENTITY_KEYS[2]; }
 
 private:
 	SqliteRemover dbRemover_;
 
 	std::array<bool, 3> entityMask_{false, false, false};
-	std::vector<std::string> pkeyValues_;
-	std::vector<std::string> entityKeyValues_;
-
-	std::string jsonFile_;
-
-	std::shared_ptr<TypeA> entity_;
+	std::shared_ptr<TabEntity> entity_;
 };
 } // end namespace entity
 
@@ -226,6 +210,7 @@ TEST(EntityTabularizer, GetDatabase)
 {
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 	EXPECT_NO_THROW(tabularizer->GetDatabase());
+	EntityTabularizer::ResetInstance();
 }
 
 TEST(EntityTabularizer, OpenDatabase)
@@ -289,12 +274,11 @@ TEST(EntityTabularizer, TabularizeFromRoot)
 
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
-
 	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()));
+	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	fixture.VerifyTabularization();
+	fixture.VerifyTabularization(fixture.GetRootKey());
 
 	EntityTabularizer::ResetInstance();
 }
@@ -305,12 +289,11 @@ TEST(EntityTabularizer, TabularizeFromIntermediate)
 
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
-
 	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()->GetAggregateMember(fixture.GetIntermKey())));
+	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	fixture.VerifyTabularization();
+	fixture.VerifyTabularization(fixture.GetIntermKey());
 
 	EntityTabularizer::ResetInstance();
 }
@@ -321,29 +304,65 @@ TEST(EntityTabularizer, TabularizeFromLeaf)
 
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
-
-	std::shared_ptr<TypeA> intermEntity = fixture.GetEntity()->GetAggregateMember(fixture.GetIntermKey());
+	std::shared_ptr<TabEntity> intermEntity = fixture.GetEntity()->GetAggregateMember(fixture.GetIntermKey());
 	EXPECT_NO_THROW(
 		tabularizer->Tabularize(*intermEntity->GetAggregateMember(fixture.GetLeafKey()))
 	);
+	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	fixture.VerifyTabularization();
+	fixture.VerifyTabularization(fixture.GetLeafKey());
 
 	EntityTabularizer::ResetInstance();
 }
 
+TEST(EntityTabularizer, TabularizeWhenResourceTabularizerIsOpen)
+{
+	EntityTabularizerFixture fixture(HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
+
+	ResourceTabularizer* resourceTabularizer = ResourceTabularizer::GetInstance();
+	resourceTabularizer->OpenDatabase(DB_PATH);
+	EXPECT_TRUE(resourceTabularizer->GetDatabase().IsOpen());
+
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
+	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
+	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()));
+	EXPECT_NO_THROW(tabularizer->CloseDatabase());
+
+	EXPECT_TRUE(resourceTabularizer->GetDatabase().IsOpen());
+
+	EntityTabularizer::ResetInstance();
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(EntityTabularizer, TabularizeWhenResourceTabularizerIsClosed)
+{
+	EntityTabularizerFixture fixture(HAS_ROOT, HAS_INTERMEDIATE, HAS_LEAF);
+
+	ResourceTabularizer* resourceTabularizer = ResourceTabularizer::GetInstance();
+	resourceTabularizer->CloseDatabase();
+	EXPECT_FALSE(resourceTabularizer->GetDatabase().IsOpen());
+
+	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
+	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
+	EXPECT_NO_THROW(tabularizer->Tabularize(*fixture.GetEntity()));
+	EXPECT_NO_THROW(tabularizer->CloseDatabase());
+
+	EXPECT_FALSE(resourceTabularizer->GetDatabase().IsOpen());
+
+	EntityTabularizer::ResetInstance();
+	ResourceTabularizer::ResetInstance();
+}
+
 TEST(EntityTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
 {
-	EntityTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
+	SqliteRemover dbRemover;
 
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
 
-	TypeA entity;
+	TabEntity entity;
 	entity.SetKey("");
 	EXPECT_THROW(tabularizer->Tabularize(entity), std::runtime_error);
 
@@ -352,14 +371,13 @@ TEST(EntityTabularizer, TabularizeThrowsWhenGivenEntityWithoutKey)
 
 TEST(EntityTabularizer, TabularizeThrowsIfDatabaseIsNotOpen)
 {
-	EntityTabularizerFixture fixture(HAS_ROOT, !HAS_INTERMEDIATE, !HAS_LEAF);
+	SqliteRemover dbRemover;
 
 	EntityTabularizer* tabularizer = EntityTabularizer::GetInstance();
 
-	EXPECT_NO_THROW(tabularizer->GetHierarchy().SetSerializationPath(fixture.GetJSONFilePath()));
 	EXPECT_NO_THROW(tabularizer->CloseDatabase());
 
-	TypeA entity;
+	TabEntity entity;
 	entity.SetKey(ENTITY_1A);
 	EXPECT_THROW(tabularizer->Tabularize(entity), std::runtime_error);
 

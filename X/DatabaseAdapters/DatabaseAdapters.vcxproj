@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EntityDetabularizer.cpp" />
+    <ClCompile Include="EntityHierarchyBlob.cpp" />
     <ClCompile Include="EntityTabularizer.cpp" />
     <ClCompile Include="ITabularizableEntity.cpp" />
     <ClCompile Include="ITabularizableResource.cpp" />
@@ -170,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="EntityDetabularizer.h" />
+    <ClInclude Include="EntityHierarchyBlob.h" />
     <ClInclude Include="EntityTabularizer.h" />
     <ClInclude Include="ITabularizableEntity.h" />
     <ClInclude Include="ITabularizableResource.h" />

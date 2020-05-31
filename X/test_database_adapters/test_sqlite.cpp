@@ -57,6 +57,13 @@ TEST_F(SqliteF, Open)
 	db.Close();
 }
 
+TEST_F(SqliteF, OpenThrowsWithEmptyPath)
+{
+	Sqlite db;
+
+	EXPECT_THROW(db.Open(""), std::runtime_error);
+}
+
 TEST_F(SqliteF, OpenThrowsIfDatabasePathDoesNotExist)
 {
 	Sqlite db;
@@ -80,6 +87,15 @@ TEST_F(SqliteF, Close)
 
 	db.Open(DB_PATH);
 	EXPECT_NO_THROW(db.Close());
+}
+
+TEST_F(SqliteF, GetPath)
+{
+	Sqlite db;
+
+	db.Open(DB_PATH);
+	EXPECT_EQ(db.GetPath(), DB_PATH);
+	db.Close();
 }
 
 TEST_F(SqliteF, IntegrationTest)

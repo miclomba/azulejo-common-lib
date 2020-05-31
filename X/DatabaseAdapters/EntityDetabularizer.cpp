@@ -7,19 +7,24 @@
 #include <string>
 #include <utility>
 
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "Entities/Entity.h"
 #include "Entities/EntityHierarchy.h"
 #include "Entities/EntityRegistry.h"
+#include "EntityHierarchyBlob.h"
 #include "ITabularizableEntity.h"
+#include "ITabularizableResource.h"
+#include "ResourceDetabularizer.h"
 #include "Sqlite.h"
 
 namespace pt = boost::property_tree;
 
 using database_adapters::EntityDetabularizer;
+using database_adapters::EntityHierarchyBlob;
 using database_adapters::ITabularizableEntity;
+using database_adapters::ITabularizableResource;
+using database_adapters::ResourceDetabularizer;
 using database_adapters::Sqlite;
 using entity::Entity;
 using entity::EntityHierarchy;
@@ -29,6 +34,13 @@ using Key = Entity::Key;
 
 namespace
 {
+const std::string ENTITY_HIERARCHY_BLOB_KEY = "entity_hierarchy_blob";
+
+auto ENTITY_HIERARCHY_BLOB_CONSTRUCTOR = []()->std::unique_ptr<ITabularizableResource> 
+{ 
+	return std::make_unique<EntityHierarchyBlob>(); 
+};
+
 std::string GetKeyPath(const Key& key, const pt::ptree& tree)
 {
 	for (const std::pair<std::string, pt::ptree>& keyValue : tree)
@@ -60,6 +72,36 @@ std::string GetParentKeyPath(const std::string& keyPath)
 		parentKeyPath = keyPath.substr(0, pos);
 
 	return parentKeyPath;
+}
+
+pt::ptree GetEntityHierarchyTree(const Sqlite& database)
+{
+	ResourceDetabularizer* resourceDetabularizer = ResourceDetabularizer::GetInstance();
+
+	bool resourceDetabularizerIsOpen = resourceDetabularizer->GetDatabase().IsOpen();
+
+	if (!resourceDetabularizerIsOpen)
+		resourceDetabularizer->OpenDatabase(database.GetPath());
+	if (!resourceDetabularizer->HasTabularizationKey(ENTITY_HIERARCHY_BLOB_KEY))
+		resourceDetabularizer->RegisterResource<char>(ENTITY_HIERARCHY_BLOB_KEY, ENTITY_HIERARCHY_BLOB_CONSTRUCTOR);
+
+	std::unique_ptr<ITabularizableResource> entityHierarchyBlob;
+	try
+	{
+		entityHierarchyBlob = resourceDetabularizer->Detabularize(ENTITY_HIERARCHY_BLOB_KEY);
+	}
+	catch (std::runtime_error&)
+	{
+		if (!resourceDetabularizerIsOpen)
+			resourceDetabularizer->CloseDatabase();
+		return pt::ptree();
+	}
+
+	if (!resourceDetabularizerIsOpen)
+		resourceDetabularizer->CloseDatabase();
+
+	auto entityHierarchyBlobPtr = dynamic_cast<EntityHierarchyBlob*>(entityHierarchyBlob.get());
+	return entityHierarchyBlobPtr->GetHierarchyTree();
 }
 } // end namespace anonymous
 
@@ -107,6 +149,8 @@ void EntityDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("EntityDetabularizer already has a database set");
 	databaseAdapter_.Open(dbPath);
+
+	hierarchy_.GetSerializationStructure() = GetEntityHierarchyTree(GetDatabase());
 }
 
 Sqlite& EntityDetabularizer::GetDatabase()
@@ -118,9 +162,6 @@ void EntityDetabularizer::LoadEntity(ITabularizableEntity& entity)
 {
 	if (!databaseAdapter_.IsOpen())
 		throw std::runtime_error("Cannot detabularize entity because the database is not open");
-
-	if (!hierarchy_.HasSerializationStructure())
-		return;
 
 	std::string keyPath = GetKeyPath(entity.GetKey(), hierarchy_.GetSerializationStructure());
 	if (keyPath.empty())
