@@ -20,6 +20,7 @@ public:
 	static void ResetInstance();
 
 	void Tabularize(const ITabularizableResource& resource, const std::string& key);
+	void Untabularize(const std::string& key);
 
 	// database
 	void CloseDatabase();

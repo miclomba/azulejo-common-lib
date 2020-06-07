@@ -52,7 +52,7 @@ void ResourceSerializer::Serialize(const ISerializableResource& resource, const 
 	if (!std::filesystem::exists(serializationPath))
 		std::filesystem::create_directories(serializationPath);
 
-	if (!resource.IsDirty())
+	if (!resource.UpdateChecksum())
 		return;
 
 	const std::string fileName = key + RESOURCE_EXT;

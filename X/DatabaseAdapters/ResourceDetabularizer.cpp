@@ -69,6 +69,8 @@ void ResourceDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 		SIZE_OF_KEY + " INTEGER, " +
 		DATA_KEY + " BLOB);";
 
+	sql += " PRAGMA auto_vacuum = FULL;";
+
 	databaseAdapter_.Execute(sql);
 }
 

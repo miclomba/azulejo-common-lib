@@ -21,6 +21,7 @@ public:
 
 	size_t GetColumnSize() const;
 	size_t GetRowSize() const;
+	bool GetDirty() const;
 
 	virtual size_t GetElementSize() const = 0;
 	virtual void* Data() = 0;
@@ -31,7 +32,7 @@ protected:
 	void SetColumnSize(const size_t size);
 	void SetRowSize(const size_t size);
 
-	bool IsDirty() const;
+	bool UpdateChecksum() const;
 	int Checksum() const;
 
 private:
@@ -39,6 +40,7 @@ private:
 	size_t N_{ 0 };
 
 	mutable int checkSum_{ -1 };
+	mutable bool dirty_{ true };
 };
 
 } // end resource

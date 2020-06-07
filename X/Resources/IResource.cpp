@@ -35,13 +35,23 @@ size_t IResource::GetRowSize() const
 	return N_;
 }
 
-bool IResource::IsDirty() const
+bool IResource::GetDirty() const
+{
+	return dirty_;
+}
+
+bool IResource::UpdateChecksum() const
 {
 	int check = Checksum();
 	if (check == checkSum_)
+	{
+		dirty_ = false;
 		return false;
+	}
 
 	checkSum_ = check;
+	dirty_ = true;
+
 	return true;
 }
 

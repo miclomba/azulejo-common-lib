@@ -62,6 +62,8 @@ void ResourceTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
 		SIZE_OF_KEY + " INTEGER, " +
 		DATA_KEY + " BLOB);";
 
+	sql += " PRAGMA auto_vacuum = FULL;";
+
 	databaseAdapter_.Execute(sql);
 }
 
@@ -81,7 +83,7 @@ void ResourceTabularizer::Tabularize(const ITabularizableResource& resource, con
 	if (key.empty())
 		throw std::runtime_error("Cannot tabularize resource with empty key");
 
-	if (!resource.IsDirty())
+	if (!resource.UpdateChecksum())
 		return;
 
 	if (!databaseAdapter_.IsOpen())
@@ -97,4 +99,14 @@ void ResourceTabularizer::Tabularize(const ITabularizableResource& resource, con
 	SqliteBlob::InsertBlob(databaseAdapter_, sql, resource.Data(), size);
 }
 
+void ResourceTabularizer::Untabularize(const std::string& key)
+{
+	if (key.empty())
+		throw std::runtime_error("Cannot untabularize resource with empty key");
 
+	if (!databaseAdapter_.IsOpen())
+		throw std::runtime_error("Cannot untabularize resource because the database is not open");
+
+	std::string sql = "DELETE FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + key + "';";
+	GetDatabase().Execute(sql);
+}

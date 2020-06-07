@@ -55,7 +55,7 @@ public:
 		return this->data_[i*this->GetRowSize() + j];
 	}
 
-	bool IsDirtyProtected() { return IsDirty(); }
+	bool UpdateChecksumProtected() { return UpdateChecksum(); }
 	int ChecksumProtected() { return Checksum(); }
 
 	void Assign(const char* buff, const size_t n) override

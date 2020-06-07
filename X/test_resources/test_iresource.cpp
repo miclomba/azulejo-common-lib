@@ -52,7 +52,7 @@ struct Resource : resource::IResource
 	{
 	}
 
-	bool IsDirtyProtected() { return IsDirty(); }
+	bool UpdateChecksumProtected() { return UpdateChecksum(); }
 	int ChecksumProtected() { return Checksum(); }
 
 private:
@@ -117,15 +117,15 @@ TEST(IResource, Assign)
 	EXPECT_NO_THROW(resource.Assign(nullptr,SIZE));
 }
 
-TEST(IResource, IsDirty)
+TEST(IResource, UpdateChecksum)
 {
 	Resource ir(ARRAY_1);
 
-	EXPECT_TRUE(ir.IsDirtyProtected());
-	EXPECT_FALSE(ir.IsDirtyProtected());
+	EXPECT_TRUE(ir.UpdateChecksumProtected());
+	EXPECT_FALSE(ir.UpdateChecksumProtected());
 
 	*static_cast<int*>(ir.Data()) = 2*ARRAY_1[0];
-	EXPECT_TRUE(ir.IsDirtyProtected());
+	EXPECT_TRUE(ir.UpdateChecksumProtected());
 }
 
 TEST(IResource, Checksum)
@@ -137,5 +137,22 @@ TEST(IResource, Checksum)
 
 	*static_cast<int*>(ir.Data()) = 2*ARRAY_1[0];
 	EXPECT_NE(ir.ChecksumProtected(), checksum);
+}
+
+TEST(IResource, GetDirty)
+{
+	Resource ir(ARRAY_1);
+
+	EXPECT_TRUE(ir.GetDirty());
+	EXPECT_TRUE(ir.UpdateChecksumProtected());
+	EXPECT_TRUE(ir.GetDirty());
+	EXPECT_FALSE(ir.UpdateChecksumProtected());
+	EXPECT_FALSE(ir.GetDirty());
+
+	*static_cast<int*>(ir.Data()) = 2 * ARRAY_1[0];
+	EXPECT_FALSE(ir.GetDirty());
+
+	EXPECT_TRUE(ir.UpdateChecksumProtected());
+	EXPECT_TRUE(ir.GetDirty());
 }
 

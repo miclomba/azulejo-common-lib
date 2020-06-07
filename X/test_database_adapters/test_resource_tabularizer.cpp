@@ -12,12 +12,14 @@
 #include "DatabaseAdapters/ITabularizableResource.h"
 #include "DatabaseAdapters/ResourceDetabularizer.h"
 #include "DatabaseAdapters/ResourceTabularizer.h"
+#include "DatabaseAdapters/SqliteBlob.h"
 
 namespace fs = std::filesystem;
 
+using database_adapters::ITabularizableResource;
 using database_adapters::ResourceTabularizer;
 using database_adapters::ResourceDetabularizer;
-using database_adapters::ITabularizableResource;
+using database_adapters::SqliteBlob;
 
 namespace
 {
@@ -25,6 +27,9 @@ const fs::path ROOT_DIR = fs::path(ROOT_FILESYSTEM) / TEST_DIRECTORY;
 const std::string DB_NAME = "db.sqlite";
 const fs::path DB_PATH = ROOT_DIR / DB_NAME;
 const std::string RESOURCE_KEY = "resource";
+const std::string DATA_KEY = "data";
+const std::string TABLE_NAME = "resources";
+const sqlite3_int64 VALID_ROW = 1;
 const int VAL = 1;
 const std::vector<int> ARRAY_1(2, VAL);
 
@@ -223,6 +228,55 @@ TEST(ResourceTabularizer, TabularizeThrowsIfResourceDataIsEmpty)
 
 	Resource resource;
 	EXPECT_THROW(tabularizer->Tabularize(resource, RESOURCE_KEY), std::runtime_error);
+
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(ResourceTabularizer, Untabularize)
+{
+	ResourceTabularizerFixture fixture;
+
+	ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+
+	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
+
+	tabularizer->Tabularize(fixture.GetResource(), RESOURCE_KEY);
+
+	{
+		SqliteBlob blob(tabularizer->GetDatabase());
+		EXPECT_NO_THROW(blob.Open(TABLE_NAME, DATA_KEY, VALID_ROW));
+	}
+
+	EXPECT_NO_THROW(tabularizer->Untabularize(RESOURCE_KEY));
+
+	{
+		SqliteBlob blob(tabularizer->GetDatabase());
+		EXPECT_THROW(blob.Open(TABLE_NAME, DATA_KEY, VALID_ROW), std::runtime_error);
+	}
+
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(ResourceTabularizer, UntabularizeThrowsWithEmptyKey)
+{
+	ResourceTabularizerFixture fixture;
+
+	ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+
+	EXPECT_NO_THROW(tabularizer->OpenDatabase(DB_PATH));
+	EXPECT_THROW(tabularizer->Untabularize(""), std::runtime_error);
+
+	ResourceTabularizer::ResetInstance();
+}
+
+TEST(ResourceTabularizer, UntabularizeThrowsWithUnopenedDatabase)
+{
+	ResourceTabularizerFixture fixture;
+
+	ResourceTabularizer* tabularizer = ResourceTabularizer::GetInstance();
+
+	EXPECT_FALSE(tabularizer->GetDatabase().IsOpen());
+	EXPECT_THROW(tabularizer->Untabularize(RESOURCE_KEY), std::runtime_error);
 
 	ResourceTabularizer::ResetInstance();
 }
