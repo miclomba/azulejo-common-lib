@@ -23,6 +23,7 @@ public:
 	std::string GetSerializationPath() const;
 
 	void Serialize(const ISerializableResource& resource, const std::string& key);
+	void Unserialize(const std::string& key);
 
 private:
 	ResourceSerializer();

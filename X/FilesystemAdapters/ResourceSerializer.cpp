@@ -7,6 +7,12 @@
 
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
+namespace fs = std::filesystem;
+
+namespace
+{
+const std::string RESOURCE_EXT = ".bin";
+}
 
 ResourceSerializer* ResourceSerializer::instance_ = nullptr;
 
@@ -45,12 +51,10 @@ void ResourceSerializer::Serialize(const ISerializableResource& resource, const 
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
 
-	const std::string RESOURCE_EXT = ".bin";
+	fs::path serializationPath = GetSerializationPath();
 
-	auto serializationPath = std::filesystem::path(GetSerializationPath());
-
-	if (!std::filesystem::exists(serializationPath))
-		std::filesystem::create_directories(serializationPath);
+	if (!fs::exists(serializationPath))
+		fs::create_directories(serializationPath);
 
 	if (!resource.UpdateChecksum())
 		return;
@@ -73,5 +77,20 @@ void ResourceSerializer::Serialize(const ISerializableResource& resource, const 
 	const char* buff = reinterpret_cast<const char*>(data);
 	size_t size = resource.GetElementSize() * resource.GetColumnSize() * resource.GetRowSize();
 	outfile.write(buff, size);
+}
+
+void ResourceSerializer::Unserialize(const std::string& key)
+{
+	if (key.empty())
+		throw std::runtime_error("Cannot unserialize resource with empty key");
+
+	const std::string fileName = key + RESOURCE_EXT;
+	fs::path resourcePath = fs::path(GetSerializationPath()) / fileName;
+
+	if (fs::exists(resourcePath))
+	{
+		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add);
+		fs::remove(resourcePath);
+	}
 }
 
