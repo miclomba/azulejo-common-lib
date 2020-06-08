@@ -129,3 +129,39 @@ TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
 	ResourceSerializer::ResetInstance();
 }
 
+TEST(ResourceSerializer, Unserialize)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+
+	Resource resource(INT_VALUES_ARRAY);
+	serializer->Serialize(resource, RESOURCE_KEY);
+	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
+
+	serializer->Unserialize(RESOURCE_KEY);
+	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, UnserializeThrowsWithEmptyKey)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	EXPECT_THROW(serializer->Unserialize(""), std::runtime_error);
+
+	ResourceSerializer::ResetInstance();
+}
+
+TEST(ResourceSerializer, UnserializeDoesNotThrowsWithUnserializedKey)
+{
+	ResourceSerializer* serializer = ResourceSerializer::GetInstance();
+
+	serializer->SetSerializationPath(RESOURCE_ROOT);
+	EXPECT_NO_THROW(serializer->Unserialize(RESOURCE_KEY));
+
+	ResourceSerializer::ResetInstance();
+}
+
+
