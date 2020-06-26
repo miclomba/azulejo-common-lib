@@ -1,0 +1,23 @@
+﻿{
+  "environments": [
+    {
+      "PATH": "${env.PATH};C:\\Users\\miclomba\\source\\repos\\Backend\\X\\x64\\Debug;C:\\Program Files\\boost\\boost_1_69_0\\stage\\lib",
+      "X_LINK_DIR": "${projectDir}/x64/Debug",
+      "X_INCL_DIR": "${projectDir}"
+    }
+  ],
+  // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": ""
+    }
+  ]
+}
