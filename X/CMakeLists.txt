@@ -16,5 +16,7 @@ message(STATUS "ENV{PATH}: $ENV{PATH}")
 message(STATUS "ENV{X_LINK_DIR}: $ENV{X_LINK_DIR}")
 
 add_subdirectory("Events")
+add_subdirectory("Intraprocess")
 add_subdirectory("test_events")
+add_subdirectory("test_intraprocess")
 
