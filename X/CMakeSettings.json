@@ -1,9 +1,12 @@
 ﻿{
   "environments": [
     {
-      "PATH": "${env.PATH};C:\\Users\\miclomba\\source\\repos\\Backend\\X\\x64\\Debug;C:\\Program Files\\boost\\boost_1_69_0\\stage\\lib",
-      "X_LINK_DIR": "${projectDir}/x64/Debug",
-      "X_INCL_DIR": "${projectDir}"
+      "PATH": "${env.PATH};${projectDir}/x64/Debug;${projectDir}/out/build/x64-Debug;C:/Program Files/boost/boost_1_69_0/stage/lib",
+      "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
+      "X_DIR": "${projectDir}",
+      "BOOST_DIR": "C:/Program Files/boost/boost_1_69_0",
+      "GTEST_LINK_DIR": "${projectDir}/../../googletest/out/build/x64-Debug (default)/lib",
+      "GTEST_INCL_DIR": "${projectDir}/../../googletest/googletest/include"
     }
   ],
   // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
