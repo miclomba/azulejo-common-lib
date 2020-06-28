@@ -6,7 +6,8 @@
       "X_DIR": "${projectDir}",
       "BOOST_DIR": "C:/Program Files/boost/boost_1_69_0",
       "GTEST_LINK_DIR": "${projectDir}/../../googletest/out/build/x64-Debug (default)/lib",
-      "GTEST_INCL_DIR": "${projectDir}/../../googletest/googletest/include"
+      "GTEST_INCL_DIR": "${projectDir}/../../googletest/googletest/include",
+      "GMOCK_INCL_DIR": "${projectDir}/../../googletest/googlemock/include"
     }
   ],
   // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
