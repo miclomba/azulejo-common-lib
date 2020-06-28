@@ -4,6 +4,7 @@ project("X")
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory("DatabaseAdapters")
 add_subdirectory("Entities")
 add_subdirectory("Events")
 add_subdirectory("Interprocess")
@@ -18,6 +19,7 @@ add_subdirectory("Resources")
 include(GoogleTest)
 enable_testing()
 
+add_subdirectory("test_database_adapters")
 add_subdirectory("test_entities")
 add_subdirectory("test_events")
 add_subdirectory("test_interprocess")
