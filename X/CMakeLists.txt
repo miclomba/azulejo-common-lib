@@ -4,6 +4,7 @@ project("X")
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory("Entities")
 add_subdirectory("Events")
 add_subdirectory("Interprocess")
 add_subdirectory("Intraprocess")
@@ -17,6 +18,7 @@ add_subdirectory("Resources")
 include(GoogleTest)
 enable_testing()
 
+add_subdirectory("test_entities")
 add_subdirectory("test_events")
 add_subdirectory("test_interprocess")
 add_subdirectory("test_intraprocess")

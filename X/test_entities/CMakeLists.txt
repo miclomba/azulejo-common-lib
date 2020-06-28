@@ -1,4 +1,4 @@
-project("test_events")
+project("test_entities")
 
 include_directories(
 "$ENV{X_DIR}"
@@ -8,20 +8,19 @@ include_directories(
 
 link_directories(
 "$ENV{X_LINK_DIR}/Entities"
-"$ENV{X_LINK_DIR}/Events"
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{BOOST_DIR}/stage/lib" 
 )
 
 add_executable("${PROJECT_NAME}"
-"test_event_channel.cpp" 
-"test_event_consumer.cpp" 
-"test_event_emitter.cpp" 
+"test_entity.cpp" 
+"test_entity_hierarchy.cpp" 
+"test_entity_registry.cpp" 
+"test_istreamable_entity.cpp" 
 )
 
 target_link_libraries("${PROJECT_NAME}" 
 "Entities"
-"Events" 
 gtestd
 gtest_maind
 )

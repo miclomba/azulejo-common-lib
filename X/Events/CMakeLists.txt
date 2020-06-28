@@ -6,7 +6,7 @@ include_directories(
 )
 
 link_directories(
-"$ENV{X_DIR}/x64/Debug"
+"$ENV{X_LINK_DIR}/Entities"
 "$ENV{BOOST_DIR}/stage/lib" 
 )
 
