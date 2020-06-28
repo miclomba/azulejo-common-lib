@@ -1,7 +1,16 @@
 @echo off
 SET ORIG_PATH=%PATH%
-SET TEST_EXPLORER_LINK_DIRS=C:/Users/miclomba/source/repos/Backend/X/x64/Debug;C:/Users/miclomba/source/repos/Backend/X/out/build/x64-Debug
-SET PATH=%PATH%;%TEST_EXPLORER_LINK_DIRS%
+
+SET BASE_LINK_DIR=C:/Users/miclomba/source/repos/Backend/X/out/build/x64-Debug
+SET DATABASE_ADAPTERS=%BASE_LINK_DIR%/DatabaseAdapters
+SET ENTITIES=%BASE_LINK_DIR%/Entities
+SET EVENTS=%BASE_LINK_DIR%/Events
+SET FILESYSTEM_ADAPTERS=%BASE_LINK_DIR%/FilesystemAdapters
+SET INTERPROCESS=%BASE_LINK_DIR%/Interprocess
+SET INTRAPROCESS=%BASE_LINK_DIR%/Intraprocess
+SET RESOURCES=%BASE_LINK_DIR%/Resources
+
+SET PATH=%PATH%;%DATABASE_ADAPTERS%;%ENTITIES%;%EVENTS%;%FILESYSTEM_ADAPTERS%;%INTERPROCESS%;%INTRAPROCESS%;%RESOURCES%
 
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe"
 

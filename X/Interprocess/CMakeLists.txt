@@ -12,3 +12,6 @@ link_directories(
 add_library("${PROJECT_NAME}" SHARED
 "ISharedMemory.cpp" 
 )
+
+install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
+

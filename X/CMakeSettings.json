@@ -2,6 +2,7 @@
   "environments": [
     {
       "PATH": "${env.PATH};${projectDir}/x64/Debug;${projectDir}/out/build/x64-Debug;C:/Program Files/boost/boost_1_69_0/stage/lib",
+      "INSTALL_PATH": "${projectDir}/out/install/X",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
       "X_INCL_DIR": "${projectDir}",
       "BOOST_LINK_DIR": "C:/Program Files/boost/boost_1_69_0/stage/lib",

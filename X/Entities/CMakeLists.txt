@@ -14,3 +14,6 @@ add_library("${PROJECT_NAME}" SHARED
 "EntityHierarchy.cpp" 
 "IStreamableEntity.cpp" 
 )
+
+install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
+

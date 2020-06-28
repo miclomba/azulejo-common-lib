@@ -24,3 +24,6 @@ target_link_libraries("${PROJECT_NAME}"
 "Entities"
 "Resources" 
 )
+
+install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
+

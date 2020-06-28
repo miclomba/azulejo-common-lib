@@ -19,3 +19,5 @@ add_library("${PROJECT_NAME}" SHARED
 target_link_libraries("${PROJECT_NAME}" 
 "Entities" 
 )
+
+install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
