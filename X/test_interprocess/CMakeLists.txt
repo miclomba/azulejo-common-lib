@@ -1,16 +1,17 @@
 project("test_interprocess")
 
 include_directories(
-"$ENV{X_DIR}"
+"$ENV{X_INCL_DIR}"
 "$ENV{GTEST_INCL_DIR}"
 "$ENV{GMOCK_INCL_DIR}"
-"$ENV{BOOST_DIR}"
+"$ENV{BOOST_INCL_DIR}"
 )
 
 link_directories(
 "$ENV{X_LINK_DIR}/Interprocess"
 "$ENV{GTEST_LINK_DIR}"
-"$ENV{BOOST_DIR}/stage/lib" 
+"$ENV{GMOCK_LINK_DIR}"
+"$ENV{BOOST_LINK_DIR}" 
 )
 
 add_executable("${PROJECT_NAME}"

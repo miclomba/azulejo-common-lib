@@ -3,10 +3,12 @@
     {
       "PATH": "${env.PATH};${projectDir}/x64/Debug;${projectDir}/out/build/x64-Debug;C:/Program Files/boost/boost_1_69_0/stage/lib",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
-      "X_DIR": "${projectDir}",
-      "BOOST_DIR": "C:/Program Files/boost/boost_1_69_0",
+      "X_INCL_DIR": "${projectDir}",
+      "BOOST_LINK_DIR": "C:/Program Files/boost/boost_1_69_0/stage/lib",
+      "BOOST_INCL_DIR": "C:/Program Files/boost/boost_1_69_0",
       "GTEST_LINK_DIR": "${projectDir}/../../googletest/out/build/x64-Debug (default)/lib",
       "GTEST_INCL_DIR": "${projectDir}/../../googletest/googletest/include",
+      "GMOCK_LINK_DIR": "${projectDir}/../../googletest/out/build/x64-Debug (default)/lib",
       "GMOCK_INCL_DIR": "${projectDir}/../../googletest/googlemock/include"
     }
   ],
