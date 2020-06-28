@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory("DatabaseAdapters")
 add_subdirectory("Entities")
+add_subdirectory("EntitiesModule")
 add_subdirectory("Events")
 add_subdirectory("FilesystemAdapters")
 add_subdirectory("Interprocess")
