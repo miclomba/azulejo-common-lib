@@ -5,8 +5,7 @@
     <ProjectGuid>dcef6cf7-da36-4363-a683-c7f84c669bc1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>test_resources_module.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\out\install\X</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>test_resources_module</Name>
@@ -16,6 +15,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,13 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ResourcesModule\ResourcesModule.vcxproj">
-      <Name>ResourcesModule</Name>
-      <Project>{8caf4564-52df-46d0-ad0f-7726cbac6758}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

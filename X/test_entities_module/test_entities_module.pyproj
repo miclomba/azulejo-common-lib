@@ -5,8 +5,7 @@
     <ProjectGuid>6ad8ebc0-8e65-4052-a365-844f6739d245</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>test_entities_module.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\out\install\X</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>test_entities_module</Name>
@@ -16,6 +15,9 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>PATH=%PATH%;C:\Program Files\boost\boost_1_69_0\stage\lib</Environment>
+    <TestFramework>pytest</TestFramework>
+    <UnitTestPattern>test*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,13 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EntitiesModule\EntitiesModule.vcxproj">
-      <Name>EntitiesModule</Name>
-      <Project>{509aac0e-0fa5-4661-b4f3-12b32ef43965}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
