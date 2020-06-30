@@ -1,6 +1,8 @@
 #ifndef intraprocess_iomp_runnable_h
 #define intraprocess_iomp_runnable_h
 
+#include <cstddef>
+
 #include "config.h"
 
 namespace intraprocess {
