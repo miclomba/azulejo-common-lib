@@ -2,10 +2,10 @@
 #include "config.h"
 
 #include <algorithm>
-#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -13,8 +13,6 @@
 #include "DatabaseAdapters/ResourceTabularizer.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "DatabaseAdapters/SqliteBlob.h"
-
-namespace fs = std::filesystem;
 
 using database_adapters::ResourceTabularizer;
 using database_adapters::Sqlite;

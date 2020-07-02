@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.hpp"
 
 #include "ISerializableResource.h"
 
@@ -71,7 +72,7 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
 
-	std::filesystem::path serializationPath = GetSerializationPath();
+	Path serializationPath = GetSerializationPath();
 	if (serializationPath.empty())
 		throw std::runtime_error("Serialization path is empty when deserializaing resource with ResourceDeserializer");
 

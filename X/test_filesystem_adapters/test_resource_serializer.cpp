@@ -1,17 +1,15 @@
 #include "config.h"
 
-#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
 #include "ContainerResource.h"
 #include "ContainerResource2D.h"
 #include "FilesystemAdapters/ResourceSerializer.h"
-
-namespace fs = std::filesystem;
 
 using filesystem_adapters::ResourceSerializer;
 using Resource = ContainerResource<int>;

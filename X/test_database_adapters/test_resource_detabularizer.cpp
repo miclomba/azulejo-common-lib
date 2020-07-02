@@ -1,10 +1,10 @@
 #include "config.h"
 
-#include <filesystem>
 #include <functional>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -12,8 +12,6 @@
 #include "DatabaseAdapters/ITabularizableResource.h"
 #include "DatabaseAdapters/ResourceDetabularizer.h"
 #include "DatabaseAdapters/ResourceTabularizer.h"
-
-namespace fs = std::filesystem;
 
 using database_adapters::ITabularizableResource;
 using database_adapters::ResourceDetabularizer;

@@ -1,8 +1,8 @@
 #include "ResourceTabularizer.h"
 
-#include <filesystem>
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.hpp"
 
 #include "ITabularizableResource.h"
 #include "Sqlite.h"
@@ -48,7 +48,7 @@ void ResourceTabularizer::ResetInstance()
 	instance_ = nullptr;
 }
 
-void ResourceTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+void ResourceTabularizer::OpenDatabase(const Path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("ResourceTabularizer already has a database open");

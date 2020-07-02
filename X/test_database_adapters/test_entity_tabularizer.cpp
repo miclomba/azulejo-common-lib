@@ -1,11 +1,11 @@
 #include "config.h"
 
 #include <array>
-#include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -18,7 +18,6 @@
 #include "DatabaseAdapters/Sqlite.h"
 #include "Entities/Entity.h"
 
-namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using database_adapters::EntityTabularizer;

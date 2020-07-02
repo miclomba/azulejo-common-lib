@@ -1,7 +1,6 @@
 #ifndef filesystem_adapters_resourcedeserializer_h
 #define filesystem_adapters_resourcedeserializer_h
 
-#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <map>
@@ -9,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+#include "Config/filesystem.h"
 
 #include "config.h"
 #include "ISerializableResource.h"
@@ -44,7 +44,7 @@ private:
 	std::string GetResourceExtension() const;
 
 	static ResourceDeserializer* instance_;
-	std::filesystem::path serializationPath_;
+	Path serializationPath_;
 	mutable std::map<std::string, std::function<std::unique_ptr<ISerializableResource>(void)>> keyToResourceMap_;
 };
 

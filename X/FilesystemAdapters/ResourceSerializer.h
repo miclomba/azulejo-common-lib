@@ -1,10 +1,10 @@
 #ifndef filesystem_adapters_resourceserializer_h
 #define filesystem_adapters_resourceserializer_h
 
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.h"
 
 #include "config.h"
 #include "ISerializableResource.h"
@@ -33,7 +33,7 @@ private:
 	ResourceSerializer& operator=(ResourceSerializer&&) = delete;
 
 	static ResourceSerializer* instance_;
-	std::filesystem::path serializationPath_;
+	Path serializationPath_;
 };
 
 } // end namespace filesystem_adapters

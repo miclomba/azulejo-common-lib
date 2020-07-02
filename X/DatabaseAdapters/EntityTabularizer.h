@@ -1,8 +1,8 @@
 #ifndef database_adapters_entitytabularizer_h
 #define database_adapters_entitytabularizer_h
 
-#include <filesystem>
 #include <string>
+#include "Config/filesystem.h"
 
 #include "config.h"
 
@@ -29,7 +29,7 @@ public:
 
 	// database
 	void CloseDatabase();
-	void OpenDatabase(const std::filesystem::path& dbPath);
+	void OpenDatabase(const Path& dbPath);
 	Sqlite& GetDatabase();
 
 private:

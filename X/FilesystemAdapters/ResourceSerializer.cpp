@@ -1,13 +1,13 @@
 #include "ResourceSerializer.h"
 
-#include "ISerializableResource.h"
-
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.hpp"
+
+#include "ISerializableResource.h"
 
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
-namespace fs = std::filesystem;
 
 namespace
 {
@@ -51,7 +51,7 @@ void ResourceSerializer::Serialize(const ISerializableResource& resource, const 
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
 
-	fs::path serializationPath = GetSerializationPath();
+	Path serializationPath = GetSerializationPath();
 
 	if (!fs::exists(serializationPath))
 		fs::create_directories(serializationPath);
@@ -85,7 +85,7 @@ void ResourceSerializer::Unserialize(const std::string& key)
 		throw std::runtime_error("Cannot unserialize resource with empty key");
 
 	const std::string fileName = key + RESOURCE_EXT;
-	fs::path resourcePath = fs::path(GetSerializationPath()) / fileName;
+	Path resourcePath = Path(GetSerializationPath()) / fileName;
 
 	if (fs::exists(resourcePath))
 	{

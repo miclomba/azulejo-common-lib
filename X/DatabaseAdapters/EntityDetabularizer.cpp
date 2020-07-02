@@ -1,11 +1,11 @@
 #include "EntityDetabularizer.h"
 
-#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include "Config/filesystem.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -144,7 +144,7 @@ void EntityDetabularizer::CloseDatabase()
 		databaseAdapter_.Close();
 }
 
-void EntityDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+void EntityDetabularizer::OpenDatabase(const Path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("EntityDetabularizer already has a database set");

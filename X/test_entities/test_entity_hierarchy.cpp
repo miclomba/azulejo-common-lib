@@ -1,8 +1,8 @@
 #include "config.h"
 
-#include <filesystem>
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -11,7 +11,6 @@
 
 #include "Entities/EntityHierarchy.h"
 
-namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using entity::EntityHierarchy;

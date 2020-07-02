@@ -1,16 +1,14 @@
 #include "Sqlite.h"
 
-#include <filesystem>
 #include <stdexcept>
 #include <stdio.h>
+#include "Config/filesystem.hpp"
 
 #include <boost/optional.hpp>
 
 #include "sqlite3.h"
 
 using database_adapters::Sqlite;
-
-namespace fs = std::filesystem;
 
 namespace
 {
@@ -38,7 +36,7 @@ bool Sqlite::IsOpen() const
 	return db_ != nullptr;
 }
 
-void Sqlite::Open(const fs::path& dbPath)
+void Sqlite::Open(const Path& dbPath)
 {
 	if (dbPath.empty())
 		throw std::runtime_error("Could not create (open) SQLite3 DB from empty path");
@@ -62,7 +60,7 @@ void Sqlite::Close()
 	db_ = nullptr;
 }
 
-fs::path Sqlite::GetPath() const
+Path Sqlite::GetPath() const
 {
 	return dbPath_;
 }

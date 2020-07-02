@@ -1,8 +1,8 @@
 #ifndef entity_entityhierarchy_h
 #define entity_entityhierarchy_h
 
-#include <filesystem>
 #include <string>
+#include "Config/filesystem.h"
 
 #include "config.h"
 
@@ -21,15 +21,15 @@ public:
 	virtual ~EntityHierarchy();
 
 	// structure
-	void LoadSerializationStructure(const std::filesystem::path& pathToJSON);
+	void LoadSerializationStructure(const Path& pathToJSON);
 	bool HasSerializationStructure() const;
 	boost::property_tree::ptree& GetSerializationStructure();
 
-	void SetSerializationPath(const std::filesystem::path& pathToJSON);
-	std::filesystem::path GetSerializationPath() const;
+	void SetSerializationPath(const Path& pathToJSON);
+	Path GetSerializationPath() const;
 
 private:
-	std::filesystem::path serializationPath_;
+	Path serializationPath_;
 	boost::property_tree::ptree serializationStructure_;
 };
 

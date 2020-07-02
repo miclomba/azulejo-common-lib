@@ -1,10 +1,10 @@
 #include "EntityTabularizer.h"
 
 #include <algorithm>
-#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include "Config/filesystem.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -104,7 +104,7 @@ void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity& enti
 		SendEntityHierarchyTreeToDatabase(hierarchy_.GetSerializationStructure(), GetDatabase());
 }
 
-void EntityTabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+void EntityTabularizer::OpenDatabase(const Path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("EntityTabularizer already has a database open");

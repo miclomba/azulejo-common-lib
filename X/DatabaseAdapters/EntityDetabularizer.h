@@ -1,12 +1,12 @@
 #ifndef database_adapters_entitydetabularizer_h
 #define database_adapters_dntitydetabularizer_h
 
-#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
+#include "Config/filesystem.h"
 
 #include "config.h"
 
@@ -35,7 +35,7 @@ public:
 
 	// database
 	void CloseDatabase();
-	void OpenDatabase(const std::filesystem::path& dbPath);
+	void OpenDatabase(const Path& dbPath);
 	Sqlite& GetDatabase();
 
 	// detabularization

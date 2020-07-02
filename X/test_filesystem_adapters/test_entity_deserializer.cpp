@@ -1,12 +1,12 @@
 #include "config.h"
 
-#include <filesystem>
 #include <fstream>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -16,7 +16,6 @@
 #include "FilesystemAdapters/ISerializableEntity.h"
 #include "FilesystemAdapters/EntityDeserializer.h"
 
-namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using entity::Entity;

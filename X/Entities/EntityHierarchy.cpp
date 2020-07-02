@@ -1,15 +1,14 @@
 #include "EntityHierarchy.h"
 
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include "Config/filesystem.hpp"
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 namespace pt = boost::property_tree;
-namespace fs = std::filesystem;
 
 using entity::EntityHierarchy;
 
@@ -20,7 +19,7 @@ EntityHierarchy::EntityHierarchy(EntityHierarchy&&) = default;
 EntityHierarchy& EntityHierarchy::operator=(EntityHierarchy&&) = default;
 EntityHierarchy::~EntityHierarchy() = default;
 
-void EntityHierarchy::LoadSerializationStructure(const fs::path& pathToJSON)
+void EntityHierarchy::LoadSerializationStructure(const Path& pathToJSON)
 {
 	serializationPath_ = pathToJSON;
 
@@ -46,12 +45,12 @@ pt::ptree& EntityHierarchy::GetSerializationStructure()
 	return serializationStructure_;
 }
 
-std::filesystem::path EntityHierarchy::GetSerializationPath() const
+Path EntityHierarchy::GetSerializationPath() const
 {
 	return serializationPath_;
 }
 
-void EntityHierarchy::SetSerializationPath(const fs::path& pathToJSON)
+void EntityHierarchy::SetSerializationPath(const Path& pathToJSON)
 {
 	serializationPath_ = pathToJSON;
 }

@@ -1,11 +1,11 @@
 #include "config.h"
 
-#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -14,8 +14,6 @@
 #include "FilesystemAdapters/ISerializableResource.h"
 #include "FilesystemAdapters/ResourceDeserializer.h"
 #include "FilesystemAdapters/ResourceSerializer.h"
-
-namespace fs = std::filesystem;
 
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceDeserializer;

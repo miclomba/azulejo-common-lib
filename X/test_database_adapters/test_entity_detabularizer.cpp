@@ -1,11 +1,11 @@
 #include "config.h"
 
-#include <filesystem>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
@@ -21,7 +21,6 @@
 #include "Entities/Entity.h"
 #include "Entities/EntityHierarchy.h"
 
-namespace fs = std::filesystem;
 namespace pt = boost::property_tree;
 
 using database_adapters::EntityDetabularizer;

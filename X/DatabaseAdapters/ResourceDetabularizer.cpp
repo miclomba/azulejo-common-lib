@@ -1,14 +1,12 @@
 #include "ResourceDetabularizer.h"
 
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include "Config/filesystem.hpp"
 
 #include "ITabularizableResource.h"
 #include "Sqlite.h"
 #include "SqliteBlob.h"
-
-namespace fs = std::filesystem;
 
 using database_adapters::ResourceDetabularizer;
 using database_adapters::ITabularizableResource;
@@ -55,7 +53,7 @@ void ResourceDetabularizer::CloseDatabase()
 		databaseAdapter_.Close();
 }
 
-void ResourceDetabularizer::OpenDatabase(const std::filesystem::path& dbPath)
+void ResourceDetabularizer::OpenDatabase(const Path& dbPath)
 {
 	if (databaseAdapter_.IsOpen())
 		throw std::runtime_error("ResourceDetabularizer already has a database set");

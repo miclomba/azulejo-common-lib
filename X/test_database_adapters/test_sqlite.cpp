@@ -1,13 +1,10 @@
 
 #include "config.h"
-
-#include <filesystem>
+#include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
 
 #include "DatabaseAdapters/Sqlite.h"
-
-namespace fs = std::filesystem;
 
 using database_adapters::Sqlite;
 

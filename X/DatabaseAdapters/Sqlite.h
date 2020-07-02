@@ -3,9 +3,9 @@
 
 #include "config.h"
 
-#include <filesystem>
 #include <functional>
 #include <string>
+#include "Config/filesystem.h"
 
 #include <boost/optional.hpp>
 
@@ -29,9 +29,9 @@ public:
 	void Execute(const std::string& sql, boost::optional<RowCallbackType> rowCallback = boost::none);
 
 	bool IsOpen() const;
-	void Open(const std::filesystem::path& dbPath);
+	void Open(const Path& dbPath);
 	void Close();
-	std::filesystem::path GetPath() const;
+	Path GetPath() const;
 
 	// TODO control access of this
 	sqlite3* GetSqlite3();
@@ -40,7 +40,7 @@ private:
 	void FreeErrorMessage(char* const ec);
 
 	sqlite3* db_{ nullptr };
-	std::filesystem::path dbPath_;
+	Path dbPath_;
 };
 
 } // end namespace database_adapters
