@@ -57,7 +57,7 @@ TEMPLATE_T
 void IConnectionHandler_t::PostReceiveMessages()
 {
 	ioAdapter_.AsyncRead(Socket(), inMessage_, HEADER_LENGTH,
-		readStrand_.wrap([meShared = shared_from_this()](boost::system::error_code error, size_t bytesTransferred)
+		readStrand_.wrap([meShared = this->shared_from_this()](boost::system::error_code error, size_t bytesTransferred)
 	{
 		if (error) return;
 
@@ -138,7 +138,7 @@ void IConnectionHandler_t::PostOutgoingMessage(const std::vector<PODType> messag
 		outMessageQue_.push_back(std::move(wrappedMessage));
 	}
 
-	IOService().post([me = shared_from_this()]() 
+	IOService().post([me = this->shared_from_this()]() 
 	{
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->SendMessageStart();
@@ -160,7 +160,7 @@ void IConnectionHandler_t::SendMessageStart()
 	}
 
 	ioAdapter_.AsyncWrite(Socket(), boost::asio::buffer(*message),
-		writeStrand_.wrap([me = shared_from_this(), message](boost::system::error_code error, size_t)
+		writeStrand_.wrap([me = this->shared_from_this(), message](boost::system::error_code error, size_t)
 	{
 		if (error) return;
 
@@ -176,7 +176,7 @@ void IConnectionHandler_t::SendMessageDone()
 
 	if (!outMessageQue_.empty())
 	{
-		IOService().post([me = shared_from_this()]() 
+		IOService().post([me = this->shared_from_this()]() 
 		{
 			auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 			meDerived->SendMessageStart();
@@ -191,7 +191,7 @@ void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::results_type 
 		throw std::runtime_error("IConnectionHandler cannot connect because socket is already open");
 
 	ioAdapter_.AsyncConnect(Socket(), endPoints,
-		[me = shared_from_this()](boost::system::error_code error, boost::asio::ip::tcp::endpoint)
+		[me = this->shared_from_this()](boost::system::error_code error, boost::asio::ip::tcp::endpoint)
 	{
 		if (error) return;
 
@@ -203,7 +203,7 @@ void IConnectionHandler_t::Connect(boost::asio::ip::tcp::resolver::results_type 
 TEMPLATE_T
 void IConnectionHandler_t::Close()
 {
-	IOService().post([me = shared_from_this()]() 
+	IOService().post([me = this->shared_from_this()]() 
 	{ 
 		auto meDerived = static_cast<IConnectionHandler_t*>(me.get());
 		meDerived->Socket().close(); 
