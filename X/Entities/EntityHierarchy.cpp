@@ -23,7 +23,7 @@ void EntityHierarchy::LoadSerializationStructure(const Path& pathToJSON)
 {
 	serializationPath_ = pathToJSON;
 
-	std::ifstream file(pathToJSON);
+	std::ifstream file(pathToJSON.string());
 	if (file)
 	{
 		boost::property_tree::read_json(file, serializationStructure_);

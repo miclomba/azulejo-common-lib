@@ -77,7 +77,7 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 		throw std::runtime_error("Serialization path is empty when deserializaing resource with ResourceDeserializer");
 
 	std::string fileName = key + GetResourceExtension();
-	std::ifstream inFile(serializationPath / fileName, std::ios::binary);
+	std::ifstream inFile((serializationPath / fileName).string(), std::ios::binary);
 	if (!inFile)
 		throw std::runtime_error("Could not open input file: " + (serializationPath / fileName).string());
 

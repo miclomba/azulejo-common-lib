@@ -60,7 +60,7 @@ void ResourceSerializer::Serialize(const ISerializableResource& resource, const 
 		return;
 
 	const std::string fileName = key + RESOURCE_EXT;
-	std::ofstream outfile(serializationPath / fileName, std::ios::binary);
+	std::ofstream outfile((serializationPath / fileName).string(), std::ios::binary);
 	if (!outfile)
 		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
 
