@@ -16,7 +16,7 @@ boost::signals2::connection EventEmitter<T>::Connect(const std::shared_ptr<IEven
 	if (!slot)
 		throw std::runtime_error("Cannot connect event emitter to event consumer because event consumer is not of type=" + GetSubscriberType());
 
-	return emitter_.connect(boost::signals2::signal<T>::slot_type(slot->GetSubscriber()).track_foreign(slot));
+	return emitter_.connect(typename boost::signals2::signal<T>::slot_type(slot->GetSubscriber()).track_foreign(slot));
 }
 
 TEMPLATE_T

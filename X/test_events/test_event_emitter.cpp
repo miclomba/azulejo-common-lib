@@ -27,12 +27,12 @@ private:
 };
 } // end namespace
 
-TEST(EventEmitterT, Construct)
+TEST(EventEmitter, Construct)
 {
 	EXPECT_NO_THROW(EventEmitter<void(void)> emitter);
 }
 
-TEST(EventEmitterT, MoveConstruct)
+TEST(EventEmitter, MoveConstruct)
 {
 	EventEmitter<void(void)> source;
 	int arity = source.Signal().arity;
@@ -47,7 +47,7 @@ TEST(EventEmitterT, MoveConstruct)
 	EXPECT_EQ(subscriberType, target.GetSubscriberType());
 }
 
-TEST(EventEmitterT, MoveAssign)
+TEST(EventEmitter, MoveAssign)
 {
 	EventEmitter<void(void)> source;
 	int arity = source.Signal().arity;
@@ -63,7 +63,7 @@ TEST(EventEmitterT, MoveAssign)
 	EXPECT_EQ(subscriberType, target.GetSubscriberType());
 }
 
-TEST(EventEmitterT, Connect) 
+TEST(EventEmitter, Connect) 
 {
 	auto consumer = std::make_shared<Consumer>();
 
@@ -72,13 +72,13 @@ TEST(EventEmitterT, Connect)
 	EXPECT_TRUE(conn.connected());
 }
 
-TEST(EventEmitterT, ConnectThrows)
+TEST(EventEmitter, ConnectThrows)
 {
 	EventEmitter<void(void)> emitter;
 	EXPECT_THROW(emitter.Connect(nullptr), std::runtime_error);
 }
 
-TEST(EventEmitterT, DisconnectConsumer)
+TEST(EventEmitter, DisconnectConsumer)
 {
 	auto consumer = std::make_shared<Consumer>();
 
@@ -90,7 +90,7 @@ TEST(EventEmitterT, DisconnectConsumer)
 	EXPECT_FALSE(conn.connected());
 }
 
-TEST(EventEmitterT, DisconnectEmitter)
+TEST(EventEmitter, DisconnectEmitter)
 {
 	auto consumer = std::make_shared<Consumer>();
 
@@ -103,7 +103,7 @@ TEST(EventEmitterT, DisconnectEmitter)
 	EXPECT_FALSE(conn.connected());
 }
 
-TEST(EventEmitterT, GetSubscriberType) 
+TEST(EventEmitter, GetSubscriberType) 
 {
 	auto consumer = std::make_shared<Consumer>();
 	std::string consumerSubscriberType = consumer->GetSubscriberType();
@@ -115,7 +115,7 @@ TEST(EventEmitterT, GetSubscriberType)
 	EXPECT_EQ(emitterSubscriberType, consumerSubscriberType);
 }
 
-TEST(EventEmitterT, Signal)
+TEST(EventEmitter, Signal)
 {
 	auto consumer = std::make_shared<Consumer>();
 

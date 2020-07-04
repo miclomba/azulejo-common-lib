@@ -8,10 +8,8 @@
 
 #include "config.h"
 
-#include <boost/signals2.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
-#include <boost/signals2/slot.hpp>
 
 #include "IEventConsumer.h"
 #include "IEventEmitter.h"
