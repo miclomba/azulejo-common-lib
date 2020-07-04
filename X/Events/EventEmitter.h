@@ -8,6 +8,7 @@
 
 #include "config.h"
 
+#include <boost/signals2.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
 
@@ -21,9 +22,6 @@ namespace events
 template<typename T>
 class EVENTS_DLL_EXPORT EventEmitter : public IEventEmitter
 {
-public:
-	typedef boost::signals2::signal<T> signal_t;
-
 public:
 	EventEmitter();
 	virtual ~EventEmitter();
