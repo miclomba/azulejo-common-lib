@@ -4,8 +4,11 @@
 #include <string>
 #include "Config/filesystem.hpp"
 
+#include <boost/system/error_code.hpp>
+
 #include "ISerializableResource.h"
 
+using boost::system::error_code;
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
 
@@ -89,7 +92,14 @@ void ResourceSerializer::Unserialize(const std::string& key)
 
 	if (fs::exists(resourcePath))
 	{
+#if defined(__APPLE__) || defined(__MACH__)
+		error_code ec;
+		fs::permissions(resourcePath, fs::perms::all_all, ec);
+		if (ec) 
+			throw std::runtime_error("ResourceSerializer could not set permissions on file: " + resourcePath.string());
+#else
 		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add);
+#endif
 		fs::remove(resourcePath);
 	}
 }
