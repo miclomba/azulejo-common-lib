@@ -24,7 +24,7 @@ public:
 	Sqlite& operator=(const Sqlite&);
 	Sqlite(Sqlite&&);
 	Sqlite& operator=(Sqlite&&);
-	~Sqlite();
+	virtual ~Sqlite();
 
 	void Execute(const std::string& sql, boost::optional<RowCallbackType> rowCallback = boost::none);
 

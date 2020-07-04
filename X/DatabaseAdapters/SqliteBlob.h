@@ -17,11 +17,11 @@ class DATABASE_ADAPTERS_DLL_EXPORT SqliteBlob
 public:
 	SqliteBlob(Sqlite& db);
 
-	SqliteBlob(const SqliteBlob&);
-	SqliteBlob& operator=(const SqliteBlob&);
-	SqliteBlob(SqliteBlob&&);
-	SqliteBlob& operator=(SqliteBlob&&);
-	~SqliteBlob();
+	SqliteBlob(const SqliteBlob&) = delete;
+	SqliteBlob& operator=(const SqliteBlob&) = delete;
+	SqliteBlob(SqliteBlob&&) = delete;
+	SqliteBlob& operator=(SqliteBlob&&) = delete;
+	virtual ~SqliteBlob();
 
 	void Open(const std::string& tableName, const std::string& columnName, const sqlite3_int64 iRow);
 	std::vector<char> Read(const size_t numBytes, const int offset) const;

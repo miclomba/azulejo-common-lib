@@ -21,11 +21,6 @@ SqliteBlob::SqliteBlob(Sqlite& db) :
 {
 }
 
-SqliteBlob::SqliteBlob(const SqliteBlob&) = default;
-SqliteBlob& SqliteBlob::operator=(const SqliteBlob&) = default;
-SqliteBlob::SqliteBlob(SqliteBlob&&) = default;
-SqliteBlob& SqliteBlob::operator=(SqliteBlob&&) = default;
-
 SqliteBlob::~SqliteBlob()
 {
 	if (blob_)
