@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/property_tree/ptree.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "DatabaseAdapters/EntityDetabularizer.h"
 #include "DatabaseAdapters/EntityHierarchyBlob.h"
@@ -23,6 +24,7 @@
 
 namespace pt = boost::property_tree;
 
+using boost::system::error_code;
 using database_adapters::EntityDetabularizer;
 using database_adapters::EntityHierarchyBlob;
 using database_adapters::EntityTabularizer;
@@ -153,7 +155,12 @@ struct SqliteRemover
 	{
 		if (fs::exists(DB_PATH))
 		{
+#if defined(__APPLE__) || defined(__MACH__)
+			error_code ec;
+			fs::permissions(DB_PATH, fs::perms::all_all, ec);
+#else
 			fs::permissions(DB_PATH, fs::perms::all, fs::perm_options::add);
+#endif
 			fs::remove(DB_PATH);
 		}
 	}

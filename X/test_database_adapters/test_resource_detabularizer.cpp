@@ -7,12 +7,14 @@
 #include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
+#include <boost/system/error_code.hpp>
 
 #include "ContainerResource.h"
 #include "DatabaseAdapters/ITabularizableResource.h"
 #include "DatabaseAdapters/ResourceDetabularizer.h"
 #include "DatabaseAdapters/ResourceTabularizer.h"
 
+using boost::system::error_code;
 using database_adapters::ITabularizableResource;
 using database_adapters::ResourceDetabularizer;
 using database_adapters::ResourceTabularizer;
@@ -39,7 +41,12 @@ struct SqliteRemover
 	{
 		if (fs::exists(DB_PATH))
 		{
+#if defined(__APPLE__) || defined(__MACH__)
+			error_code ec;
+			fs::permissions(DB_PATH, fs::perms::all_all, ec);
+#else
 			fs::permissions(DB_PATH, fs::perms::all, fs::perm_options::add);
+#endif
 			fs::remove(DB_PATH);
 		}
 	}

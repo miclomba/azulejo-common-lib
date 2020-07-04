@@ -3,9 +3,11 @@
 #include "Config/filesystem.hpp"
 
 #include <gtest/gtest.h>
+#include <boost/system/error_code.hpp>
 
 #include "DatabaseAdapters/Sqlite.h"
 
+using boost::system::error_code;
 using database_adapters::Sqlite;
 
 namespace
@@ -32,7 +34,12 @@ struct SqliteF : public testing::Test
 	{
 		if (fs::exists(DB_PATH))
 		{
+#if defined(__APPLE__) || defined(__MACH__)
+			error_code ec;
+			fs::permissions(DB_PATH, fs::perms::all_all, ec);
+#else
 			fs::permissions(DB_PATH, fs::perms::all, fs::perm_options::add);
+#endif
 			fs::remove(DB_PATH);
 		}
 	}
