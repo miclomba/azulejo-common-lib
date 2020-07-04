@@ -6,9 +6,9 @@ export X_LINK_DIR="$X_DIR/out/xcode"
 export X_INCL_DIR="$X_DIR"
 
 # google tests
-export GTEST_LINK_DIR="$REPOS/googletest/out/xcode/lib/Debug"
+export GTEST_LINK_DIR="$REPOS/googletest/out/xcode/lib"
 export GTEST_INCL_DIR="$REPOS/googletest/googletest/include"
-export GMOCK_LINK_DIR="$REPOS/googletest/out/xcode/lib/Debug"
+export GMOCK_LINK_DIR="$REPOS/googletest/out/xcode/lib"
 export GMOCK_INCL_DIR="$REPOS/googletest/googlemock/include"
 
 # compile boost yourself
