@@ -1,3 +1,7 @@
+# To run cmake we need command line tools for xcode:
+# install via:
+#     xcode-select --install
+
 export REPOS="$HOME/source/repos"
 export X_DIR="$REPOS/Backend/X"
 
