@@ -32,7 +32,6 @@ target_link_libraries("${PROJECT_NAME}"
 "Events" 
 gtestd
 gtest_maind
-"boost_system$ENV{BOOST_LIB_SUFFIX}"
 )
 
 if (MSVC)
