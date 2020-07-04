@@ -1,8 +1,8 @@
 #ifndef filesystem_adapters_entityserializer_h
 #define filesystem_adapters_entityserializer_h
 
-#include <filesystem>
 #include <string>
+#include "Config/filesystem.h"
 
 #include "config.h"
 

@@ -1,12 +1,12 @@
 #ifndef filesystem_adapters_entitydeserializer_h
 #define filesystem_adapters_entitydeserializer_h
 
-#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
+#include "Config/filesystem.h"
 
 #include "config.h"
 
