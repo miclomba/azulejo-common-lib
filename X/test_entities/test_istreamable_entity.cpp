@@ -57,7 +57,7 @@ struct TypeC : public Entity {};
 
 TEST(IStreamableEntity, Construct)
 {
-	EXPECT_NO_THROW(TypeA streamable());
+	EXPECT_NO_THROW(TypeA streamable);
 }
 
 TEST(IStreamableEntity, CopyConstruct)

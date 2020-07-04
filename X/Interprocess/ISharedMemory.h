@@ -26,6 +26,7 @@ public:
 	void* GetSharedAddress() const;
 	bool IsSharedMemoryOwner() const;
 
+	bool Destroy();
 	void Create(const std::string& name, const size_t size);
 	void Open(const std::string& name);
 

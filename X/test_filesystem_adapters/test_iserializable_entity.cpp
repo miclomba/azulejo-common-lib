@@ -41,7 +41,7 @@ struct TypeB : public Entity
 
 TEST(ISerializableEntity, Construct)
 {
-	EXPECT_NO_THROW(TypeA serializable());
+	EXPECT_NO_THROW(TypeA serializable);
 }
 
 TEST(ISerializableEntity, CopyConstruct)

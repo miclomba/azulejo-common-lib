@@ -38,7 +38,7 @@ struct TypeA : public ITabularizableEntity
 
 TEST(ITabularizableEntity, Construct)
 {
-	EXPECT_NO_THROW(TypeA tabularizable());
+	EXPECT_NO_THROW(TypeA tabularizable);
 }
 
 TEST(ITabularizableEntity, CopyConstruct)

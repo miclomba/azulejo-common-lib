@@ -9,8 +9,7 @@
 
 #include <boost/optional.hpp>
 
-// forward decl
-struct sqlite3;
+#include "sqlite3.h"
 
 namespace database_adapters {
 

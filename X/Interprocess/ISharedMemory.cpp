@@ -17,9 +17,16 @@ ISharedMemory::~ISharedMemory()
 		return;
 
 	const char* name = shmem_->get_name();
-	bool removed = boost::interprocess::shared_memory_object::remove(name);
-	if (!removed)
-		throw std::runtime_error("Could not remove shared memory: name=" + std::string(name));
+	boost::interprocess::shared_memory_object::remove(name);
+}
+
+bool ISharedMemory::Destroy()
+{
+	if (!shmem_ || !isShmemOwner_)
+		return true;
+
+	const char* name = shmem_->get_name();
+	return boost::interprocess::shared_memory_object::remove(name);
 }
 
 void ISharedMemory::Create(const std::string& name, const size_t size)

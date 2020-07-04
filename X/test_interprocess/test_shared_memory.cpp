@@ -28,6 +28,14 @@ TEST(ISharedMemory, Construct)
 	EXPECT_NO_THROW(ShareableCreator shareable);
 }
 
+TEST(ISharedMemory, Destroy)
+{
+	ShareableCreator shareable;
+
+	shareable.Create(NAME, SHMEM_SIZE);
+	EXPECT_TRUE(shareable.Destroy());
+}
+
 TEST(ISharedMemory, Create)
 {
 	ShareableCreator shareable;
@@ -84,7 +92,7 @@ TEST(ISharedMemory, OpenThrows)
 	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
 }
 
-TEST(ISharedMemory, Destroy)
+TEST(ISharedMemory, IsSharedMemoryOwnerWhenMemoryIsShared)
 {
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;

@@ -35,6 +35,8 @@ Entity& Entity::operator=(const Entity& other)
 	membersMap_.clear();
 	for (const std::pair<Key,SharedEntity>& e : other.membersMap_)
 		membersMap_[e.first] = other.ConstructEntity(*e.second); 
+
+	return *this;
 }
 
 Entity::~Entity() = default;

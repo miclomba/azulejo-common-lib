@@ -117,7 +117,8 @@ private:
 
 TEST_F(SqliteBlobF, Construct)
 {
-	EXPECT_NO_THROW(SqliteBlob(GetDatabase()));
+	Sqlite& db = GetDatabase();
+	EXPECT_NO_THROW(SqliteBlob blob(db));
 }
 
 TEST_F(SqliteBlobF, DestructBeforeOpenning)
