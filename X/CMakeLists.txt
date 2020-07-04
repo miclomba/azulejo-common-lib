@@ -18,7 +18,9 @@ if (NOT APPLE)
 add_subdirectory("Intraprocess")
 endif()
 add_subdirectory("Resources")
+if (NOT APPLE)
 add_subdirectory("ResourcesModule")
+endif()
 
 # SETUP_GOOGLE_TEST
 #Note: make sure to add the following option in CMakeLists.txt of the googletest project

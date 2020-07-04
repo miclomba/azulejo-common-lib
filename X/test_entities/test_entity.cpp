@@ -125,7 +125,7 @@ TEST(Entity, CopyConstruct)
 	
 	EXPECT_EQ(source.GetKey(), target.GetKey());
 	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
-	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue(), 8);
+	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue());
 }
 
 TEST(Entity, CopyAssign)
@@ -144,7 +144,7 @@ TEST(Entity, CopyAssign)
 
 	EXPECT_EQ(source.GetKey(), target.GetKey());
 	EXPECT_NE(&source.GetProtectedMember(MEMBER_KEY), &target.GetProtectedMember(MEMBER_KEY));
-	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue(), 8);
+	EXPECT_EQ(sourceMemberPtr->GetValue(), targetMemberPtr->GetValue());
 }
 
 TEST(Entity, GetKey)
