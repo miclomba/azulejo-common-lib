@@ -7,8 +7,11 @@
 #include "config.h"
 
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/read.hpp>
 #include <boost/asio/streambuf.hpp>
+#include <boost/asio/write.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace interprocess {
@@ -34,7 +37,7 @@ public:
 
 	virtual void AsyncWrite(
 		boost::asio::ip::tcp::socket& socket,
-		boost::asio::mutable_buffer& messageBuffer,
+		const std::vector<PODType>& messageBuffer,
 		std::function<void(boost::system::error_code error, size_t)> handler
 	);
 

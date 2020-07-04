@@ -4,6 +4,10 @@ project("X")
 
 set(CMAKE_CXX_STANDARD 17)
 
+if (MSVC)
+set(CMAKE_CXX_FLAGS "/permissive- /EHsc")
+endif()
+
 add_subdirectory("DatabaseAdapters")
 add_subdirectory("Entities")
 add_subdirectory("EntitiesModule")

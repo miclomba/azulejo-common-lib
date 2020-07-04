@@ -47,7 +47,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		std::function<void(error_code error, size_t bytesTransferred)>)
 	);
 
-	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, boost::asio::mutable_buffer& message,
+	MOCK_METHOD3(AsyncWrite, void(tcp::socket&, const std::vector<char>& message,
 		std::function<void(error_code error, size_t bytesTransferred)>)
 	);
 
@@ -64,7 +64,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		handlerWrapper(error_code(), readCount_ == 1 ? HEADER_LENGTH : RECEIVED_MESSAGE.size()); 
 	}
 
-	void AsyncWriteImpl(tcp::socket& socket, boost::asio::mutable_buffer& message,
+	void AsyncWriteImpl(tcp::socket& socket, const std::vector<char>& message,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		ValidateSentMessage(message);
@@ -105,7 +105,7 @@ struct IOAdapter : public AsioAdapter<PODType>
 		); 
 	}
 
-	void AsyncWriteImplWithErrorParam(tcp::socket& socket, boost::asio::mutable_buffer& message,
+	void AsyncWriteImplWithErrorParam(tcp::socket& socket, const std::vector<char>& message,
 		std::function<void(error_code error, size_t bytesTransferred)>&& handlerWrapper)
 	{
 		ValidateSentMessage(message);
@@ -128,11 +128,11 @@ private:
 			inMessage[i] = message[i];
 	}
 
-	void ValidateSentMessage(boost::asio::mutable_buffer& message)
+	void ValidateSentMessage(const std::vector<char>& message)
 	{
 		size_t podSize = sizeof(PODType);
 		std::vector<PODType> messageVector(message.size() / podSize);
-		boost::asio::buffer_copy(boost::asio::buffer(messageVector), message);
+		boost::asio::buffer_copy(boost::asio::buffer(messageVector), boost::asio::buffer(message));
 		ASSERT_EQ(messageVector.size(), SENT_MESSAGE_WITH_HEADER.size());
 		for (size_t i = 0; i < SENT_MESSAGE_WITH_HEADER.size(); ++i)
 			EXPECT_EQ(messageVector[i], SENT_MESSAGE_WITH_HEADER.at(i));

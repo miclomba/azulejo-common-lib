@@ -23,11 +23,11 @@ void AsioAdapter_t::AsyncRead(
 TEMPLATE_T
 void AsioAdapter_t::AsyncWrite(
 	boost::asio::ip::tcp::socket& socket,
-	boost::asio::mutable_buffer& messageBuffer,
+	const std::vector<PODType>& messageBuffer,
 	std::function<void(boost::system::error_code error, size_t)> handler
 )
 {
-	boost::asio::async_write(socket, messageBuffer, handler);
+	boost::asio::async_write(socket, boost::asio::buffer(messageBuffer), handler);
 }
 
 TEMPLATE_T

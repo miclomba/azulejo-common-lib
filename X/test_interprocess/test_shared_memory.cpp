@@ -18,7 +18,7 @@ namespace
 {
 const std::string NAME = "shmem";
 const std::string OTHER_NAME = "other_shmem";
-const size_t SIZE = 1024;
+const size_t SHMEM_SIZE = 1024;
 
 struct ShareableCreator : public ISharedMemory {};
 } // end namespace anonymous
@@ -32,7 +32,7 @@ TEST(ISharedMemory, Create)
 {
 	ShareableCreator shareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
+	EXPECT_NO_THROW(shareable.Create(NAME,SHMEM_SIZE));
 }
 
 TEST(ISharedMemory, CreateThrowsWhenSharedMemoryAlreadyExists)
@@ -40,23 +40,23 @@ TEST(ISharedMemory, CreateThrowsWhenSharedMemoryAlreadyExists)
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
-	EXPECT_THROW(otherShareable.Create(NAME, SIZE), std::runtime_error);
+	EXPECT_NO_THROW(shareable.Create(NAME, SHMEM_SIZE));
+	EXPECT_THROW(otherShareable.Create(NAME, SHMEM_SIZE), std::runtime_error);
 }
 
 TEST(ISharedMemory, CreateWhenAlreadyCreatedThrows)
 {
 	ShareableCreator shareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
-	EXPECT_THROW(shareable.Create(OTHER_NAME, SIZE), std::runtime_error);
+	EXPECT_NO_THROW(shareable.Create(NAME, SHMEM_SIZE));
+	EXPECT_THROW(shareable.Create(OTHER_NAME, SHMEM_SIZE), std::runtime_error);
 }
 
 TEST(ISharedMemory, CreateUsingEmptyNameThrows)
 {
 	ShareableCreator shareable;
 
-	EXPECT_THROW(shareable.Create("", SIZE), std::runtime_error);
+	EXPECT_THROW(shareable.Create("", SHMEM_SIZE), std::runtime_error);
 }
 
 TEST(ISharedMemory, CreateUsingInvalidSizeThrows)
@@ -71,7 +71,7 @@ TEST(ISharedMemory, Open)
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME,SIZE));
+	EXPECT_NO_THROW(shareable.Create(NAME,SHMEM_SIZE));
 	EXPECT_NO_THROW(otherShareable.Open(NAME));
 }
 
@@ -80,7 +80,7 @@ TEST(ISharedMemory, OpenThrows)
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_NO_THROW(shareable.Create(NAME, SHMEM_SIZE));
 	EXPECT_THROW(otherShareable.Open(OTHER_NAME), std::runtime_error);
 }
 
@@ -89,7 +89,7 @@ TEST(ISharedMemory, Destroy)
 	ShareableCreator shareable;
 	ShareableCreator otherShareable;
 
-	EXPECT_NO_THROW(shareable.Create(NAME, SIZE));
+	EXPECT_NO_THROW(shareable.Create(NAME, SHMEM_SIZE));
 	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
 	EXPECT_NO_THROW(otherShareable.Open(NAME));
 	EXPECT_FALSE(otherShareable.IsSharedMemoryOwner());
@@ -101,7 +101,7 @@ TEST(ISharedMemory, GetSharedName)
 {
 	ShareableCreator shareable;
 
-	shareable.Create(NAME,SIZE);
+	shareable.Create(NAME,SHMEM_SIZE);
 	EXPECT_EQ(NAME,shareable.GetSharedName());
 }
 
@@ -116,8 +116,8 @@ TEST(ISharedMemory, GetSharedSize)
 {
 	ShareableCreator shareable;
 
-	shareable.Create(NAME,SIZE);
-	EXPECT_EQ(SIZE, shareable.GetSharedSize());
+	shareable.Create(NAME,SHMEM_SIZE);
+	EXPECT_EQ(SHMEM_SIZE, shareable.GetSharedSize());
 }
 
 TEST(ISharedMemory, ThrowOnGetSharedSize)
@@ -131,7 +131,7 @@ TEST(ISharedMemory, GetSharedAddress)
 {
 	ShareableCreator shareable;
 
-	shareable.Create(NAME,SIZE);
+	shareable.Create(NAME,SHMEM_SIZE);
 	EXPECT_NO_THROW(shareable.GetSharedAddress());
 }
 
@@ -147,7 +147,7 @@ TEST(ISharedMemory, IsSharedMemoryOwner)
 	ShareableCreator shareable;
 	EXPECT_FALSE(shareable.IsSharedMemoryOwner());
 
-	shareable.Create(NAME, SIZE);
+	shareable.Create(NAME, SHMEM_SIZE);
 	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
 }
 
@@ -163,7 +163,7 @@ int main(int argc, const char** argv)
 	if (argc == 1)
 	{
 		sable = std::make_shared<ShareableCreator>();
-		sable->Create(NAME,SIZE);
+		sable->Create(NAME,SHMEM_SIZE);
 	}
 	else
 	{
@@ -173,8 +173,8 @@ int main(int argc, const char** argv)
 
 	if (NAME != sable->GetSharedName())
 		throw std::runtime_error("Shared memory segment's name is not equal to " + NAME);
-	if (SIZE != sable->GetSharedSize())
-		throw std::runtime_error("Shared memory segment's size is not equal to " + SIZE);
+	if (SHMEM_SIZE != sable->GetSharedSize())
+		throw std::runtime_error("Shared memory segment's size is not equal to " + SHMEM_SIZE);
 	if (!sable->GetSharedAddress())
 		throw std::runtime_error("Shared memory address is null");
 

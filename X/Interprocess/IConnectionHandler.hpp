@@ -159,7 +159,7 @@ void IConnectionHandler_t::SendMessageStart()
 		outMessageQue_.pop_front();
 	}
 
-	ioAdapter_.AsyncWrite(Socket(), boost::asio::buffer(*message),
+	ioAdapter_.AsyncWrite(Socket(), *message,
 		writeStrand_.wrap([me = this->shared_from_this(), message](boost::system::error_code error, size_t)
 	{
 		if (error) return;
