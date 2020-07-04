@@ -1,16 +1,18 @@
 project("Events")
 
+if (APPLE)
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
+else()
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
+endif()
+
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{BOOST_INCL_DIR}"
 )
 
 link_directories(
-if (APPLE)
-"$ENV{X_LINK_DIR}/Entities/Debug"
-else()
-"$ENV{X_LINK_DIR}/Entities"
-endif()
+"${ENTITIES_LIB}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 

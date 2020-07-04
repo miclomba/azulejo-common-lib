@@ -1,5 +1,11 @@
 project("ResourcesModule")
 
+if (APPLE)
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources/Debug")
+else()
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
+endif()
+
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{BOOST_INCL_DIR}"
@@ -7,11 +13,7 @@ include_directories(
 )
 
 link_directories(
-if (APPLE)
-"$ENV{X_LINK_DIR}/Resources/Debug"
-else()
-"$ENV{X_LINK_DIR}/Resources"
-endif()
+"${RESOURCES_LIB}"
 "$ENV{BOOST_LINK_DIR}"
 "$ENV{PYTHON3_LINK_DIR}"
 )

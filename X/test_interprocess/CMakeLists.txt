@@ -1,5 +1,11 @@
 project("test_interprocess")
 
+if (APPLE)
+set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess/Debug")
+else()
+set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
+endif()
+
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{GTEST_INCL_DIR}"
@@ -8,11 +14,7 @@ include_directories(
 )
 
 link_directories(
-if (APPLE)
-"$ENV{X_LINK_DIR}/Interprocess/Debug"
-else()
-"$ENV{X_LINK_DIR}/Interprocess"
-endif()
+"${INTERPROCESS_LIB}"
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{GMOCK_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 

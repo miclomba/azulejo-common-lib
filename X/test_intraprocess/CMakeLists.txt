@@ -1,5 +1,11 @@
 project("test_intraprocess")
 
+if (APPLE)
+set(INTRAPROCESS_LIB "$ENV{X_LINK_DIR}/Intraprocess/Debug")
+else()
+set(INTRAPROCESS_LIB "$ENV{X_LINK_DIR}/Intraprocess")
+endif()
+
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{GTEST_INCL_DIR}"
@@ -7,11 +13,7 @@ include_directories(
 )
 
 link_directories(
-if (APPLE)
-"$ENV{X_LINK_DIR}/Intraprocess/Debug"
-else()
-"$ENV{X_LINK_DIR}/Intraprocess"
-endif()
+"${INTRAPROCESS_LIB}"
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 
 )

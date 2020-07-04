@@ -1,5 +1,15 @@
 project("test_database_adapters")
 
+if (APPLE)
+set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters/Debug")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources/Debug")
+else()
+set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
+endif()
+
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{GTEST_INCL_DIR}"
@@ -7,15 +17,9 @@ include_directories(
 )
 
 link_directories(
-if (APPLE)
-"$ENV{X_LINK_DIR}/DatabaseAdapters/Debug"
-"$ENV{X_LINK_DIR}/Entities/Debug"
-"$ENV{X_LINK_DIR}/Resources/Debug"
-else()
-"$ENV{X_LINK_DIR}/DatabaseAdapters"
-"$ENV{X_LINK_DIR}/Entities"
-"$ENV{X_LINK_DIR}/Resources"
-endif()
+"${DATABASE_ADAPTERS_LIB}"
+"${ENTITIES_LIB}"
+"${RESOURCES_LIB}"
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 
 )
