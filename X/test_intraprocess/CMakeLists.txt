@@ -7,7 +7,11 @@ include_directories(
 )
 
 link_directories(
+if (APPLE)
+"$ENV{X_LINK_DIR}/Intraprocess/Debug"
+else()
 "$ENV{X_LINK_DIR}/Intraprocess"
+endif()
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 
 )

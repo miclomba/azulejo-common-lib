@@ -8,7 +8,11 @@ include_directories(
 )
 
 link_directories(
+if (APPLE)
+"$ENV{X_LINK_DIR}/Interprocess/Debug"
+else()
 "$ENV{X_LINK_DIR}/Interprocess"
+endif()
 "$ENV{GTEST_LINK_DIR}"
 "$ENV{GMOCK_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 

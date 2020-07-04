@@ -6,7 +6,11 @@ include_directories(
 )
 
 link_directories(
+if (APPLE)
+"$ENV{X_LINK_DIR}/Entities/Debug"
+else()
 "$ENV{X_LINK_DIR}/Entities"
+endif()
 "$ENV{BOOST_LINK_DIR}" 
 )
 
