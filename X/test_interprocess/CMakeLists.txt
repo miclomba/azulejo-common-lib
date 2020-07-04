@@ -33,6 +33,9 @@ gmockd
 gmock_maind
 gtestd
 gtest_maind
+"boost_chrono$ENV{BOOST_LIB_SUFFIX}"
+"boost_system$ENV{BOOST_LIB_SUFFIX}"
+"boost_thread$ENV{BOOST_LIB_SUFFIX}"
 )
 
 gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)

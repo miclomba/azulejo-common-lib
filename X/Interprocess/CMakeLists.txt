@@ -13,5 +13,9 @@ add_library("${PROJECT_NAME}" SHARED
 "ISharedMemory.cpp" 
 )
 
+target_link_libraries("${PROJECT_NAME}" 
+"boost_system$ENV{BOOST_LIB_SUFFIX}"
+)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
 

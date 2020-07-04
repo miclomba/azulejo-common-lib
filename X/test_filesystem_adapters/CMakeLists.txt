@@ -44,6 +44,7 @@ target_link_libraries("${PROJECT_NAME}"
 "Resources" 
 gtestd
 gtest_maind
+"boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 
 gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)

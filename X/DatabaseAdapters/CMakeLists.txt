@@ -35,6 +35,7 @@ add_library("${PROJECT_NAME}" SHARED
 target_link_libraries("${PROJECT_NAME}" 
 "Entities"
 "Resources" 
+"boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})

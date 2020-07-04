@@ -24,6 +24,7 @@ add_library("${PROJECT_NAME}" SHARED
 
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
+"boost_python37$ENV{BOOST_LIB_SUFFIX}"
 )
 
 install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.dll DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)

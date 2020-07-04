@@ -5,6 +5,7 @@
       "INSTALL_PATH": "${projectDir}/out/install/X",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
       "X_INCL_DIR": "${projectDir}",
+      "BOOST_LIB_SUFFIX": "-vc141-mt-gd-x64-1_69",
       "BOOST_LINK_DIR": "C:/Program Files/boost/boost_1_69_0/stage/lib",
       "BOOST_INCL_DIR": "C:/Program Files/boost/boost_1_69_0",
       "OMP_INCL_DIR": "C:/Program Files/boost/boost_1_69_0",
