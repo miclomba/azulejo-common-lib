@@ -1,7 +1,7 @@
 project("test_resources")
 
 if (APPLE)
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources/Debug")
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 else()
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 endif()

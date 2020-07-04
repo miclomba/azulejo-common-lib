@@ -1,7 +1,7 @@
 project("test_interprocess")
 
 if (APPLE)
-set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess/Debug")
+set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
 else()
 set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
 endif()

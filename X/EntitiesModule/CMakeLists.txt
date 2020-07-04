@@ -1,7 +1,7 @@
 project("EntitiesModule")
 
 if (APPLE)
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 else()
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 endif()

@@ -1,8 +1,8 @@
 project("FilesystemAdapters")
 
 if (APPLE)
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources/Debug")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 else()
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")

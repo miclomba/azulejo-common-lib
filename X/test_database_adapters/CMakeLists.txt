@@ -1,9 +1,9 @@
 project("test_database_adapters")
 
 if (APPLE)
-set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters/Debug")
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources/Debug")
+set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
+set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 else()
 set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")

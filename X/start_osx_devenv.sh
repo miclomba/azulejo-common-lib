@@ -13,7 +13,7 @@ export GMOCK_INCL_DIR="$REPOS/googletest/googlemock/include"
 
 # compile boost yourself
 export BOOST_INCL_DIR="$REPOS/boost/boost_1_69_0"
-export BOOST_LINK_DIR="$REPOS/boost/boost_1_69_0/stage/lib/Debug"
+export BOOST_LINK_DIR="$REPOS/boost/boost_1_69_0/stage/lib"
 
 # brew install libomp
 export OMP_INCL_DIR="/usr/local/Cellar/libomp/10.0.0/include"

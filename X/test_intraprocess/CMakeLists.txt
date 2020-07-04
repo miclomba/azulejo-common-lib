@@ -1,7 +1,7 @@
 project("test_intraprocess")
 
 if (APPLE)
-set(INTRAPROCESS_LIB "$ENV{X_LINK_DIR}/Intraprocess/Debug")
+set(INTRAPROCESS_LIB "$ENV{X_LINK_DIR}/Intraprocess")
 else()
 set(INTRAPROCESS_LIB "$ENV{X_LINK_DIR}/Intraprocess")
 endif()

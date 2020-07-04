@@ -1,8 +1,8 @@
 project("test_events")
 
 if (APPLE)
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities/Debug")
-set(EVENTS_LIB "$ENV{X_LINK_DIR}/Events/Debug")
+set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
+set(EVENTS_LIB "$ENV{X_LINK_DIR}/Events")
 else()
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 set(EVENTS_LIB "$ENV{X_LINK_DIR}/Events")
