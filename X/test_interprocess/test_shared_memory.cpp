@@ -33,7 +33,11 @@ TEST(ISharedMemory, Destroy)
 	ShareableCreator shareable;
 
 	shareable.Create(NAME, SHMEM_SIZE);
+	EXPECT_TRUE(shareable.IsSharedMemoryOwner());
+
 	EXPECT_TRUE(shareable.Destroy());
+	EXPECT_FALSE(shareable.IsSharedMemoryOwner());
+	EXPECT_THROW(shareable.GetSharedAddress(), std::runtime_error);
 }
 
 TEST(ISharedMemory, Create)

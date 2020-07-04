@@ -26,7 +26,11 @@ bool ISharedMemory::Destroy()
 		return true;
 
 	const char* name = shmem_->get_name();
-	return boost::interprocess::shared_memory_object::remove(name);
+	bool destroyed = boost::interprocess::shared_memory_object::remove(name);
+
+	shmem_ = nullptr;
+	isShmemOwner_ = false;
+	return destroyed;
 }
 
 void ISharedMemory::Create(const std::string& name, const size_t size)
