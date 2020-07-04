@@ -1,5 +1,5 @@
 #ifndef database_adapters_entitydetabularizer_h
-#define database_adapters_dntitydetabularizer_h
+#define database_adapters_entitydetabularizer_h
 
 #include <functional>
 #include <map>

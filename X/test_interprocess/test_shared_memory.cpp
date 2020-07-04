@@ -25,7 +25,7 @@ struct ShareableCreator : public ISharedMemory {};
 
 TEST(ISharedMemory, Construct)
 {
-	EXPECT_NO_THROW(ShareableCreator shareable());
+	EXPECT_NO_THROW(ShareableCreator shareable);
 }
 
 TEST(ISharedMemory, Create)
