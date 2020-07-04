@@ -34,4 +34,6 @@ gtestd
 gtest_maind
 )
 
+if (MSVC)
 gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+endif()
