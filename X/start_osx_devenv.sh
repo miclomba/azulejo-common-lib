@@ -26,3 +26,7 @@ export PYTHON3_INCL_DIR="/Library/Frameworks/Python.framework/Versions/2.7/inclu
 export PATH="$PATH:$X_LINK_DIR:$BOOST_LINK_DIR:$GTEST_LINK_DIR:$GMOCK_LINK_DIR:$OMP_LINK_DIR:$PYTHON3_LINK_DIR"
 
 cmake -G Xcode ../../
+
+# to install run
+# 
+#    cmake --install out/xcode --config Debug
