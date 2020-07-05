@@ -43,10 +43,7 @@ struct Runnable : public IOMPRunnable
 protected:
 	void Run() override 
 	{
-		// Create an atomic
-		#pragma omp atomic
 		int sharedAtomic = 0;
-
 		int sharedMaster = 0;
 		int sharedCritical = 0;
 		int sharedSingle = 0;
@@ -60,10 +57,13 @@ protected:
 				sharedMaster += 1;
 			}
 
-			// divide the loop into threads
+			// break the loop into threads
 			#pragma omp for schedule(auto)
 			for (int i = 0; i < numThreads_; ++i)
+			{
+				#pragma omp atomic
 				sharedAtomic += 1;
+			}
 
 			// divide the work into sections (one per thread) 
 			#pragma omp sections
@@ -84,8 +84,8 @@ protected:
 						sharedCritical += 1;
 					}
 				}
-				#pragma omp barrier
 			}
+			#pragma omp barrier
 
 			// for this to be executed by only one thread
 			#pragma omp single
