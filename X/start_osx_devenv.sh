@@ -5,7 +5,7 @@
 export REPOS="$HOME/source/repos"
 export X_DIR="$REPOS/Backend/X"
 
-export INSTALL_PATH="$X_DIR/out/xcode/install"
+export INSTALL_PATH="/usr/local/lib"
 export X_LINK_DIR="$X_DIR/out/xcode"
 export X_INCL_DIR="$X_DIR"
 
