@@ -6,6 +6,7 @@ export GTEST_LINK_DIR="$REPOS/googletest/out/xcode/lib"
 export GMOCK_LINK_DIR="$REPOS/googletest/out/xcode/lib"
 export BOOST_LINK_DIR="$REPOS/boost/boost_1_69_0/stage/lib"
 export OMP_LINK_DIR="/usr/local/Cellar/libomp/10.0.0/lib"
+export DYLD_LIBRARY_PATH="$BOOST_LINK_DIR"
 
 export PATH="$X_LINK_DIR:$BOOST_LINK_DIR:$GTEST_LINK_DIR:$GMOCK_LINK_DIR:$OMP_LINK_DIR:$PATH"
 
