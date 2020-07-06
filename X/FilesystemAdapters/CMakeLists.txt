@@ -1,12 +1,7 @@
 project("FilesystemAdapters")
 
-if (APPLE)
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-else()
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-endif()
 
 include_directories(
 "$ENV{X_INCL_DIR}"

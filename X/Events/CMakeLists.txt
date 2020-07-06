@@ -1,10 +1,6 @@
 project("Events")
 
-if (APPLE)
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
-else()
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
-endif()
 
 include_directories(
 "$ENV{X_INCL_DIR}"

@@ -16,9 +16,7 @@ add_subdirectory("FilesystemAdapters")
 add_subdirectory("Interprocess")
 add_subdirectory("Intraprocess")
 add_subdirectory("Resources")
-if (NOT APPLE)
 add_subdirectory("ResourcesModule")
-endif()
 
 # SETUP_GOOGLE_TEST
 #Note: make sure to add the following option in CMakeLists.txt of the googletest project

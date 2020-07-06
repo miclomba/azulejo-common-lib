@@ -1,10 +1,6 @@
 project("test_resources")
 
-if (APPLE)
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-else()
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-endif()
 
 include_directories(
 "$ENV{X_INCL_DIR}"

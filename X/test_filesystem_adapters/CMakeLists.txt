@@ -1,16 +1,9 @@
 project("test_filesystem_adapters")
 
-if (APPLE)
 set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 set(FILESYSTEM_ADAPTERS_LIB "$ENV{X_LINK_DIR}/FilesystemAdapters")
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-else()
-set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
-set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
-set(FILESYSTEM_ADAPTERS_LIB "$ENV{X_LINK_DIR}/FilesystemAdapters")
-set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
-endif()
 
 include_directories(
 "$ENV{X_INCL_DIR}"

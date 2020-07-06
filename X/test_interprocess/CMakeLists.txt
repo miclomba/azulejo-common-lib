@@ -1,10 +1,6 @@
 project("test_interprocess")
 
-if (APPLE)
 set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
-else()
-set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
-endif()
 
 include_directories(
 "$ENV{X_INCL_DIR}"
