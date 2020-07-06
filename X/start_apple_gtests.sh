@@ -1,14 +1,14 @@
 export REPOS="$HOME/source/repos"
-export X_DIR="$REPOS/Backend/X"
+#export X_DIR="$REPOS/Backend/X"
 
-export X_LINK_DIR="$X_DIR/out/xcode"
-export GTEST_LINK_DIR="$REPOS/googletest/out/xcode/lib"
-export GMOCK_LINK_DIR="$REPOS/googletest/out/xcode/lib"
-export BOOST_LINK_DIR="$REPOS/boost/boost_1_69_0/stage/lib"
+export X_LINK_DIR="/usr/local/lib"
+#export GTEST_LINK_DIR="$REPOS/googletest/out/xcode/lib"
+#export GMOCK_LINK_DIR="$REPOS/googletest/out/xcode/lib"
+export BOOST_LINK_DIR="$REPOS/boost/boost_1_69_0/stage/lib/Debug"
 export OMP_LINK_DIR="/usr/local/Cellar/libomp/10.0.0/lib"
 export DYLD_LIBRARY_PATH="$BOOST_LINK_DIR"
 
-export PATH="$X_LINK_DIR:$BOOST_LINK_DIR:$GTEST_LINK_DIR:$GMOCK_LINK_DIR:$OMP_LINK_DIR:$PATH"
+export PATH="$X_LINK_DIR:$BOOST_LINK_DIR:$OMP_LINK_DIR:$PATH"
 
 echo "Running test_database_adapters"
 ./out/xcode/test_database_adapters/Debug/test_database_adapters | grep -i failed
