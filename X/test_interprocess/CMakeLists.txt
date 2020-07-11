@@ -11,11 +11,13 @@ include_directories(
 link_directories(
 "${INTERPROCESS_LIB}"
 "$ENV{GTEST_LINK_DIR}"
+"$ENV{GTEST_LINK_BIN}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 
 add_executable("${PROJECT_NAME}"
 "chat_client_server.cpp" 
+"main.cpp"
 "test_async_server.cpp" 
 "test_connection_handler.cpp" 
 "test_shared_memory.cpp" 
@@ -24,9 +26,9 @@ add_executable("${PROJECT_NAME}"
 target_link_libraries("${PROJECT_NAME}" 
 "Interprocess"
 gmockd
-gmock_maind
 gtestd
 gtest_maind
+gmock_maind
 "boost_chrono$ENV{BOOST_LIB_SUFFIX}"
 "boost_system$ENV{BOOST_LIB_SUFFIX}"
 "boost_thread$ENV{BOOST_LIB_SUFFIX}"

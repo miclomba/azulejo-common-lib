@@ -13,6 +13,7 @@ link_directories(
 "${ENTITIES_LIB}"
 "${EVENTS_LIB}"
 "$ENV{GTEST_LINK_DIR}"
+"$ENV{GTEST_LINK_BIN}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 

@@ -11,6 +11,7 @@ include_directories(
 link_directories(
 "${RESOURCES_LIB}"
 "$ENV{GTEST_LINK_DIR}"
+"$ENV{GTEST_LINK_BIN}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 

@@ -15,6 +15,7 @@ link_directories(
 "${ENTITIES_LIB}"
 "${RESOURCES_LIB}"
 "$ENV{GTEST_LINK_DIR}"
+"$ENV{GTEST_LINK_BIN}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 

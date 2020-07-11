@@ -1,15 +1,15 @@
 ﻿{
   "environments": [
     {
-      "PATH": "${env.PATH};${projectDir}/out/build/x64-Debug;${projectDir}/../../vcpkg/installed/x64-windows/debug/lib",
       "INSTALL_PATH": "${projectDir}/out/install/X",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
       "X_INCL_DIR": "${projectDir}",
       "BOOST_LIB_SUFFIX": "-vc140-mt-gd",
       "BOOST_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/debug/lib",
       "BOOST_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include",
-      "GTEST_LINK_DIR": "${projectDir}/../../googletest/out/install/x64-Debug (default)/lib",
-      "GTEST_INCL_DIR": "${projectDir}/../../googletest/out/install/x64-Debug (default)/include",
+      "GTEST_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/debug/lib",
+      "GTEST_LINK_BIN": "${projectDir}/../../vcpkg/packages/gtest_x64-windows/debug/lib/manual-link",
+      "GTEST_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include",
       "PYTHON3_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/lib",
       "PYTHON3_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include/python3.8"
     }
