@@ -13,7 +13,7 @@ using database_adapters::Sqlite;
 namespace
 {
 #ifdef _WIN32
-const std::string BAD_DB_PATH = "/$$$%%%";
+const std::string BAD_DB_PATH = "<<$$$%%%";
 #else
 const std::string BAD_DB_PATH = "/";
 #endif
