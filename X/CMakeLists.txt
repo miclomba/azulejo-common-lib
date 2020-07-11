@@ -5,7 +5,7 @@ project("X")
 set(CMAKE_CXX_STANDARD 17)
 
 if (MSVC)
-set(CMAKE_CXX_FLAGS "/permissive- /EHsc /WX")
+set(CMAKE_CXX_FLAGS "/permissive- /EHsc /WX /openmp")
 endif()
 
 add_subdirectory("DatabaseAdapters")

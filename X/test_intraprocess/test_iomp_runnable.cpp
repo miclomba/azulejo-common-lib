@@ -58,7 +58,7 @@ protected:
 			}
 
 			// break the loop into threads
-			#pragma omp for schedule(auto)
+			#pragma omp for schedule(dynamic)
 			for (int i = 0; i < numThreads_; ++i)
 			{
 				#pragma omp atomic
@@ -71,7 +71,7 @@ protected:
 				#pragma omp section
 				{
 					// critical section A
-					#pragma omp critical A
+					#pragma omp critical
 					{
 						sharedCritical += 1;
 					}
@@ -79,7 +79,7 @@ protected:
 				#pragma omp section
 				{
 					// critical section B
-					#pragma omp critical B
+					#pragma omp critical
 					{
 						sharedCritical += 1;
 					}
