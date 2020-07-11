@@ -5,14 +5,12 @@ set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{GTEST_INCL_DIR}"
-"$ENV{GMOCK_INCL_DIR}"
 "$ENV{BOOST_INCL_DIR}"
 )
 
 link_directories(
 "${INTERPROCESS_LIB}"
 "$ENV{GTEST_LINK_DIR}"
-"$ENV{GMOCK_LINK_DIR}"
 "$ENV{BOOST_LINK_DIR}" 
 )
 

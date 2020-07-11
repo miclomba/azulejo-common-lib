@@ -175,7 +175,7 @@ TEST(IConnectionHandler, Socket)
 	MockConnHandler handler(context);
 
 	tcp::socket& soket = handler.Socket();
-	EXPECT_EQ(&(soket.get_io_context()), &context);
+	EXPECT_EQ(&(soket.get_executor().context()), &context);
 }
 
 TEST(IConnectionHandler, IOService)

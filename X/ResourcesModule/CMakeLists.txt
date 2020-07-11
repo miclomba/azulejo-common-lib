@@ -45,7 +45,8 @@ add_library("${PROJECT_NAME}" SHARED
 if (MSVC)
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
-"boost_python37$ENV{BOOST_LIB_SUFFIX}"
+"boost_python38$ENV{BOOST_LIB_SUFFIX}"
+"python38"
 )
 elseif(APPLE)
 target_link_libraries("${PROJECT_NAME}" 
