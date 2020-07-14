@@ -10,10 +10,12 @@ link_directories(
 )
 
 add_library("${PROJECT_NAME}" SHARED
+"HTTP.cpp"
 "ISharedMemory.cpp" 
 )
 
 target_link_libraries("${PROJECT_NAME}" 
+"cpprest_2_10d"
 "boost_system$ENV{BOOST_LIB_SUFFIX}"
 )
 

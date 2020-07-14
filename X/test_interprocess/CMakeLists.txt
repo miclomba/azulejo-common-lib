@@ -20,6 +20,7 @@ add_executable("${PROJECT_NAME}"
 "main.cpp"
 "test_async_server.cpp" 
 "test_connection_handler.cpp" 
+"test_http.cpp" 
 "test_shared_memory.cpp" 
 )
 
