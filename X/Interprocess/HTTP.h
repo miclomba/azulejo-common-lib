@@ -15,7 +15,8 @@ class INTERPROCESS_DLL_EXPORT HTTP
 {
 public:
 
-	void Get(const Path& resultsFile);
+	std::wstring GetJSON(const Path& uri);
+	void Get(const Path& uri, const Path& resultPath);
 
 };
 
