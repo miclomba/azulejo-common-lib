@@ -10,8 +10,9 @@ link_directories(
 )
 
 add_library("${PROJECT_NAME}" SHARED
-"HTTP.cpp"
 "ISharedMemory.cpp" 
+"RESTClient.cpp"
+"RESTServer.cpp"
 )
 
 target_link_libraries("${PROJECT_NAME}" 

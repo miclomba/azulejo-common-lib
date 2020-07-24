@@ -11,12 +11,16 @@
 
 namespace interprocess {
 
-class INTERPROCESS_DLL_EXPORT HTTP
+class INTERPROCESS_DLL_EXPORT RESTClient
 {
 public:
 
-	std::wstring GetJSON(const Path& uri);
-	void Get(const Path& uri, const Path& resultPath);
+    RESTClient();
+
+    void make_request(web::http::method mtd, web::json::value const& jvalue);
+
+private:
+    web::http::client::http_client client_;
 
 };
 

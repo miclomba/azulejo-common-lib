@@ -20,6 +20,10 @@ SET RESOURCESMODULE=%BASE_LINK_DIR%/ResourcesModule
 REM Setting the path so that test_*.exe can find the appropriate dlls during test discovery
 SET PATH=%PATH%;%DEPENDENCY_MAN_LINK_BIN%;%DEPENDENCY_MAN_LINK_DIR%;%DEPENDENCY_LINK_BIN%;%DEPENDENCY_LINK_LIB%;%DATABASE_ADAPTERS%;%ENTITIES%;%ENTITIESMODULE%;%EVENTS%;%FILESYSTEM_ADAPTERS%;%INTERPROCESS%;%INTRAPROCESS%;%RESOURCES%;%RESOURCESMODULE%
 
+if %1.==. (
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe"
+) else (
+"C:/Users/miclomba/source/repos/Backend/X/out/build/x64-Debug/test_interprocess/test_interprocess.exe" %1
+)
 
 SET PATH=%ORIG_PATH%

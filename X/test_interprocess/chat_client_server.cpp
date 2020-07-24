@@ -10,10 +10,10 @@
 #include "chat_server.h"
 #include "chat_client.h"
 
-#ifndef USER_DEFINED_MAIN
-int fake_main(int argc, char* argv[])
-#else
+#ifdef USER_TCP_SERVER_MAIN
 int main(int argc, char* argv[])
+#else
+int fake_main(int argc, char* argv[])
 #endif
 {
 	if (argc < 1)
