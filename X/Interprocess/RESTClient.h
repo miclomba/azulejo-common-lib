@@ -20,7 +20,7 @@ public:
     RESTClient(const std::wstring& uri);
 
     web::json::value MakeRequest(
-        web::http::method mtd, 
+        web::http::method httpMethod, 
         const std::wstring& uri, 
         const web::json::value& jValue
     );
