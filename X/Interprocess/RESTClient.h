@@ -4,8 +4,11 @@
 #include <string>
 #include "Config/filesystem.h"
 
+#include <cpprest/details/basic_types.h>
 #include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
+#include <cpprest/http_msg.h>
+#include <cpprest/json.h>
+//#include <cpprest/filestream.h>
 
 #include "config.h"
 
@@ -19,7 +22,7 @@ public:
     web::json::value MakeRequest(
         web::http::method mtd, 
         const std::wstring& uri, 
-        const web::json::value& jvalue
+        const web::json::value& jValue
     );
 
 private:

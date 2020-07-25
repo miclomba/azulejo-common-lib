@@ -8,6 +8,7 @@
 
 //#include <cpprest/filestream.h>
 #include <cpprest/http_client.h>
+#include <cpprest/http_msg.h>
 #include <cpprest/json.h>
 
 //using namespace utility;                    // Common utilities like string conversions
@@ -30,11 +31,11 @@ pplx::task<web::http::http_response> MakeTaskRequest(
     web::http::client::http_client& client,
     web::http::method mtd,
     const std::wstring& uri,
-    web::json::value const& jvalue)
+    web::json::value const& jValue)
 {
     return (mtd == web::http::methods::GET || mtd == web::http::methods::HEAD) ?
         client.request(mtd, uri) :
-        client.request(mtd, uri, jvalue);
+        client.request(mtd, uri, jValue);
 }
 } // end namespace
 
@@ -43,11 +44,11 @@ RESTClient::RESTClient(const std::wstring& uri) :
 {
 }
 
-web::json::value RESTClient::MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue)
+web::json::value RESTClient::MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jValue)
 {
     web::json::value response;
 
-    MakeTaskRequest(client_, mtd, uri, jvalue)
+    MakeTaskRequest(client_, mtd, uri, jValue)
         .then([](web::http::http_response httpResponse)
         {
             if (httpResponse.status_code() == web::http::status_codes::OK)

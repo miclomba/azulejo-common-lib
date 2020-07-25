@@ -1,166 +1,179 @@
 #include "RESTServer.h"
 
+#include <functional>
+#include <codecvt>
 #include <iostream>
-#include <map>
+#include <locale>
 #include <set>
 #include <string>
+#include <utility>
 
+#include <cpprest/details/basic_types.h>
 #include <cpprest/http_listener.h>
+#include <cpprest/http_msg.h>
 #include <cpprest/json.h>
-
-using namespace web;
-using namespace web::http;
-using namespace web::http::experimental::listener;
 
 using interprocess::RESTServer;
 
+//using namespace utility;                    // Common utilities like string conversions
+//using namespace web;                        // Common features like URIs and json.
+//using namespace web::http;                  // Common HTTP functionality
+//using namespace web::http::client;          // HTTP client features
+//using namespace concurrency::streams;       // Asynchronous streams
+
 namespace
 {
-void PrintJSON(json::value const& jvalue, utility::string_t const& prefix)
+const std::wstring DELETED_MSG = L"<deleted>";
+const std::wstring FAILED_MSG = L"<failed>";
+const std::wstring NIL_MSG = L"<nil>";
+const std::wstring PUT_MSG = L"<put>";
+const std::wstring UPDATED_MSG = L"<updated>";
+
+std::wstring WStr(const std::string& s)
 {
-    std::wcout << prefix << jvalue.serialize() << std::endl;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+    return conv.from_bytes(s);
 }
 
 void HandleRequest(
-    http_request request,
-    std::function<void(json::value const&, json::value&)> action
+    web::http::http_request request,
+    std::function<void(const web::json::value&, web::json::value&)> action
 )
 {
-    auto answer = json::value::object();
+    web::json::value answer = web::json::value::object();
+    web::http::status_code code = web::http::status_codes::OK;
 
     request
         .extract_json()
-        .then([&answer, &action](pplx::task<json::value> task) 
+        .then([&code, &answer, &action](pplx::task<web::json::value> task) 
         {
             try
             {
-                auto const& jvalue = task.get();
-                PrintJSON(jvalue, L"R: ");
+                const web::json::value& jValue = task.get();
 
-                if (!jvalue.is_null())
-                    action(jvalue, answer);
+                if (!jValue.is_null())
+                    action(jValue, answer);
             }
-            catch (http_exception const& e)
+            catch (const web::http::http_exception& e)
             {
-                std::wcout << e.what() << std::endl;
+                code = web::http::status_codes::BadRequest;
+                answer = web::json::value(WStr("ERROR: RESTServer: ") + WStr(e.what()));
             }
         })
         .wait();
 
-    PrintJSON(answer, L"S: ");
-    request.reply(status_codes::OK, answer);
+    request.reply(code, answer);
 }
 } // end namespace
 
 RESTServer::RESTServer(const std::wstring& uri) :
     listener_(uri)
 {
-    listener_.support(methods::GET, [this](http_request request) { GETCallback(request); });
-    listener_.support(methods::POST, [this](http_request request) { POSTCallback(request); });
-    listener_.support(methods::PUT, [this](http_request request) { PUTCallback(request); });
-    listener_.support(methods::DEL, [this](http_request request) { DELCallback(request); });
-}
-
-void RESTServer::AcceptCallback()
-{
-
+    listener_.support(web::http::methods::GET, [this](web::http::http_request request) { 
+        GETHandler(request); 
+    });
+    listener_.support(web::http::methods::POST, [this](web::http::http_request request) {     
+        HandleRequest(
+            request,
+            [this](const web::json::value& jValue, web::json::value& answer) { POSTHandler(jValue, answer); }
+        ); 
+    });
+    listener_.support(web::http::methods::PUT, [this](web::http::http_request request) {
+        HandleRequest(
+            request,
+            [this](const web::json::value& jValue, web::json::value& answer) { PUTHandler(jValue, answer); }
+        );
+    });
+    listener_.support(web::http::methods::DEL, [this](web::http::http_request request) {
+        HandleRequest(
+            request,
+            [this](const web::json::value& jValue, web::json::value& answer) { DELHandler(jValue, answer); }
+        );
+    });
 }
 
 void RESTServer::Listen()
 {
     listener_
         .open()
-        .then([this]() { AcceptCallback(); })
+        .then([this]() { AcceptHandler(); })
         .wait();
 }
 
-void RESTServer::GETCallback(http_request request)
+void RESTServer::GETHandler(web::http::http_request request)
 {
     web::json::value answer = web::json::value::object();
 
     for (const std::pair<utility::string_t, utility::string_t>& p : dictionary_)
-        answer[p.first] = json::value::string(p.second);
+        answer[p.first] = web::json::value::string(p.second);
 
-    request.reply(status_codes::OK, answer);
+    request.reply(web::http::status_codes::OK, answer);
 }
 
-void RESTServer::POSTCallback(http_request request)
+void RESTServer::AcceptHandler()
 {
-    HandleRequest(
-        request,
-        [this](json::value const& jvalue, json::value& answer)
-        {
-            for (auto const& e : jvalue.as_array())
-            {
-                if (e.is_string())
-                {
-                    auto key = e.as_string();
-                    auto pos = dictionary_.find(key);
 
-                    if (pos == dictionary_.end())
-                        answer[key] = json::value::string(L"<nil>");
-                    else
-                        answer[pos->first] = json::value::string(pos->second);
-                }
-            }
-        }
-    );
 }
 
-void RESTServer::PUTCallback(http_request request)
+void RESTServer::POSTHandler(const web::json::value& jValue, web::json::value& answer)
 {
-    HandleRequest(
-        request,
-        [this](json::value const& jvalue, json::value& answer)
+    for (const web::json::value& e : jValue.as_array())
+    {
+        if (e.is_string())
         {
-            for (auto const& e : jvalue.as_object())
-            {
-                if (e.second.is_string())
-                {
-                    auto key = e.first;
-                    auto value = e.second.as_string();
+            const utility::string_t& key = e.as_string();
+            auto pos = dictionary_.find(key);
 
-                    if (dictionary_.find(key) == dictionary_.end())
-                        answer[key] = json::value::string(L"<put>");
-                    else
-                        answer[key] = json::value::string(L"<updated>");
-
-                    dictionary_[key] = value;
-                }
-            }
+            if (pos == dictionary_.end())
+                answer[key] = web::json::value::string(NIL_MSG);
+            else
+                answer[pos->first] = web::json::value::string(pos->second);
         }
-    );
+    }
 }
 
-void RESTServer::DELCallback(http_request request)
+void RESTServer::PUTHandler(const web::json::value& jValue, web::json::value& answer)
 {
-    HandleRequest(
-        request,
-        [this](json::value const& jvalue, json::value& answer)
+    for (const std::pair<utility::string_t, web::json::value>& e : jValue.as_object())
+    {
+        if (e.second.is_string())
         {
-            std::set<utility::string_t> keys;
-            for (auto const& e : jvalue.as_array())
-            {
-                if (e.is_string())
-                {
-                    auto key = e.as_string();
+            utility::string_t key = e.first;
+            utility::string_t value = e.second.as_string();
 
-                    auto pos = dictionary_.find(key);
-                    if (pos == dictionary_.end())
-                    {
-                        answer[key] = json::value::string(L"<failed>");
-                    }
-                    else
-                    {
-                        answer[key] = json::value::string(L"<deleted>");
-                        keys.insert(key);
-                    }
-                }
-            }
+            if (dictionary_.find(key) == dictionary_.end())
+                answer[key] = web::json::value::string(PUT_MSG);
+            else
+                answer[key] = web::json::value::string(UPDATED_MSG);
 
-            for (auto const& key : keys)
-                dictionary_.erase(key);
+            dictionary_[key] = value;
         }
-    );
+    }
+}
+
+void RESTServer::DELHandler(const web::json::value& jValue, web::json::value& answer)
+{
+    std::set<utility::string_t> keys;
+    for (const web::json::value& e : jValue.as_array())
+    {
+        if (e.is_string())
+        {
+            utility::string_t key = e.as_string();
+
+            auto pos = dictionary_.find(key);
+            if (pos == dictionary_.end())
+            {
+                answer[key] = web::json::value::string(FAILED_MSG);
+            }
+            else
+            {
+                answer[key] = web::json::value::string(DELETED_MSG);
+                keys.insert(key);
+            }
+        }
+    }
+
+    for (const utility::string_t& key : keys)
+        dictionary_.erase(key);
 }
 
