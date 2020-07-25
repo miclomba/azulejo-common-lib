@@ -8,12 +8,17 @@
 #include "Interprocess/RESTClient.h"
 #include "Interprocess/RESTServer.h"
 
-void display_json_client(
-	web::json::value const& jvalue,
-	utility::string_t const& prefix)
+namespace
 {
-	std::wcout << prefix << jvalue.serialize() << std::endl;
+const std::string CLIENT_PARAM = "rest_client";
+const std::string SERVER_PARAM = "rest_server";
+
+void PrintJSON(const web::json::value& jvalue, const utility::string_t& prefix)
+{
+	std::wcout << '\n' << prefix << '\n';
+	std::wcout << L"S: " << jvalue.serialize() << '\n';
 }
+} // end namespace
 
 #ifdef USER_REST_SERVER_MAIN
 int main(int argc, char* argv[])
@@ -23,19 +28,18 @@ int fake_main(int argc, char* argv[])
 {
 	if (argc < 2)
 	{
-		std::cerr << "Usage: test_interprocess rest_server\n";
-		std::cerr << "Usage: test_interprocess rest_client\n";
+		std::cerr << "Usage: test_interprocess " + SERVER_PARAM + "\n";
+		std::cerr << "Usage: test_interprocess " + CLIENT_PARAM + "\n";
 		return 1;
 	}
 
-	if (std::string(argv[1]) == "rest_server")
+	if (std::string(argv[1]).compare(SERVER_PARAM) == 0)
 	{
-		interprocess::RESTServer server;
+		interprocess::RESTServer server(L"http://localhost/restdemo");
 
 		try
 		{
 			server.Listen();
-
 			while (true);
 		}
 		catch (std::exception const& e)
@@ -43,43 +47,34 @@ int fake_main(int argc, char* argv[])
 			std::wcout << e.what() << std::endl;
 		}
 	}
-	else if (std::string(argv[1]) == "rest_client")
+	else if (std::string(argv[1]).compare(CLIENT_PARAM) == 0)
 	{
-		interprocess::RESTClient client;
+		interprocess::RESTClient client(U("http://localhost"));
 
 		auto putvalue = web::json::value::object();
 		putvalue[L"one"] = web::json::value::string(L"100");
 		putvalue[L"two"] = web::json::value::string(L"200");
-
-		std::wcout << L"\nPUT (add values)\n";
-		display_json_client(putvalue, L"S: ");
-		client.make_request(web::http::methods::PUT, putvalue);
+		PrintJSON(putvalue, L"PUT (add values)");
+		client.MakeRequest(web::http::methods::PUT, L"/restdemo", putvalue);
 
 		auto getvalue = web::json::value::array();
 		getvalue[0] = web::json::value::string(L"one");
 		getvalue[1] = web::json::value::string(L"two");
 		getvalue[2] = web::json::value::string(L"three");
-
-		std::wcout << L"\nPOST (get some values)\n";
-		display_json_client(getvalue, L"S: ");
-		client.make_request(web::http::methods::POST, getvalue);
+		PrintJSON(getvalue, L"POST (get some values)");
+		client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
 
 		auto delvalue = web::json::value::array();
 		delvalue[0] = web::json::value::string(L"one");
+		PrintJSON(delvalue, L"DELETE (delete values)");
+		client.MakeRequest(web::http::methods::DEL, L"/restdemo", delvalue);
 
-		std::wcout << L"\nDELETE (delete values)\n";
-		display_json_client(delvalue, L"S: ");
-		client.make_request(web::http::methods::DEL, delvalue);
-
-		std::wcout << L"\nPOST (get some values)\n";
-		display_json_client(getvalue, L"S: ");
-		client.make_request(web::http::methods::POST, getvalue);
+		PrintJSON(getvalue, L"POST (get some values)");
+		client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
 
 		auto nullvalue = web::json::value::null();
-
-		std::wcout << L"\nGET (get all values)\n";
-		display_json_client(nullvalue, L"S: ");
-		client.make_request(web::http::methods::GET, nullvalue);
+		PrintJSON(nullvalue, L"GET (get all values)");
+		client.MakeRequest(web::http::methods::GET, L"/restdemo", nullvalue);
 	}
 
 	return 0;

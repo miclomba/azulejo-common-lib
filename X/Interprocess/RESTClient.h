@@ -14,10 +14,9 @@ namespace interprocess {
 class INTERPROCESS_DLL_EXPORT RESTClient
 {
 public:
+    RESTClient(const std::wstring& uri);
 
-    RESTClient();
-
-    void make_request(web::http::method mtd, web::json::value const& jvalue);
+    void MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue);
 
 private:
     web::http::client::http_client client_;

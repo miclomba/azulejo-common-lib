@@ -29,53 +29,48 @@ std::wstring WStr(const std::string &s)
     return conv.from_bytes(s);
 }
 
-void display_json_client(
-    web::json::value const& jvalue,
-    utility::string_t const& prefix)
+void PrintJSON(const web::json::value& jvalue, const utility::string_t& prefix)
 {
     std::wcout << prefix << jvalue.serialize() << std::endl;
 }
 
-pplx::task<http_response> make_task_request(
+pplx::task<http_response> MakeTaskRequest(
     web::http::client::http_client& client,
     web::http::method mtd,
+    const std::wstring& uri,
     web::json::value const& jvalue)
 {
     return (mtd == methods::GET || mtd == methods::HEAD) ?
-        client.request(mtd, L"/restdemo") :
-        client.request(mtd, L"/restdemo", jvalue);
+        client.request(mtd, uri) :
+        client.request(mtd, uri, jvalue);
 }
 } // end namespace
 
-RESTClient::RESTClient() :
-    client_(U("http://localhost"))
+RESTClient::RESTClient(const std::wstring& uri) :
+    client_(uri)
 {
 }
 
-void RESTClient::make_request(
-    web::http::method mtd,
-    web::json::value const& jvalue)
+void RESTClient::MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue)
 {
-    make_task_request(client_, mtd, jvalue)
+    MakeTaskRequest(client_, mtd, uri, jvalue)
         .then([](http_response response)
-            {
-                if (response.status_code() == status_codes::OK)
-                {
-                    return response.extract_json();
-                }
-                return pplx::task_from_result(json::value());
-            })
+        {
+            if (response.status_code() == status_codes::OK)
+                return response.extract_json();
+            return pplx::task_from_result(json::value());
+        })
         .then([](pplx::task<json::value> previousTask)
+        {
+            try
             {
-                try
-                {
-                    display_json_client(previousTask.get(), L"R: ");
-                }
-                catch (http_exception const& e)
-                {
-                    std::wcout << e.what() << std::endl;
-                }
-            })
-                .wait();
+                PrintJSON(previousTask.get(), L"R: ");
+            }
+            catch (http_exception const& e)
+            {
+                std::wcout << e.what() << std::endl;
+            }
+        })
+        .wait();
 }
 

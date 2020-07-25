@@ -11,17 +11,17 @@ namespace interprocess {
 class INTERPROCESS_DLL_EXPORT RESTServer
 {
 public:
-	RESTServer();
+	RESTServer(const std::wstring& uri);
 
 	void Listen();
 
 protected:
 	using http_request = web::http::http_request;
 
-	virtual void handle_get(http_request request);
-	virtual void handle_post(http_request request);
-	virtual void handle_put(http_request request);
-	virtual void handle_del(http_request request);
+	virtual void GETCallback(http_request request);
+	virtual void POSTCallback(http_request request);
+	virtual void PUTCallback(http_request request);
+	virtual void DELCallback(http_request request);
 
 private:
 	using http_listener = web::http::experimental::listener::http_listener;
