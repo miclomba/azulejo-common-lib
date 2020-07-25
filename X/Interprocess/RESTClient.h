@@ -1,5 +1,5 @@
-#ifndef interprocess_http_h
-#define interprocess_http_h
+#ifndef interprocess_rest_client_h
+#define interprocess_rest_client_h
 
 #include <string>
 #include "Config/filesystem.h"
@@ -27,9 +27,8 @@ public:
 
 private:
     web::http::client::http_client client_;
-
 };
 
 } // end interprocess
 
-#endif  // interprocess_http_h
+#endif  // interprocess_rest_client_h
