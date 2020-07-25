@@ -4,15 +4,6 @@
 #include <stdexcept>
 #include <string>
 
-/*
-	This test project uses gmock google project. To install gmock:
-	from nuget:
-		Install-Package gmock -Version 1.10.0
-	then add in packages.config:
-		<package id="gmock" version="1.10.0" targetFramework="native" />
-	and add in vcxproj add to ExtensionTargets:
-		<Import Project="..\packages\gmock.1.10.0\build\native\gmock.targets" Condition="Exists('..\packages\gmock.1.10.0\build\native\gmock.targets')" />
-*/
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
