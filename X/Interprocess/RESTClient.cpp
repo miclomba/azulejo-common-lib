@@ -30,25 +30,50 @@ std::wstring WStr(const std::string &s)
 pplx::task<web::http::http_response> MakeTaskRequest(
     web::http::client::http_client& client,
     web::http::method httpMethod,
-    const std::wstring& uri,
+    const std::wstring& requestURI,
     web::json::value const& jValue)
 {
     return (httpMethod == web::http::methods::GET || httpMethod == web::http::methods::HEAD) ?
-        client.request(httpMethod, uri) :
-        client.request(httpMethod, uri, jValue);
+        client.request(httpMethod, requestURI) :
+        client.request(httpMethod, requestURI, jValue);
 }
 } // end namespace
 
-RESTClient::RESTClient(const std::wstring& uri) :
-    client_(uri)
+RESTClient::RESTClient(const std::wstring& serverURI) :
+    client_(serverURI)
 {
 }
 
-web::json::value RESTClient::MakeRequest(web::http::method httpMethod, const std::wstring& uri, const web::json::value& jValue)
+web::json::value RESTClient::GETRequest(const std::wstring& requestURI)
+{
+    return RESTClient::MakeRequest(web::http::methods::GET, requestURI);
+}
+
+web::json::value RESTClient::HEADRequest(const std::wstring& requestURI)
+{
+    return RESTClient::MakeRequest(web::http::methods::HEAD, requestURI);
+}
+
+web::json::value RESTClient::PUTRequest(const std::wstring& requestURI, const web::json::value& jValue)
+{
+    return RESTClient::MakeRequest(web::http::methods::PUT, requestURI, jValue);
+}
+
+web::json::value RESTClient::POSTRequest(const std::wstring& requestURI, const web::json::value& jValue)
+{
+    return RESTClient::MakeRequest(web::http::methods::POST, requestURI, jValue);
+}
+
+web::json::value RESTClient::DELRequest(const std::wstring& requestURI, const web::json::value& jValue)
+{
+    return RESTClient::MakeRequest(web::http::methods::DEL, requestURI, jValue);
+}
+
+web::json::value RESTClient::MakeRequest(web::http::method httpMethod, const std::wstring& requestURI, const web::json::value& jValue)
 {
     web::json::value response;
 
-    MakeTaskRequest(client_, httpMethod, uri, jValue)
+    MakeTaskRequest(client_, httpMethod, requestURI, jValue)
         .then([](web::http::http_response httpResponse)
         {
             if (httpResponse.status_code() == web::http::status_codes::OK)
@@ -63,7 +88,7 @@ web::json::value RESTClient::MakeRequest(web::http::method httpMethod, const std
             }
             catch (web::http::http_exception const& e)
             {
-                response = web::json::value(WStr("ERROR: RESTClient received: ") + WStr(e.what()));
+                response = web::json::value(WStr("ERROR: RESTClient: ") + WStr(e.what()));
             }
         })
         .wait();

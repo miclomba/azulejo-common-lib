@@ -16,7 +16,7 @@ namespace interprocess {
 class INTERPROCESS_DLL_EXPORT RESTServer
 {
 public:
-	RESTServer(const std::wstring& uri);
+	RESTServer(const std::wstring& serverURI);
 
 	void Listen();
 
@@ -28,6 +28,7 @@ protected:
 
 private:
 	void GETHandler(web::http::http_request request);
+	void HEADHandler(web::http::http_request request);
 
 	web::http::experimental::listener::http_listener listener_;
 	std::map<utility::string_t, utility::string_t> dictionary_;

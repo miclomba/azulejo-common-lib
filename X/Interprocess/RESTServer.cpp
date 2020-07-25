@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <codecvt>
-#include <iostream>
 #include <locale>
 #include <set>
 #include <string>
@@ -66,11 +65,14 @@ void HandleRequest(
 }
 } // end namespace
 
-RESTServer::RESTServer(const std::wstring& uri) :
-    listener_(uri)
+RESTServer::RESTServer(const std::wstring& serverURI) :
+    listener_(serverURI)
 {
     listener_.support(web::http::methods::GET, [this](web::http::http_request request) { 
         GETHandler(request); 
+    });
+    listener_.support(web::http::methods::HEAD, [this](web::http::http_request request) {
+        HEADHandler(request);
     });
     listener_.support(web::http::methods::POST, [this](web::http::http_request request) {     
         HandleRequest(
@@ -106,6 +108,13 @@ void RESTServer::GETHandler(web::http::http_request request)
 
     for (const std::pair<utility::string_t, utility::string_t>& p : dictionary_)
         answer[p.first] = web::json::value::string(p.second);
+
+    request.reply(web::http::status_codes::OK, answer);
+}
+
+void RESTServer::HEADHandler(web::http::http_request request)
+{
+    web::json::value answer = web::json::value::object();
 
     request.reply(web::http::status_codes::OK, answer);
 }

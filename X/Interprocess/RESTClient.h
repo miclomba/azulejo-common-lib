@@ -17,15 +17,21 @@ namespace interprocess {
 class INTERPROCESS_DLL_EXPORT RESTClient
 {
 public:
-    RESTClient(const std::wstring& uri);
+    RESTClient(const std::wstring& serverURI);
 
-    web::json::value MakeRequest(
-        web::http::method httpMethod, 
-        const std::wstring& uri, 
-        const web::json::value& jValue
-    );
+    web::json::value GETRequest(const std::wstring& requestURI);
+    web::json::value HEADRequest(const std::wstring& requestURI);
+    web::json::value PUTRequest(const std::wstring& requestURI, const web::json::value& jValue);
+    web::json::value POSTRequest(const std::wstring& requestURI, const web::json::value& jValue);
+    web::json::value DELRequest(const std::wstring& requestURI, const web::json::value& jValue);
 
 private:
+    web::json::value MakeRequest(
+        web::http::method httpMethod,
+        const std::wstring& uri,
+        const web::json::value& jValue = web::json::value::null()
+    );
+
     web::http::client::http_client client_;
 };
 

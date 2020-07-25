@@ -13,7 +13,7 @@
 #ifdef USER_TCP_SERVER_MAIN
 int main(int argc, char* argv[])
 #else
-int fake_main(int argc, char* argv[])
+int fake_tcp_main(int argc, char* argv[])
 #endif
 {
 	if (argc < 1)
