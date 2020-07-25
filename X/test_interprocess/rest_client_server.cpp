@@ -13,10 +13,15 @@ namespace
 const std::string CLIENT_PARAM = "rest_client";
 const std::string SERVER_PARAM = "rest_server";
 
-void PrintJSON(const web::json::value& jvalue, const utility::string_t& prefix)
+void PrintJSONRequest(const web::json::value& jvalue, const utility::string_t& prefix)
 {
 	std::wcout << '\n' << prefix << '\n';
 	std::wcout << L"S: " << jvalue.serialize() << '\n';
+}
+
+void PrintJSONResponse(const web::json::value& jvalue)
+{
+	std::wcout << L"R: " << jvalue.serialize() << std::endl;
 }
 } // end namespace
 
@@ -49,32 +54,38 @@ int fake_main(int argc, char* argv[])
 	}
 	else if (std::string(argv[1]).compare(CLIENT_PARAM) == 0)
 	{
+		web::json::value response;
 		interprocess::RESTClient client(U("http://localhost"));
 
 		auto putvalue = web::json::value::object();
 		putvalue[L"one"] = web::json::value::string(L"100");
 		putvalue[L"two"] = web::json::value::string(L"200");
-		PrintJSON(putvalue, L"PUT (add values)");
-		client.MakeRequest(web::http::methods::PUT, L"/restdemo", putvalue);
+		PrintJSONRequest(putvalue, L"PUT (add values)");
+		response = client.MakeRequest(web::http::methods::PUT, L"/restdemo", putvalue);
+		PrintJSONResponse(response);
 
 		auto getvalue = web::json::value::array();
 		getvalue[0] = web::json::value::string(L"one");
 		getvalue[1] = web::json::value::string(L"two");
 		getvalue[2] = web::json::value::string(L"three");
-		PrintJSON(getvalue, L"POST (get some values)");
-		client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
+		PrintJSONRequest(getvalue, L"POST (get some values)");
+		response = client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
+		PrintJSONResponse(response);
 
 		auto delvalue = web::json::value::array();
 		delvalue[0] = web::json::value::string(L"one");
-		PrintJSON(delvalue, L"DELETE (delete values)");
-		client.MakeRequest(web::http::methods::DEL, L"/restdemo", delvalue);
+		PrintJSONRequest(delvalue, L"DELETE (delete values)");
+		response = client.MakeRequest(web::http::methods::DEL, L"/restdemo", delvalue);
+		PrintJSONResponse(response);
 
-		PrintJSON(getvalue, L"POST (get some values)");
-		client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
+		PrintJSONRequest(getvalue, L"POST (get some values)");
+		response = client.MakeRequest(web::http::methods::POST, L"/restdemo", getvalue);
+		PrintJSONResponse(response);
 
 		auto nullvalue = web::json::value::null();
-		PrintJSON(nullvalue, L"GET (get all values)");
-		client.MakeRequest(web::http::methods::GET, L"/restdemo", nullvalue);
+		PrintJSONRequest(nullvalue, L"GET (get all values)");
+		response = client.MakeRequest(web::http::methods::GET, L"/restdemo", nullvalue);
+		PrintJSONResponse(response);
 	}
 
 	return 0;

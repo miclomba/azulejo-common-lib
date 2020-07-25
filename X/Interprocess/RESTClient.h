@@ -16,7 +16,11 @@ class INTERPROCESS_DLL_EXPORT RESTClient
 public:
     RESTClient(const std::wstring& uri);
 
-    void MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue);
+    web::json::value MakeRequest(
+        web::http::method mtd, 
+        const std::wstring& uri, 
+        const web::json::value& jvalue
+    );
 
 private:
     web::http::client::http_client client_;

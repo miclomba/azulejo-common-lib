@@ -18,6 +18,7 @@ public:
 protected:
 	using http_request = web::http::http_request;
 
+	virtual void AcceptCallback();
 	virtual void GETCallback(http_request request);
 	virtual void POSTCallback(http_request request);
 	virtual void PUTCallback(http_request request);

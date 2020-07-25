@@ -12,9 +12,6 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-#define TRACE(msg)            std::wcout << msg
-#define TRACE_ACTION(a, k, v) std::wcout << a << L" (" << k << L", " << v << L")\n"
-
 using interprocess::RESTServer;
 
 namespace
@@ -64,33 +61,31 @@ RESTServer::RESTServer(const std::wstring& uri) :
     listener_.support(methods::DEL, [this](http_request request) { DELCallback(request); });
 }
 
+void RESTServer::AcceptCallback()
+{
+
+}
+
 void RESTServer::Listen()
 {
     listener_
         .open()
-        .then([this]() {TRACE(L"\nstarting to listen\n"); })
+        .then([this]() { AcceptCallback(); })
         .wait();
 }
 
 void RESTServer::GETCallback(http_request request)
 {
-    TRACE(L"\nhandle GET\n");
+    web::json::value answer = web::json::value::object();
 
-    auto answer = json::value::object();
-
-    for (auto const& p : dictionary_)
+    for (const std::pair<utility::string_t, utility::string_t>& p : dictionary_)
         answer[p.first] = json::value::string(p.second);
-
-    PrintJSON(json::value::null(), L"R: ");
-    PrintJSON(answer, L"S: ");
 
     request.reply(status_codes::OK, answer);
 }
 
 void RESTServer::POSTCallback(http_request request)
 {
-    TRACE("\nhandle POST\n");
-
     HandleRequest(
         request,
         [this](json::value const& jvalue, json::value& answer)
@@ -114,8 +109,6 @@ void RESTServer::POSTCallback(http_request request)
 
 void RESTServer::PUTCallback(http_request request)
 {
-    TRACE("\nhandle PUT\n");
-
     HandleRequest(
         request,
         [this](json::value const& jvalue, json::value& answer)
@@ -128,15 +121,9 @@ void RESTServer::PUTCallback(http_request request)
                     auto value = e.second.as_string();
 
                     if (dictionary_.find(key) == dictionary_.end())
-                    {
-                        TRACE_ACTION(L"added", key, value);
                         answer[key] = json::value::string(L"<put>");
-                    }
                     else
-                    {
-                        TRACE_ACTION(L"updated", key, value);
                         answer[key] = json::value::string(L"<updated>");
-                    }
 
                     dictionary_[key] = value;
                 }
@@ -147,8 +134,6 @@ void RESTServer::PUTCallback(http_request request)
 
 void RESTServer::DELCallback(http_request request)
 {
-    TRACE("\nhandle DEL\n");
-
     HandleRequest(
         request,
         [this](json::value const& jvalue, json::value& answer)
@@ -167,7 +152,6 @@ void RESTServer::DELCallback(http_request request)
                     }
                     else
                     {
-                        TRACE_ACTION(L"deleted", pos->first, pos->second);
                         answer[key] = json::value::string(L"<deleted>");
                         keys.insert(key);
                     }

@@ -1,23 +1,20 @@
 #include "RESTClient.h"
 
 #include <codecvt>
-#include <exception>
 #include <functional>
-#include <iostream>
 #include <locale>
-#include <memory>
 #include <string>
-#include "Config/filesystem.hpp"
+//#include "Config/filesystem.hpp"
 
-#include <cpprest/filestream.h>
+//#include <cpprest/filestream.h>
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 
-using namespace utility;                    // Common utilities like string conversions
-using namespace web;                        // Common features like URIs.
-using namespace web::http;                  // Common HTTP functionality
-using namespace web::http::client;          // HTTP client features
-using namespace concurrency::streams;       // Asynchronous streams
+//using namespace utility;                    // Common utilities like string conversions
+//using namespace web;                        // Common features like URIs and json.
+//using namespace web::http;                  // Common HTTP functionality
+//using namespace web::http::client;          // HTTP client features
+//using namespace concurrency::streams;       // Asynchronous streams
 
 using interprocess::RESTClient;
 
@@ -29,18 +26,13 @@ std::wstring WStr(const std::string &s)
     return conv.from_bytes(s);
 }
 
-void PrintJSON(const web::json::value& jvalue, const utility::string_t& prefix)
-{
-    std::wcout << prefix << jvalue.serialize() << std::endl;
-}
-
-pplx::task<http_response> MakeTaskRequest(
+pplx::task<web::http::http_response> MakeTaskRequest(
     web::http::client::http_client& client,
     web::http::method mtd,
     const std::wstring& uri,
     web::json::value const& jvalue)
 {
-    return (mtd == methods::GET || mtd == methods::HEAD) ?
+    return (mtd == web::http::methods::GET || mtd == web::http::methods::HEAD) ?
         client.request(mtd, uri) :
         client.request(mtd, uri, jvalue);
 }
@@ -51,26 +43,30 @@ RESTClient::RESTClient(const std::wstring& uri) :
 {
 }
 
-void RESTClient::MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue)
+web::json::value RESTClient::MakeRequest(web::http::method mtd, const std::wstring& uri, const web::json::value& jvalue)
 {
+    web::json::value response;
+
     MakeTaskRequest(client_, mtd, uri, jvalue)
-        .then([](http_response response)
+        .then([](web::http::http_response httpResponse)
         {
-            if (response.status_code() == status_codes::OK)
-                return response.extract_json();
-            return pplx::task_from_result(json::value());
+            if (httpResponse.status_code() == web::http::status_codes::OK)
+                return httpResponse.extract_json();
+            return pplx::task_from_result(web::json::value());
         })
-        .then([](pplx::task<json::value> previousTask)
+        .then([&response](pplx::task<web::json::value> jsonResponse)
         {
             try
             {
-                PrintJSON(previousTask.get(), L"R: ");
+                response = std::move(jsonResponse.get());
             }
-            catch (http_exception const& e)
+            catch (web::http::http_exception const& e)
             {
-                std::wcout << e.what() << std::endl;
+                response = web::json::value(WStr("ERROR: RESTClient received: ") + WStr(e.what()));
             }
         })
         .wait();
+
+    return response;
 }
 
