@@ -16,7 +16,7 @@ namespace interprocess {
 class INTERPROCESS_DLL_EXPORT RESTServer
 {
 public:
-	RESTServer(const std::wstring& serverURI);
+	RESTServer(const std::wstring& baseURI);
 
 	void Listen();
 

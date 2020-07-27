@@ -11,7 +11,6 @@ link_directories(
 
 add_library("${PROJECT_NAME}" SHARED
 "ISharedMemory.cpp" 
-"RESTClient.cpp"
 "RESTServer.cpp"
 )
 

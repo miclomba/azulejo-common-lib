@@ -65,8 +65,8 @@ void HandleRequest(
 }
 } // end namespace
 
-RESTServer::RESTServer(const std::wstring& serverURI) :
-    listener_(serverURI)
+RESTServer::RESTServer(const std::wstring& baseURI) :
+    listener_(baseURI)
 {
     listener_.support(web::http::methods::GET, [this](web::http::http_request request) { 
         GETHandler(request); 
