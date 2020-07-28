@@ -8,11 +8,23 @@
 #include <cpprest/details/basic_types.h>
 
 #include "Interprocess/RESTClient.h"
+#include "Interprocess/RESTServer.h"
 
 namespace
 {
 const std::wstring BASE_URI = U("http://localhost/");
 const std::wstring API_URI = U("api");
+
+utility::string_t PrintJSONResponse(const web::json::value& jValue)
+{
+	return jValue.serialize();
+}
+
+void VerifyResponse(const web::json::value& response, const utility::string_t& expectedResponse)
+{
+	utility::string_t responseStr = response.serialize();
+	EXPECT_TRUE(responseStr.compare(expectedResponse) == 0);
+}
 
 struct MockResultTask
 {
@@ -255,4 +267,33 @@ TEST(RESTClient, DELRequest)
 	EXPECT_EQ(MockResultTask::GetCounts(), 1);
 }
 
+TEST(RESTClient, Integration)
+{
+	web::json::value response, putvalue, getvalue, delvalue;
+	interprocess::RESTClient client(BASE_URI);
+
+	putvalue = web::json::value::object();
+	putvalue[L"one"] = web::json::value::string(L"100");
+	putvalue[L"two"] = web::json::value::string(L"200");
+	response = client.PUTRequest(L"/restdemo", putvalue);
+	VerifyResponse(response, L"{\"one\":\"<put>\",\"two\":\"<put>\"}");
+	
+	getvalue = web::json::value::array();
+	getvalue[0] = web::json::value::string(L"one");
+	getvalue[1] = web::json::value::string(L"two");
+	getvalue[2] = web::json::value::string(L"three");
+	response = client.POSTRequest(L"/restdemo", getvalue);
+	VerifyResponse(response, L"{\"one\":\"100\",\"three\":\"<nil>\",\"two\":\"200\"}");
+	
+	delvalue = web::json::value::array();
+	delvalue[0] = web::json::value::string(L"one");
+	response = client.DELRequest(L"/restdemo", delvalue);
+	VerifyResponse(response, L"{\"one\":\"<deleted>\"}");
+	
+	response = client.POSTRequest(L"/restdemo", getvalue);
+	VerifyResponse(response, L"{\"one\":\"<nil>\",\"three\":\"<nil>\",\"two\":\"200\"}");
+	
+	response = client.GETRequest(L"/restdemo");
+	VerifyResponse(response, L"{\"two\":\"200\"}");
+}
 
