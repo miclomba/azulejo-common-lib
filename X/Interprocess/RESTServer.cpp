@@ -191,3 +191,8 @@ void RESTServer::DELHandler(const web::json::value& jValue, web::json::value& an
         dictionary_.erase(key);
 }
 
+std::map<utility::string_t, utility::string_t>& RESTServer::GetDictionary()
+{
+    return dictionary_;
+}
+

@@ -30,6 +30,8 @@ protected:
 	virtual void GETHandler(web::http::http_request request);
 	virtual void HEADHandler(web::http::http_request request);
 
+	std::map<utility::string_t, utility::string_t>& GetDictionary();
+
 private:
 	web::http::experimental::listener::http_listener listener_;
 	std::map<utility::string_t, utility::string_t> dictionary_;
