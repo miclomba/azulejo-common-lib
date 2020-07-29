@@ -10,7 +10,6 @@
 #include <cpprest/details/basic_types.h>
 
 #include "Interprocess/RESTClient.h"
-#include "Interprocess/RESTServer.h"
 
 namespace
 {

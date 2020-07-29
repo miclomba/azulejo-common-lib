@@ -102,6 +102,11 @@ void RESTServer::Listen()
         .wait();
 }
 
+const web::http::experimental::listener::http_listener& RESTServer::GetListener() const
+{
+    return listener_;
+}
+
 void RESTServer::GETHandler(web::http::http_request request)
 {
     web::json::value answer = web::json::value::object();

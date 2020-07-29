@@ -20,16 +20,17 @@ public:
 
 	void Listen();
 
+	const web::http::experimental::listener::http_listener& GetListener() const;
+
 protected:
 	virtual void AcceptHandler();
 	virtual void POSTHandler(const web::json::value& jValue, web::json::value& answer);
 	virtual void PUTHandler(const web::json::value& jValue, web::json::value& answer);
 	virtual void DELHandler(const web::json::value& jValue, web::json::value& answer);
+	virtual void GETHandler(web::http::http_request request);
+	virtual void HEADHandler(web::http::http_request request);
 
 private:
-	void GETHandler(web::http::http_request request);
-	void HEADHandler(web::http::http_request request);
-
 	web::http::experimental::listener::http_listener listener_;
 	std::map<utility::string_t, utility::string_t> dictionary_;
 };
