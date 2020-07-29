@@ -77,7 +77,7 @@ web::json::value RESTClient_t::GetJSON(ResponseTask&& jsonResponse)
     {
         return std::move(jsonResponse.get());
     }
-    catch (web::http::http_exception const& e)
+    catch (const web::http::http_exception& e)
     {
         auto WStr = [](const std::string& s) -> std::wstring
         {

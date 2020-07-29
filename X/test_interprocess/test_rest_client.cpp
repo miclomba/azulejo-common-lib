@@ -14,6 +14,8 @@ namespace
 {
 const std::wstring BASE_URI = U("http://localhost/");
 const std::wstring API_URI = U("api");
+const std::wstring EXPECTED_JSON_RESPONSE = L"{\"one\":\"100\",\"two\":\"200\"}";
+const std::wstring ERROR_JSON_RESPONSE = L"\"ERROR: RESTClient: \"";
 
 utility::string_t PrintJSONResponse(const web::json::value& jValue)
 {
@@ -24,6 +26,14 @@ void VerifyResponse(const web::json::value& response, const utility::string_t& e
 {
 	utility::string_t responseStr = response.serialize();
 	EXPECT_TRUE(responseStr.compare(expectedResponse) == 0);
+}
+
+web::json::value CreateJSONObj()
+{
+	web::json::value value = web::json::value::object();
+	value[L"one"] = web::json::value::string(L"100");
+	value[L"two"] = web::json::value::string(L"200");
+	return value;
 }
 
 struct MockResultTask
@@ -57,10 +67,10 @@ struct MockResponseTask
 	MockResponseTask() {}
 	MockResponseTask(concurrency::task<web::json::value>) {}
 
-	web::json::value get() 
+	virtual web::json::value get() 
 	{ 
 		calledGet_++;
-		return web::json::value(); 
+		return CreateJSONObj(); 
 	}
 
 	MockResultTask then(std::function<void(MockResponseTask jsonResponse)> handler) 
@@ -81,13 +91,26 @@ struct MockResponseTask
 		calledGet_ = 0;
 	}
 
-private:
+protected:
 	static int calledThen_;
 	static int calledGet_;
 };
 
 int MockResponseTask::calledGet_ = 0;
 int MockResponseTask::calledThen_ = 0;
+
+struct MockResponseTaskBad : public MockResponseTask
+{
+	MockResponseTaskBad() {}
+	MockResponseTaskBad(concurrency::task<web::json::value>) {}
+	MockResponseTaskBad(MockResponseTask&&) {}
+
+	web::json::value get() override
+	{
+		calledGet_++;
+		throw web::http::http_exception("");
+	}
+};
 
 struct MockRequestTask
 {
@@ -147,7 +170,8 @@ struct MockRequestTaskBad : public MockRequestTask
 } // end namespace
 
 using MockClient = interprocess::RESTClient<MockRequestTask, MockResponseTask, MockResultTask>;
-using MockClientBad = interprocess::RESTClient<MockRequestTaskBad, MockResponseTask, MockResultTask>;
+using MockClientBadRequest = interprocess::RESTClient<MockRequestTaskBad, MockResponseTask, MockResultTask>;
+using MockClientBadResponse = interprocess::RESTClient<MockRequestTask, MockResponseTaskBad, MockResultTask>;
 using RESTClient = interprocess::RESTClient<
 	concurrency::task<web::http::http_response>,
 	concurrency::task<web::json::value>,
@@ -183,8 +207,25 @@ TEST(RESTClient, GETRequest)
 	MockClient client(BASE_URI);
 
 	web::json::value responseJSON = client.GETRequest(API_URI);
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
+	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
+	EXPECT_EQ(MockResultTask::GetCounts(), 1);
+}
+
+TEST(RESTClient, GETRequestBadRequest)
+{
+	MockRequestTaskBad::ResetCounts();
+	MockResponseTask::ResetCounts();
+	MockResultTask::ResetCounts();
+
+	MockClientBadRequest client(BASE_URI);
+
+	web::json::value responseJSON = client.GETRequest(API_URI);
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
+
+	EXPECT_EQ(MockRequestTaskBad::GetCounts(), 2);
 	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
 	EXPECT_EQ(MockResultTask::GetCounts(), 1);
 }
@@ -192,15 +233,16 @@ TEST(RESTClient, GETRequest)
 TEST(RESTClient, GETRequestBadResponse)
 {
 	MockRequestTask::ResetCounts();
-	MockResponseTask::ResetCounts();
+	MockResponseTaskBad::ResetCounts();
 	MockResultTask::ResetCounts();
 
-	MockClientBad client(BASE_URI);
+	MockClientBadResponse client(BASE_URI);
 
 	web::json::value responseJSON = client.GETRequest(API_URI);
+	VerifyResponse(responseJSON, ERROR_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
-	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
+	EXPECT_EQ(MockResponseTaskBad::GetCounts(), 2);
 	EXPECT_EQ(MockResultTask::GetCounts(), 1);
 }
 
@@ -213,6 +255,7 @@ TEST(RESTClient, HEADRequest)
 	MockClient client(BASE_URI);
 
 	web::json::value responseJSON = client.HEADRequest(API_URI);
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
 	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
@@ -227,8 +270,8 @@ TEST(RESTClient, POSTRequest)
 
 	MockClient client(BASE_URI);
 
-	web::json::value requestJSON;
-	web::json::value responseJSON = client.POSTRequest(API_URI, requestJSON);
+	web::json::value responseJSON = client.POSTRequest(API_URI, CreateJSONObj());
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
 	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
@@ -243,8 +286,8 @@ TEST(RESTClient, PUTRequest)
 
 	MockClient client(BASE_URI);
 
-	web::json::value requestJSON;
-	web::json::value responseJSON = client.PUTRequest(API_URI, requestJSON);
+	web::json::value responseJSON = client.PUTRequest(API_URI, CreateJSONObj());
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
 	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
@@ -259,8 +302,8 @@ TEST(RESTClient, DELRequest)
 
 	MockClient client(BASE_URI);
 
-	web::json::value requestJSON;
-	web::json::value responseJSON = client.DELRequest(API_URI, requestJSON);
+	web::json::value responseJSON = client.DELRequest(API_URI, CreateJSONObj());
+	VerifyResponse(responseJSON, EXPECTED_JSON_RESPONSE);
 
 	EXPECT_EQ(MockRequestTask::GetCounts(), 2);
 	EXPECT_EQ(MockResponseTask::GetCounts(), 2);
