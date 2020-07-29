@@ -23,7 +23,7 @@ SET PATH=%PATH%;%DEPENDENCY_MAN_LINK_BIN%;%DEPENDENCY_MAN_LINK_DIR%;%DEPENDENCY_
 if %1.==. (
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe"
 ) else (
-"C:/Users/miclomba/source/repos/Backend/X/out/build/x64-Debug/test_interprocess/test_interprocess.exe" %1
+"C:/Users/miclomba/source/repos/Backend/X/out/install/X/rest_server.exe" %1
 )
 
 SET PATH=%ORIG_PATH%

@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/process.hpp>
+
 #include <cpprest/details/basic_types.h>
 
 #include "Interprocess/RESTClient.h"
@@ -310,8 +312,14 @@ TEST(RESTClient, DELRequest)
 	EXPECT_EQ(MockResultTask::GetCounts(), 1);
 }
 
+#ifdef INTEGRATION_TEST
 TEST(RESTClient, Integration)
 {
+	//boost::process::child proc("C:/Users/miclomba/source/repos/Backend/X/start_win_devenv.bat rest_server");
+	//while (!proc.running()) {}
+	//ASSERT_TRUE(proc.valid());
+	//proc.detach();
+
 	web::json::value response, putvalue, getvalue, delvalue;
 	interprocess::RESTClient client(BASE_URI);
 
@@ -338,5 +346,9 @@ TEST(RESTClient, Integration)
 	
 	response = client.GETRequest(L"/restdemo");
 	VerifyResponse(response, L"{\"two\":\"200\"}");
+
+	//proc.terminate();
+	//proc.wait();
 }
+#endif
 

@@ -4,6 +4,10 @@
 #include "Config/config_boost.h"
 #include "Config/config_gtest.h"
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 //#define USER_TCP_SERVER_MAIN
 //#define USER_REST_SERVER_MAIN
 
