@@ -1,8 +1,13 @@
 #ifndef interprocess_rest_server_h
 #define interprocess_rest_server_h
 
+#include <functional>
+#include <codecvt>
+#include <locale>
 #include <map>
+#include <set>
 #include <string>
+#include <utility>
 
 #include <cpprest/details/basic_types.h>
 #include <cpprest/http_listener.h>
@@ -13,14 +18,15 @@
 
 namespace interprocess {
 
-class INTERPROCESS_DLL_EXPORT RESTServer
+template<typename HTTPListener = web::http::experimental::listener::http_listener>
+class RESTServer
 {
 public:
 	RESTServer(const std::wstring& baseURI);
 
 	void Listen();
 
-	const web::http::experimental::listener::http_listener& GetListener() const;
+	const HTTPListener& GetListener() const;
 
 protected:
 	virtual void AcceptHandler();
@@ -33,9 +39,24 @@ protected:
 	std::map<utility::string_t, utility::string_t>& GetDictionary();
 
 private:
-	web::http::experimental::listener::http_listener listener_;
+	const std::wstring DELETED_MSG = L"<deleted>";
+	const std::wstring FAILED_MSG = L"<failed>";
+	const std::wstring NIL_MSG = L"<nil>";
+	const std::wstring PUT_MSG = L"<put>";
+	const std::wstring UPDATED_MSG = L"<updated>";
+
+	std::wstring WStr(const std::string& s);
+
+	void HandleRequest(
+		web::http::http_request request,
+		std::function<void(const web::json::value&, web::json::value&)> action
+	);
+
+	HTTPListener listener_;
 	std::map<utility::string_t, utility::string_t> dictionary_;
 };
+
+#include "RESTServer.hpp"
 
 } // end namespace interprocess
 

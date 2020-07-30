@@ -1,5 +1,6 @@
 #include "config.h"
 
+#include <functional>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -14,11 +15,15 @@
 
 #include "Interprocess/RESTServer.h"
 
-using RESTServer = interprocess::RESTServer;
+using RESTServer = interprocess::RESTServer<web::http::experimental::listener::http_listener>;
 
 namespace
 {
 const std::wstring BASE_URI = U("http://localhost/");
+std::vector<web::http::method> METHODS = {
+	web::http::methods::GET, web::http::methods::HEAD, web::http::methods::POST,
+	web::http::methods::PUT, web::http::methods::DEL
+};
 
 web::json::value CreateJSONObj()
 {
@@ -64,11 +69,57 @@ struct RESTServerT : public RESTServer
 private:
 	bool calledAcceptHandler_{ false };
 };
+
+struct MockListener
+{
+	MockListener(const std::wstring& baseURI) {}
+
+	MockListener& open() 
+	{
+		openCount_++;
+		return *this; 
+	}
+
+	MockListener& then(std::function<void()>) 
+	{
+		thenCount_++;
+		return *this; 
+	}
+
+	void wait() 
+	{
+		waitCount_++;
+	}
+
+	void support(web::http::method mtd, std::function<void(web::http::http_request request)>) 
+	{
+		methods_.push_back(mtd);
+	}
+
+	int OpenCount() const { return openCount_; }
+	int ThenCount() const { return thenCount_; }
+	int WaitCount() const { return waitCount_; }
+
+	const std::vector<web::http::method>& Methods() const { return methods_; }
+
+private:
+	int openCount_{ 0 };
+	int thenCount_{ 0 };
+	int waitCount_{ 0 };
+	
+	std::vector<web::http::method> methods_;
+};
 } // end namespace
+
+using MockRESTServer = interprocess::RESTServer<MockListener>;
 
 TEST(RESTServer, Construct)
 {
-	EXPECT_NO_THROW(RESTServer server(BASE_URI));
+	MockRESTServer server(BASE_URI);
+	const MockListener& listener = server.GetListener();
+
+	const std::vector<web::http::method>& methods = listener.Methods();
+	EXPECT_EQ(methods, METHODS);
 }
 
 TEST(RESTServer, ConstructThrows)
@@ -88,9 +139,14 @@ TEST(RESTServer, GetListener)
 
 TEST(RESTServer, Listen)
 {
-	RESTServer server(BASE_URI);
+	MockRESTServer server(BASE_URI);
 
 	EXPECT_NO_THROW(server.Listen());
+	const MockListener& listener = server.GetListener();
+
+	EXPECT_EQ(listener.OpenCount(), 1);
+	EXPECT_EQ(listener.ThenCount(), 1);
+	EXPECT_EQ(listener.WaitCount(), 1);
 }
 
 TEST(RESTServer, AcceptHandler)

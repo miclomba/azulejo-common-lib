@@ -1,18 +1,6 @@
-#include "RESTServer.h"
 
-#include <functional>
-#include <codecvt>
-#include <locale>
-#include <set>
-#include <string>
-#include <utility>
-
-#include <cpprest/details/basic_types.h>
-#include <cpprest/http_listener.h>
-#include <cpprest/http_msg.h>
-#include <cpprest/json.h>
-
-using interprocess::RESTServer;
+#define TEMPLATE_T template<typename HTTPListener>
+#define RESTServer_t RESTServer<HTTPListener>
 
 //using namespace utility;                    // Common utilities like string conversions
 //using namespace web;                        // Common features like URIs and json.
@@ -20,21 +8,15 @@ using interprocess::RESTServer;
 //using namespace web::http::client;          // HTTP client features
 //using namespace concurrency::streams;       // Asynchronous streams
 
-namespace
-{
-const std::wstring DELETED_MSG = L"<deleted>";
-const std::wstring FAILED_MSG = L"<failed>";
-const std::wstring NIL_MSG = L"<nil>";
-const std::wstring PUT_MSG = L"<put>";
-const std::wstring UPDATED_MSG = L"<updated>";
-
-std::wstring WStr(const std::string& s)
+TEMPLATE_T
+std::wstring RESTServer_t::WStr(const std::string& s)
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
     return conv.from_bytes(s);
 }
 
-void HandleRequest(
+TEMPLATE_T
+void RESTServer_t::HandleRequest(
     web::http::http_request request,
     std::function<void(const web::json::value&, web::json::value&)> action
 )
@@ -44,7 +26,7 @@ void HandleRequest(
 
     request
         .extract_json()
-        .then([&code, &answer, &action](pplx::task<web::json::value> task) 
+        .then([this, &code, &answer, &action](pplx::task<web::json::value> task) 
         {
             try
             {
@@ -56,16 +38,16 @@ void HandleRequest(
             catch (const web::http::http_exception& e)
             {
                 code = web::http::status_codes::BadRequest;
-                answer = web::json::value(WStr("ERROR: RESTServer: ") + WStr(e.what()));
+                answer = web::json::value(this->WStr("ERROR: RESTServer: ") + WStr(e.what()));
             }
         })
         .wait();
 
     request.reply(code, answer);
 }
-} // end namespace
 
-RESTServer::RESTServer(const std::wstring& baseURI) :
+TEMPLATE_T
+RESTServer_t::RESTServer(const std::wstring& baseURI) :
     listener_(baseURI)
 {
     listener_.support(web::http::methods::GET, [this](web::http::http_request request) { 
@@ -94,7 +76,8 @@ RESTServer::RESTServer(const std::wstring& baseURI) :
     });
 }
 
-void RESTServer::Listen()
+TEMPLATE_T
+void RESTServer_t::Listen()
 {
     listener_
         .open()
@@ -102,12 +85,14 @@ void RESTServer::Listen()
         .wait();
 }
 
-const web::http::experimental::listener::http_listener& RESTServer::GetListener() const
+TEMPLATE_T
+const HTTPListener& RESTServer_t::GetListener() const
 {
     return listener_;
 }
 
-void RESTServer::GETHandler(web::http::http_request request)
+TEMPLATE_T
+void RESTServer_t::GETHandler(web::http::http_request request)
 {
     web::json::value answer = web::json::value::object();
 
@@ -117,19 +102,22 @@ void RESTServer::GETHandler(web::http::http_request request)
     request.reply(web::http::status_codes::OK, answer);
 }
 
-void RESTServer::HEADHandler(web::http::http_request request)
+TEMPLATE_T
+void RESTServer_t::HEADHandler(web::http::http_request request)
 {
     web::json::value answer = web::json::value::object();
 
     request.reply(web::http::status_codes::OK, answer);
 }
 
-void RESTServer::AcceptHandler()
+TEMPLATE_T
+void RESTServer_t::AcceptHandler()
 {
 
 }
 
-void RESTServer::POSTHandler(const web::json::value& jValue, web::json::value& answer)
+TEMPLATE_T
+void RESTServer_t::POSTHandler(const web::json::value& jValue, web::json::value& answer)
 {
     for (const web::json::value& e : jValue.as_array())
     {
@@ -146,7 +134,8 @@ void RESTServer::POSTHandler(const web::json::value& jValue, web::json::value& a
     }
 }
 
-void RESTServer::PUTHandler(const web::json::value& jValue, web::json::value& answer)
+TEMPLATE_T
+void RESTServer_t::PUTHandler(const web::json::value& jValue, web::json::value& answer)
 {
     for (const std::pair<utility::string_t, web::json::value>& e : jValue.as_object())
     {
@@ -165,7 +154,8 @@ void RESTServer::PUTHandler(const web::json::value& jValue, web::json::value& an
     }
 }
 
-void RESTServer::DELHandler(const web::json::value& jValue, web::json::value& answer)
+TEMPLATE_T
+void RESTServer_t::DELHandler(const web::json::value& jValue, web::json::value& answer)
 {
     std::set<utility::string_t> keys;
     for (const web::json::value& e : jValue.as_array())
@@ -191,8 +181,12 @@ void RESTServer::DELHandler(const web::json::value& jValue, web::json::value& an
         dictionary_.erase(key);
 }
 
-std::map<utility::string_t, utility::string_t>& RESTServer::GetDictionary()
+TEMPLATE_T
+std::map<utility::string_t, utility::string_t>& RESTServer_t::GetDictionary()
 {
     return dictionary_;
 }
+
+#undef RESTServer_t
+#undef TEMPLATE_T
 
