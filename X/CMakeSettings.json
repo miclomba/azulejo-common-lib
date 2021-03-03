@@ -11,7 +11,7 @@
       "GTEST_LINK_BIN": "${projectDir}/../../vcpkg/packages/gtest_x64-windows/debug/lib/manual-link",
       "GTEST_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include",
       "PYTHON3_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/lib",
-      "PYTHON3_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include/python3.8"
+      "PYTHON3_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include/python3.9"
     }
   ],
   // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
