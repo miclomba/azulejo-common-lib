@@ -1,5 +1,5 @@
-#ifndef interprocess_async_server_h
-#define interprocess_async_server_h
+#ifndef interprocess_tcp_server_h
+#define interprocess_tcp_server_h
 
 #include <memory>
 #include <stdexcept>
@@ -15,18 +15,18 @@
 namespace interprocess {
 
 template<typename ConnHandlerT, typename AcceptorT = boost::asio::ip::tcp::acceptor>
-class AsyncServer 
+class TCPServer 
 {
 	using shared_conn_handler_t = std::shared_ptr<ConnHandlerT>;
 
 public:
-	AsyncServer(boost::asio::io_context& context, const size_t numThreads = 1);
-	virtual ~AsyncServer();
+	TCPServer(boost::asio::io_context& context, const size_t numThreads = 1);
+	virtual ~TCPServer();
 
-	AsyncServer(const AsyncServer&) = delete;
-	AsyncServer& operator=(const AsyncServer&) = delete;
-	AsyncServer(AsyncServer&&) = delete;
-	AsyncServer& operator=(AsyncServer&&) = delete;
+	TCPServer(const TCPServer&) = delete;
+	TCPServer& operator=(const TCPServer&) = delete;
+	TCPServer(TCPServer&&) = delete;
+	TCPServer& operator=(TCPServer&&) = delete;
 
 	void Start(const boost::asio::ip::tcp::endpoint& endPoint);
 	void Join();
@@ -45,8 +45,8 @@ private:
 	AcceptorT acceptor_;
 };
 
-#include "AsyncServer.hpp"
+#include "TCPServer.hpp"
 
 } // end namespace interprocess
-#endif // interprocess_async_server_h
+#endif // interprocess_tcp_server_h
 

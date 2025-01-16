@@ -6,8 +6,8 @@
 #include <set>
 #include <vector>
 
-#include "Interprocess/AsyncServer.h"
 #include "Interprocess/IConnectionHandler.h"
+#include "Interprocess/TCPServer.h"
 
 using boost::asio::ip::tcp;
 
@@ -82,11 +82,11 @@ public:
 
 //----------------------------------------------------------------------
 
-class chat_server : public interprocess::AsyncServer<chat_session>
+class chat_server : public interprocess::TCPServer<chat_session>
 {
 public:
 	chat_server(boost::asio::io_context& io_context, const tcp::endpoint& endpoint, const size_t numThreads) : 
-		AsyncServer<chat_session>(io_context, numThreads)
+		TCPServer<chat_session>(io_context, numThreads)
 	{
 		Start(endpoint);
 	}

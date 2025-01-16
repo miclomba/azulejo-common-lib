@@ -22,8 +22,8 @@ add_executable("${PROJECT_NAME}"
 
 target_link_libraries("${PROJECT_NAME}" 
 "Intraprocess" 
-gtestd
-gtest_maind
+gtest
+gtest_main
 )
 
 if (MSVC)

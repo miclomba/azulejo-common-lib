@@ -1,17 +1,20 @@
 ﻿{
   "environments": [
     {
+      "PYTHON_VERSION": "python311",
+      "PYTHON_VERSION_OSX": "python37",
+      "Python_ROOT_DIR": "/usr/local/Cellar/python/3.7.8",
+      "BOOST_LIB_SUFFIX": "-vc143-mt-gd-x64-1_86",
       "INSTALL_PATH": "${projectDir}/out/install/X",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
       "X_INCL_DIR": "${projectDir}",
-      "BOOST_LIB_SUFFIX": "-vc140-mt-gd",
-      "BOOST_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/debug/lib",
-      "BOOST_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include",
-      "GTEST_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/debug/lib",
-      "GTEST_LINK_BIN": "${projectDir}/../../vcpkg/packages/gtest_x64-windows/debug/lib/manual-link",
-      "GTEST_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include",
-      "PYTHON3_LINK_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/lib",
-      "PYTHON3_INCL_DIR": "${projectDir}/../../vcpkg/installed/x64-windows/include/python3.9"
+      "BOOST_LINK_DIR": "${projectDir}/vcpkg_installed/x64-windows/debug/lib",
+      "BOOST_INCL_DIR": "${projectDir}/vcpkg_installed/x64-windows/include",
+      "GTEST_LINK_DIR": "${projectDir}/vcpkg_installed/x64-windows/debug/lib",
+      "GTEST_LINK_BIN": "${projectDir}/vcpkg_installed/x64-windows/debug/lib/manual-link",
+      "GTEST_INCL_DIR": "${projectDir}/vcpkg_installed/x64-windows/include",
+      "PYTHON3_LINK_DIR": "${projectDir}/vcpkg_installed/x64-windows/lib",
+      "PYTHON3_INCL_DIR": "${projectDir}/vcpkg_installed/x64-windows/include/python3.11"
     }
   ],
   // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.

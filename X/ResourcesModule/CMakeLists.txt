@@ -1,13 +1,10 @@
 project("ResourcesModule")
 
-set(PYTHON_VERSION "python39")
-set(PYTHON_VERSION_OSX "python37")
-
 if (APPLE)
 #make sure to brew install python3
 #make sure that $HOME/user-config.jam contains the following before building boost in order to build libboost_python37 instead of libboost_python27:
 #using python : : /usr/local/Cellar/python/3.7.8/Frameworks/Python.framework/Versions/3.7/bin/python3 : /usr/local/Cellar/python/3.7.8/Frameworks/Python.framework/Versions/3.7/include/python3.7m ;
-set(Python_ROOT_DIR "/usr/local/Cellar/python/3.7.8")
+set(Python_ROOT_DIR "$ENV{Python_ROOT_DIR}")
 find_package(Python COMPONENTS Development)
 endif()
 
@@ -48,13 +45,13 @@ add_library("${PROJECT_NAME}" SHARED
 if (MSVC)
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
-"boost_${PYTHON_VERSION}$ENV{BOOST_LIB_SUFFIX}"
-"${PYTHON_VERSION}"
+"boost_$ENV{PYTHON_VERSION}$ENV{BOOST_LIB_SUFFIX}"
+"$ENV{PYTHON_VERSION}"
 )
 elseif(APPLE)
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
-"boost_${PYTHON_VERSION_OSX}$ENV{BOOST_LIB_SUFFIX}"
+"boost_$ENV{PYTHON_VERSION_OSX}$ENV{BOOST_LIB_SUFFIX}"
 "${Python_LIBRARIES}"
 )
 endif()

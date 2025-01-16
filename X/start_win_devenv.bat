@@ -2,11 +2,11 @@
 SET ORIG_PATH=%PATH%
 
 SET REPOS=C:/Users/miclomba/source/repos
-SET DEPENDENCY_LINK_BIN=%REPOS%/vcpkg/installed/x64-windows/debug/bin
-SET DEPENDENCY_LINK_LIB=%REPOS%/vcpkg/installed/x64-windows/debug/lib
-SET DEPENDENCY_MAN_LINK_BIN=%REPOS%/vcpkg/packages/gtest_x64-windows/debug/bin
-SET DEPENDENCY_MAN_LINK_DIR=%REPOS%/vcpkg/packages/gtest_x64-windows/debug/lib/manual-link
 SET BASE_LINK_DIR=%REPOS%/Backend/X/out/build/x64-Debug
+SET DEPENDENCY_LINK_BIN=%BASE_LINK_DIR%/vcpkg_installed/x64-windows/debug/bin
+SET DEPENDENCY_LINK_LIB=%BASE_LINK_DIR%/vcpkg_installed/x64-windows/debug/lib
+SET DEPENDENCY_MAN_LINK_BIN=%BASE_LINK_DIR%/vcpkg_installed/x64-windows/debug/bin
+SET DEPENDENCY_MAN_LINK_DIR=%BASE_LINK_DIR%/vcpkg_installed/x64-windows/debug/lib/manual-link
 SET DATABASE_ADAPTERS=%BASE_LINK_DIR%/DatabaseAdapters
 SET ENTITIES=%BASE_LINK_DIR%/Entities
 SET ENTITIESMODULE=%BASE_LINK_DIR%/EntitiesModule
@@ -21,7 +21,7 @@ REM Setting the path so that test_*.exe can find the appropriate dlls during tes
 SET PATH=%PATH%;%DEPENDENCY_MAN_LINK_BIN%;%DEPENDENCY_MAN_LINK_DIR%;%DEPENDENCY_LINK_BIN%;%DEPENDENCY_LINK_LIB%;%DATABASE_ADAPTERS%;%ENTITIES%;%ENTITIESMODULE%;%EVENTS%;%FILESYSTEM_ADAPTERS%;%INTERPROCESS%;%INTRAPROCESS%;%RESOURCES%;%RESOURCESMODULE%
 
 if %1.==. (
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe"
 ) else (
 "C:/Users/miclomba/source/repos/Backend/X/out/install/X/rest_server.exe" %1
 )

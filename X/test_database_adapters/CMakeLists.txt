@@ -35,8 +35,8 @@ target_link_libraries("${PROJECT_NAME}"
 "DatabaseAdapters"
 "Entities"
 "Resources" 
-gtestd
-gtest_maind
+gtest
+gtest_main
 "boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 

@@ -1,5 +1,5 @@
 #include "IResource.h"
-
+#include <stdexcept>
 #include <boost/crc.hpp>
 
 using resource::IResource;

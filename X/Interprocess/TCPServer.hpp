@@ -1,25 +1,25 @@
 
 #define TEMPLATE_T template<typename ConnHandlerT, typename AcceptorT>
-#define AsyncServer_t AsyncServer<ConnHandlerT, AcceptorT>
+#define TCPServer_t TCPServer<ConnHandlerT, AcceptorT>
 
 TEMPLATE_T
-AsyncServer_t::AsyncServer(boost::asio::io_context& context, const size_t numThreads) :
+TCPServer_t::TCPServer(boost::asio::io_context& context, const size_t numThreads) :
 	ioService_(context),
 	numThreads_(numThreads),
 	acceptor_(context)
 {
 	if (numThreads_ == 0)
-		throw std::runtime_error("Cannot construct AsyncServer because number of threads is invalid");
+		throw std::runtime_error("Cannot construct TCPServer because number of threads is invalid");
 }
 
 TEMPLATE_T
-AsyncServer_t::~AsyncServer()
+TCPServer_t::~TCPServer()
 {
 	Join();
 }
 
 TEMPLATE_T
-void AsyncServer_t::Join()
+void TCPServer_t::Join()
 {
 	ioService_.stop();
 
@@ -31,7 +31,7 @@ void AsyncServer_t::Join()
 }
 
 TEMPLATE_T
-void AsyncServer_t::Start(const boost::asio::ip::tcp::endpoint& endPoint)
+void TCPServer_t::Start(const boost::asio::ip::tcp::endpoint& endPoint)
 {
 	using boost::asio::ip::tcp;
 	using boost::system::error_code;
@@ -39,16 +39,16 @@ void AsyncServer_t::Start(const boost::asio::ip::tcp::endpoint& endPoint)
 	error_code ec;
 
 	acceptor_.open(endPoint.protocol(), ec);
-	if (ec) throw std::runtime_error("AsyncServer could not open protocol via port " + std::to_string(endPoint.port()));
+	if (ec) throw std::runtime_error("TCPServer could not accept on port " + std::to_string(endPoint.port()));
 
 	acceptor_.set_option(tcp::acceptor::reuse_address(true), ec);
-	if (ec) throw std::runtime_error("AsyncServer could not set option to reuse addresses");
+	if (ec) throw std::runtime_error("TCPServer could not set option to reuse addresses");
 
 	acceptor_.bind(endPoint, ec);
-	if (ec) throw std::runtime_error("AsyncServer could not bind on endpoint");
+	if (ec) throw std::runtime_error("TCPServer could not bind on endpoint");
 
 	acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
-	if (ec) throw std::runtime_error("AsyncServer could not listen");
+	if (ec) throw std::runtime_error("TCPServer could not listen");
 
 	auto handler = std::make_shared<ConnHandlerT>(ioService_);
 	acceptor_.async_accept(handler->Socket(), [=](error_code errorCode) 
@@ -61,7 +61,7 @@ void AsyncServer_t::Start(const boost::asio::ip::tcp::endpoint& endPoint)
 }
 
 TEMPLATE_T
-void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handler, const boost::system::error_code errorCode)
+void TCPServer_t::HandleNewConnection(TCPServer::shared_conn_handler_t handler, const boost::system::error_code errorCode)
 {
 	using boost::system::error_code;
 
@@ -78,17 +78,17 @@ void AsyncServer_t::HandleNewConnection(AsyncServer::shared_conn_handler_t handl
 }
 
 TEMPLATE_T
-size_t AsyncServer_t::GetNumThreads() const
+size_t TCPServer_t::GetNumThreads() const
 {
 	return numThreads_;
 }
 
 TEMPLATE_T
-AcceptorT& AsyncServer_t::GetAcceptor()
+AcceptorT& TCPServer_t::GetAcceptor()
 {
 	return acceptor_;
 }
 
 #undef TEMPLATE_T 
-#undef AsyncServer_t 
+#undef TCPServer_t 
 

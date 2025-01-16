@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (MSVC)
 set(CMAKE_CXX_FLAGS "/permissive- /EHsc /WX /openmp")
+add_compile_definitions(_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS)
+add_definitions(-D_WIN32_WINNT=0x0A00)
 endif()
 
 add_subdirectory("DatabaseAdapters")
