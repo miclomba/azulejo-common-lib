@@ -6,19 +6,19 @@
 
 #if defined(_WIN64) || defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define ROOT_FILESYSTEM "C:/"
-#define TEST_DIRECTORY "/users/miclomba/downloads"
+#define TEST_DIRECTORY std::getenv("USERPROFILE")
 #elif defined(__APPLE__) || defined(__MACH__)
 #define ROOT_FILESYSTEM "/"
-#define TEST_DIRECTORY "/Users/miclomba/Downloads"
+#define TEST_DIRECTORY std::getenv("HOME")
 #elif defined(__linux__)
 #define ROOT_FILESYSTEM "/"
-#define TEST_DIRECTORY "/Users/miclomba/Downloads"
+#define TEST_DIRECTORY std::getenv("HOME")
 #elif defined(__FreeBSD__)
 #define ROOT_FILESYSTEM "/"
-#define TEST_DIRECTORY "/Users/miclomba/Downloads"
+#define TEST_DIRECTORY std::getenv("HOME")
 #elif defined(__ANDROID__)
 #define ROOT_FILESYSTEM "/"
-#define TEST_DIRECTORY "/Users/miclomba/Downloads"
+#define TEST_DIRECTORY std::getenv("HOME")
 #endif
 
 #endif
