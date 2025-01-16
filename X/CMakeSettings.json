@@ -5,6 +5,7 @@
       "PYTHON_VERSION_OSX": "python37",
       "Python_ROOT_DIR": "/usr/local/Cellar/python/3.7.8",
       "BOOST_LIB_SUFFIX": "-vc143-mt-gd-x64-1_86",
+      "PATH": "${env.PATH};${projectDir}/out/build/x64-Debug/vcpkg_installed/x64-windows/debug/bin;${projectDir}/out/build/x64-Debug/vcpkg_installed/x64-windows/debug/lib;${projectDir}/out/build/x64-Debug/vcpkg_installed/x64-windows/debug/lib/manual-link;${projectDir}/out/build/x64-Debug/DatabaseAdapters;${projectDir}/out/build/x64-Debug/Entities;${projectDir}/out/build/x64-Debug/EntitiesModule;${projectDir}/out/build/x64-Debug/Events;${projectDir}/out/build/x64-Debug/FilesystemAdapters;${projectDir}/out/build/x64-Debug/Interprocess;${projectDir}/out/build/x64-Debug/Intraprocess;${projectDir}/out/build/x64-Debug/Resources;${projectDir}/out/build/x64-Debug/ResourcesModule",
       "INSTALL_PATH": "${projectDir}/out/install/X",
       "X_LINK_DIR": "${projectDir}/out/build/x64-Debug",
       "X_INCL_DIR": "${projectDir}",
