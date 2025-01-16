@@ -314,7 +314,7 @@ TEST(RESTClient, DELRequest)
 #ifdef INTEGRATION_TEST
 TEST(RESTClient, Integration)
 {
-	//boost::process::child proc("C:/Users/miclomba/source/repos/Backend/X/start_win_devenv.bat rest_server");
+	//boost::process::child proc("C:/Users/jdoe/azulejo-common-lib/start_win_devenv.bat rest_server");
 	//while (!proc.running()) {}
 	//ASSERT_TRUE(proc.valid());
 	//proc.detach();

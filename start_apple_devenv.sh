@@ -3,7 +3,7 @@
 #     xcode-select --install
 
 export REPOS="$HOME/source/repos"
-export X_DIR="$REPOS/Backend/X"
+export X_DIR="$REPOS/azulejo-common-lib"
 
 export INSTALL_PATH="/usr/local/lib"
 export X_LINK_DIR="$X_DIR/out/xcode"
