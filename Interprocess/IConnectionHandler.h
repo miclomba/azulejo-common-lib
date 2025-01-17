@@ -1,3 +1,8 @@
+/**
+ * @file IConnectionHandler.h
+ * @brief Declaration of the IConnectionHandler interface for managing network connections.
+ */
+
 #ifndef interprocess_iconnection_handler_h
 #define interprocess_iconnection_handler_h
 
@@ -19,73 +24,189 @@
 
 namespace interprocess {
 
+/**
+ * @class IConnectionHandler
+ * @brief An interface for managing TCP network connections using Boost.Asio.
+ *
+ * @tparam PODType The Plain Old Data (POD) type used for messages.
+ * @tparam AsioAdapterT The adapter type for integrating with Boost.Asio (default: AsioAdapter<PODType>).
+ */
 template<typename PODType, typename AsioAdapterT = AsioAdapter<PODType>>
 class IConnectionHandler : 
-	public std::enable_shared_from_this<IConnectionHandler<PODType, AsioAdapterT>>
+    public std::enable_shared_from_this<IConnectionHandler<PODType, AsioAdapterT>>
 {
 public:
-	using shared_conn_handler_t = std::shared_ptr<IConnectionHandler>;
+    /**
+     * @brief Alias for a shared pointer to the IConnectionHandler.
+     */
+    using shared_conn_handler_t = std::shared_ptr<IConnectionHandler>;
 
-	IConnectionHandler(boost::asio::io_context& ioService);
+    /**
+     * @brief Constructor for the IConnectionHandler class.
+     * @param ioService Reference to the Boost.Asio I/O context.
+     */
+    IConnectionHandler(boost::asio::io_context& ioService);
 
-	virtual ~IConnectionHandler();
-	IConnectionHandler(const IConnectionHandler&) = delete;
-	IConnectionHandler& operator=(const IConnectionHandler&) = delete;
-	IConnectionHandler(IConnectionHandler&&) = delete;
-	IConnectionHandler& operator=(IConnectionHandler&&) = delete;
+    /**
+     * @brief Virtual destructor for the IConnectionHandler class.
+     */
+    virtual ~IConnectionHandler();
 
-	virtual void StartApplication(shared_conn_handler_t thisHandler) = 0;
+    /**
+     * @brief Deleted copy constructor to prevent copying.
+     */
+    IConnectionHandler(const IConnectionHandler&) = delete;
 
-	//incoming
-	void PostReceiveMessages();
-	bool HasReceivedMessages() const;
+    /**
+     * @brief Deleted copy assignment operator to prevent copying.
+     * @return Reference to the updated instance (not used).
+     */
+    IConnectionHandler& operator=(const IConnectionHandler&) = delete;
 
-	std::vector<PODType> GetOneMessage();
+    /**
+     * @brief Deleted move constructor to prevent moving.
+     */
+    IConnectionHandler(IConnectionHandler&&) = delete;
 
-	//outgoing
-	void PostOutgoingMessage(std::vector<PODType> message);
-	bool HasOutgoingMessages() const;
+    /**
+     * @brief Deleted move assignment operator to prevent moving.
+     * @return Reference to the updated instance (not used).
+     */
+    IConnectionHandler& operator=(IConnectionHandler&&) = delete;
 
-	//connection
-	void Connect(boost::asio::ip::tcp::resolver::results_type endPoints);
+    /**
+     * @brief Start the application logic for the connection handler.
+     * @param thisHandler Shared pointer to the current connection handler instance.
+     */
+    virtual void StartApplication(shared_conn_handler_t thisHandler) = 0;
 
-	//close
-	void Close();
+    /**
+     * @brief Post a request to receive messages.
+     */
+    void PostReceiveMessages();
 
-	// accessors
-	boost::asio::ip::tcp::socket& Socket();
-	boost::asio::io_context& IOService();
-	AsioAdapterT& IOAdapter();
+    /**
+     * @brief Check if there are received messages in the queue.
+     * @return True if there are received messages, false otherwise.
+     */
+    bool HasReceivedMessages() const;
+
+    /**
+     * @brief Retrieve one received message from the queue.
+     * @return A vector containing the received message data.
+     */
+    std::vector<PODType> GetOneMessage();
+
+    /**
+     * @brief Post a message to be sent to the outgoing message queue.
+     * @param message The message data to send.
+     */
+    void PostOutgoingMessage(std::vector<PODType> message);
+
+    /**
+     * @brief Check if there are outgoing messages in the queue.
+     * @return True if there are outgoing messages, false otherwise.
+     */
+    bool HasOutgoingMessages() const;
+
+    /**
+     * @brief Connect to a remote endpoint.
+     * @param endPoints The list of resolved endpoints to connect to.
+     */
+    void Connect(boost::asio::ip::tcp::resolver::results_type endPoints);
+
+    /**
+     * @brief Close the connection.
+     */
+    void Close();
+
+    /**
+     * @brief Get the TCP socket associated with the connection handler.
+     * @return Reference to the TCP socket.
+     */
+    boost::asio::ip::tcp::socket& Socket();
+
+    /**
+     * @brief Get the Boost.Asio I/O context associated with the connection handler.
+     * @return Reference to the I/O context.
+     */
+    boost::asio::io_context& IOService();
+
+    /**
+     * @brief Get the I/O adapter associated with the connection handler.
+     * @return Reference to the I/O adapter.
+     */
+    AsioAdapterT& IOAdapter();
 
 private:
-	//incoming
-	void QueueReceivedMessage(size_t bytesTransferred);
-	size_t ReceivedDataLength(const size_t bytesTransferreds);
+    /**
+     * @brief Queue a received message after data transfer.
+     * @param bytesTransferred The number of bytes received.
+     */
+    void QueueReceivedMessage(size_t bytesTransferred);
 
-	//outgoing
-	std::vector<PODType> WrapWithHeader(const std::vector<PODType> message) const;
-	void SendMessageStart();
-	void SendMessageDone();
+    /**
+     * @brief Get the length of the received data.
+     * @param bytesTransferred The number of bytes received.
+     * @return The length of the received data.
+     */
+    size_t ReceivedDataLength(const size_t bytesTransferred);
 
-	// incoming
-	const size_t HEADER_LENGTH = 4;
-	std::vector<char> inMessage_;
-	mutable std::mutex readLock_;
-	boost::asio::io_context::strand readStrand_;
-	std::deque<std::vector<PODType>> inMessageQue_;
+    /**
+     * @brief Wrap a message with a header for outgoing transmission.
+     * @param message The message data to wrap.
+     * @return A vector containing the wrapped message.
+     */
+    std::vector<PODType> WrapWithHeader(const std::vector<PODType> message) const;
 
-	//outgoing
-	mutable std::mutex writeLock_;
-	boost::asio::io_context::strand writeStrand_;
-	std::deque<std::vector<PODType>> outMessageQue_;
+    /**
+     * @brief Start sending a message from the outgoing queue.
+     */
+    void SendMessageStart();
 
-	boost::asio::io_context& ioServiceRef_;
-	boost::asio::ip::tcp::socket socket_;
-	AsioAdapterT ioAdapter_;
+    /**
+     * @brief Complete the sending of the current message.
+     */
+    void SendMessageDone();
+
+    /** @brief Length of the header used in messages. */
+    const size_t HEADER_LENGTH = 4;
+
+    /** @brief Buffer for incoming message data. */
+    std::vector<char> inMessage_;
+
+    /** @brief Mutex for synchronizing access to the read queue. */
+    mutable std::mutex readLock_;
+
+    /** @brief Strand for managing read operations. */
+    boost::asio::io_context::strand readStrand_;
+
+    /** @brief Queue of received messages. */
+    std::deque<std::vector<PODType>> inMessageQue_;
+
+    /** @brief Mutex for synchronizing access to the write queue. */
+    mutable std::mutex writeLock_;
+
+    /** @brief Strand for managing write operations. */
+    boost::asio::io_context::strand writeStrand_;
+
+    /** @brief Queue of outgoing messages. */
+    std::deque<std::vector<PODType>> outMessageQue_;
+
+    /** @brief Reference to the Boost.Asio I/O context. */
+    boost::asio::io_context& ioServiceRef_;
+
+    /** @brief TCP socket for the connection. */
+    boost::asio::ip::tcp::socket socket_;
+
+    /** @brief Adapter for integrating with Boost.Asio. */
+    AsioAdapterT ioAdapter_;
 };
 
 #include "IConnectionHandler.hpp"
 
 } // end namespace interprocess
+
 #endif // interprocess_iconnection_handler_h
+
 

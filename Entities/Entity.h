@@ -1,3 +1,8 @@
+/**
+ * @file Entity.h
+ * @brief Declaration of the Entity base class for managing class members.
+ */
+
 #ifndef entity_entity_h
 #define entity_entity_h
 
@@ -12,53 +17,161 @@
 
 namespace entity {
 
+/**
+* @class Entity
+* @brief A base class for managing class members through functions instead of composition.
+*/
 class ENTITY_DLL_EXPORT Entity
 {
 public:
-	using Key = std::string;
-	using SharedEntity = std::shared_ptr<Entity>;
-	using MemberMap = std::map<Key, SharedEntity>;
+    /**
+    * @typedef Key
+    * @brief Type alias for the key used to identify members.
+    */
+    using Key = std::string;
+
+    /**
+    * @typedef SharedEntity
+    * @brief Type alias for a shared pointer to an Entity.
+    */
+    using SharedEntity = std::shared_ptr<Entity>;
+
+    /**
+    * @typedef MemberMap
+    * @brief Type alias for a map of keys to shared Entity pointers.
+    */
+    using MemberMap = std::map<Key, SharedEntity>;
 
 public:
-	virtual ~Entity();
+    /**
+    * @brief Destructor for the Entity class.
+    */
+    virtual ~Entity();
 
-	Entity(const Entity& other);
-	Entity& operator=(const Entity& other);
-	Entity(Entity&& other);
-	Entity& operator=(Entity&& other);
+    /**
+    * @brief Copy constructor.
+    * @param other The Entity instance to copy from.
+    */
+    Entity(const Entity& other);
 
-	Key GetKey() const;
-	void SetKey(const Key& key);
+    /**
+    * @brief Copy assignment operator.
+    * @param other The Entity instance to copy from.
+    * @return Reference to the updated Entity instance.
+    */
+    Entity& operator=(const Entity& other);
+
+    /**
+    * @brief Move constructor.
+    * @param other The Entity instance to move from.
+    */
+    Entity(Entity&& other);
+
+    /**
+    * @brief Move assignment operator.
+    * @param other The Entity instance to move from.
+    * @return Reference to the updated Entity instance.
+    */
+    Entity& operator=(Entity&& other);
+
+    /**
+    * @brief Get the key associated with this Entity.
+    * @return The key as a string.
+    */
+    Key GetKey() const;
+
+    /**
+    * @brief Set the key associated with this Entity.
+    * @param key The key to set.
+    */
+    void SetKey(const Key& key);
 
 protected:
-	Entity();
+    /**
+    * @brief Default constructor for the Entity class.
+    */
+    Entity();
 
-	template<class T>
-	SharedEntity& GetAggregatedMember(const Key& key) const;
-	// make virtual so that classes such as ISerializableEntity can override for lazy loading
-	virtual SharedEntity& GetAggregatedMember(const Key& key) const;
+    /**
+    * @brief Retrieve a member by its key, casting it to the desired type.
+    * @tparam T The type of the member to retrieve.
+    * @param key The key of the member to retrieve.
+    * @return A shared pointer to the member.
+    */
+    template<class T>
+    SharedEntity& GetAggregatedMember(const Key& key) const;
 
-	std::map<Key, SharedEntity>& GetAggregatedMembers() const;
+    /**
+    * @brief Retrieve a member by its key (virtual version).
+    * @param key The key of the member to retrieve.
+    * @return A shared pointer to the member.
+    */
+    virtual SharedEntity& GetAggregatedMember(const Key& key) const;
 
-	template<class T = Entity>
-	std::vector<Key> GetAggregatedMemberKeys() const;
+    /**
+    * @brief Get all aggregated members.
+    * @return A reference to the map of keys to shared Entity pointers.
+    */
+    std::map<Key, SharedEntity>& GetAggregatedMembers() const;
 
-	void AggregateMember(const Key& key);
+    /**
+    * @brief Retrieve the keys of all aggregated members.
+    * @tparam T The type of the members (default is Entity).
+    * @return A vector of keys.
+    */
+    template<class T = Entity>
+    std::vector<Key> GetAggregatedMemberKeys() const;
 
-	template<class T>
-	void AggregateMember(std::shared_ptr<T> sharedObj);
+    /**
+    * @brief Add a new member to the Entity.
+    * @param key The key associated with the member.
+    */
+    void AggregateMember(const Key& key);
 
-	void RemoveMember(const Key& key);
-	void RemoveMember(SharedEntity sharedObj);
+    /**
+    * @brief Add a new member to the Entity.
+    * @tparam T The type of the member.
+    * @param sharedObj A shared pointer to the member.
+    */
+    template<class T>
+    void AggregateMember(std::shared_ptr<T> sharedObj);
+
+    /**
+    * @brief Remove a member from the Entity by its key.
+    * @param key The key of the member to remove.
+    */
+    void RemoveMember(const Key& key);
+
+    /**
+    * @brief Remove a member from the Entity by its shared pointer.
+    * @param sharedObj A shared pointer to the member to remove.
+    */
+    void RemoveMember(SharedEntity sharedObj);
 
 private:
-	template<typename T>
-	void RegisterEntityConstructor(const Key& key);
-	std::unique_ptr<Entity> ConstructEntity(const Entity& other) const;
+    /**
+    * @brief Register a constructor for a specific Entity type.
+    * @tparam T The type of the Entity to register.
+    * @param key The key associated with the Entity type.
+    */
+    template<typename T>
+    void RegisterEntityConstructor(const Key& key);
 
-	Key key_;
-	mutable std::map<Key, SharedEntity> membersMap_;
-	mutable std::map<Entity::Key, std::function<std::unique_ptr<Entity>(const Entity&)>> keyToEntityConstructorMap_;
+    /**
+    * @brief Construct a new Entity instance by copying another Entity.
+    * @param other The Entity to copy.
+    * @return A unique pointer to the newly constructed Entity.
+    */
+    std::unique_ptr<Entity> ConstructEntity(const Entity& other) const;
+
+    /** @brief The key associated with this Entity. */
+    Key key_;
+
+    /** @brief Map of keys to shared Entity pointers. */
+    mutable std::map<Key, SharedEntity> membersMap_;
+
+    /** @brief Map of keys to Entity constructors. */
+    mutable std::map<Entity::Key, std::function<std::unique_ptr<Entity>(const Entity&)>> keyToEntityConstructorMap_;
 };
 
 #include "Entity.hpp"
@@ -66,4 +179,3 @@ private:
 } // end namespace entity
 
 #endif // entity_entity_h
-
