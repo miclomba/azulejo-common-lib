@@ -1,3 +1,8 @@
+/**
+ * @file EntityHierarchyBlob.h
+ * @brief Declaration of the EntityHierarchyBlob class for managing serialized entity hierarchy data.
+ */
+
 #ifndef database_adapters_entityhierarchyblob_h
 #define database_adapters_entityhierarchyblob_h
 
@@ -5,35 +10,86 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "config.h"
-
 #include "DatabaseAdapters/ITabularizableResource.h"
 
 namespace database_adapters {
 
+/**
+ * @class EntityHierarchyBlob
+ * @brief A class for handling serialized entity hierarchy data as a tabularizable resource.
+ *
+ * Inherits from `database_adapters::ITabularizableResource`.
+ */
 class DATABASE_ADAPTERS_DLL_EXPORT EntityHierarchyBlob : public database_adapters::ITabularizableResource
 {
 public:
-	EntityHierarchyBlob();
+    /**
+     * @brief Default constructor for the EntityHierarchyBlob class.
+     */
+    EntityHierarchyBlob();
 
-	EntityHierarchyBlob(const boost::property_tree::ptree& hierarchyTree);
-	EntityHierarchyBlob(const std::string& buff);
-	EntityHierarchyBlob(std::string&& buff);
+    /**
+     * @brief Constructor for creating an EntityHierarchyBlob from a property tree.
+     * @param hierarchyTree The property tree representing the entity hierarchy.
+     */
+    EntityHierarchyBlob(const boost::property_tree::ptree& hierarchyTree);
 
-	virtual ~EntityHierarchyBlob();
+    /**
+     * @brief Constructor for creating an EntityHierarchyBlob from a string buffer.
+     * @param buff The string containing serialized hierarchy data.
+     */
+    EntityHierarchyBlob(const std::string& buff);
 
-	const boost::property_tree::ptree& GetHierarchyTree();
+    /**
+     * @brief Constructor for creating an EntityHierarchyBlob from a temporary string buffer.
+     * @param buff The temporary string containing serialized hierarchy data.
+     */
+    EntityHierarchyBlob(std::string&& buff);
 
-	void Assign(const char* buff, const size_t n) override;
+    /**
+     * @brief Destructor for the EntityHierarchyBlob class.
+     */
+    virtual ~EntityHierarchyBlob();
 
-	void* Data() override;
-	const void* Data() const override;
+    /**
+     * @brief Get the property tree representing the entity hierarchy.
+     * @return A reference to the property tree.
+     */
+    const boost::property_tree::ptree& GetHierarchyTree();
 
-	size_t GetElementSize() const override;
+    /**
+     * @brief Assign new serialized data to the EntityHierarchyBlob.
+     * @param buff Pointer to the data buffer.
+     * @param n The size of the data in bytes.
+     */
+    void Assign(const char* buff, const size_t n) override;
+
+    /**
+     * @brief Access the serialized data as a mutable pointer.
+     * @return A pointer to the serialized data.
+     */
+    void* Data() override;
+
+    /**
+     * @brief Access the serialized data as a constant pointer.
+     * @return A constant pointer to the serialized data.
+     */
+    const void* Data() const override;
+
+    /**
+     * @brief Get the size of an individual element in the serialized data.
+     * @return The size of an individual element in bytes.
+     */
+    size_t GetElementSize() const override;
 
 private:
-	std::string data_;
-	boost::property_tree::ptree hierarchyTree_;
+    /** @brief The serialized data buffer. */
+    std::string data_;
+
+    /** @brief The property tree representing the entity hierarchy. */
+    boost::property_tree::ptree hierarchyTree_;
 };
 
-} // database_adapters
+} // namespace database_adapters
+
 #endif // database_adapters_entityhierarchyblob_h
