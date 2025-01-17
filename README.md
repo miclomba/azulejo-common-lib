@@ -1,15 +1,15 @@
 
 # azulejo-common-lib
 
-A set of common components for building C++ apps. Current offerrings:
+A library for composing C++ class systems that use aggregation as a basis for class member 
+association. Aggregated members benefit from recursive functions that automate serialization 
+and storage in relational databases. In addition, the library provides channels for event 
+driven communication along with concurrency, parallelism, and interprocess utilities (TCP, 
+HTTP, shared memory). 
 
-0. Event consumer and emitter base classes 
-1. Serializable base "Entity" to streamline light-object serialization 
-2. Serializable base "Resource" to streamline heavy-object (e.g. array) serialization 
-3. Interprocess constructs that streamline communication over TCP, REST, Shared Memory, Async IO
-4. Intraprocess constructos (Thread Pool, Runnable)
-
-See example usage in [azulejo-gl-asteroids](https://github.com/miclomba/azulejo-gl-asteroids)
+Sample implementations:
++ [azulejo-gl-asteroids](https://github.com/miclomba/azulejo-gl-asteroids) - a classic Asteroids game using OpenGL
++ [azulejo-gl-3dmodeler](https://github.com/miclomba/azulejo-gl-3dmodeler) - a 3D modeling app starter using OpenGL
 
 ## Prerequisites
 
