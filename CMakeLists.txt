@@ -12,13 +12,17 @@ endif()
 
 add_subdirectory("DatabaseAdapters")
 add_subdirectory("Entities")
+if (MSVC)
 add_subdirectory("EntitiesModule")
+endif()
 add_subdirectory("Events")
 add_subdirectory("FilesystemAdapters")
 add_subdirectory("Interprocess")
 add_subdirectory("Intraprocess")
 add_subdirectory("Resources")
+if (MSVC)
 add_subdirectory("ResourcesModule")
+endif()
 
 # SETUP_GOOGLE_TEST
 #Note: make sure to add the following option in CMakeLists.txt of the googletest project
@@ -32,7 +36,10 @@ add_subdirectory("test_database_adapters")
 add_subdirectory("test_entities")
 add_subdirectory("test_events")
 add_subdirectory("test_filesystem_adapters")
+# TODO: cpprest sdk is not portable between windows and mac - replace with Drogon
+if (MSVC)
 add_subdirectory("test_interprocess")
+endif()
 add_subdirectory("test_intraprocess")
 add_subdirectory("test_resources")
 
