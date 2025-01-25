@@ -10,51 +10,27 @@ endif()
 
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 
-if (MSVC)
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{BOOST_INCL_DIR}"
 "$ENV{PYTHON3_INCL_DIR}"
 )
-elseif(APPLE)
-include_directories(
-"$ENV{X_INCL_DIR}"
-"$ENV{BOOST_INCL_DIR}"
-"${Python_INCLUDE_DIRS}"
-)
-endif()
 
-if (MSVC)
 link_directories(
 "${RESOURCES_LIB}"
 "$ENV{BOOST_LINK_DIR}"
 "$ENV{PYTHON3_LINK_DIR}"
 )
-elseif(APPLE)
-link_directories(
-"${RESOURCES_LIB}"
-"$ENV{BOOST_LINK_DIR}"
-"${Python_LIBRARY_DIRS}"
-)
-endif()
 
 add_library("${PROJECT_NAME}" SHARED
 "ResourcesModule.cpp" 
 )
 
-if (MSVC)
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
-"boost_$ENV{PYTHON_VERSION}$ENV{BOOST_LIB_SUFFIX}"
+"boost_$ENV{BOOST_PYTHON_VERSION}$ENV{BOOST_LIB_SUFFIX}"
 "$ENV{PYTHON_VERSION}"
 )
-elseif(APPLE)
-target_link_libraries("${PROJECT_NAME}" 
-"Resources"
-"boost_$ENV{PYTHON_VERSION_OSX}$ENV{BOOST_LIB_SUFFIX}"
-"${Python_LIBRARIES}"
-)
-endif()
 
 if (MSVC)
 install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.dll DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)
