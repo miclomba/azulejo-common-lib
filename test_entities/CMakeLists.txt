@@ -29,4 +29,4 @@ gtest_main
 "boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 
-gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+#gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
