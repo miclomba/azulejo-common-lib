@@ -30,4 +30,4 @@ gtest
 gtest_main
 )
 
-#gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
