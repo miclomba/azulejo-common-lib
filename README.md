@@ -17,22 +17,20 @@ Sample implementations:
 
 Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
 
-### On Mac OS
+### On MacOS
 
 0. Install `XCode`
 1. Install `clang` by running: `xcode-select --install`
 2. Install build tools: `brew install cmake ninja autoconf automake autoconf-archive libtool pkg-config`
 3. FreeGLUT depends on `X11` so install `XQuartz` by running: `brew install --cask xquartz`
 4. Install `libomp` by running: `brew install libomp llvm`
+5. Install `VSCode`
+6. Install VSCode extensions:
 
-## On Ubuntu
+- CMake Tools (by Microsoft)
+- C/C++ (by Microsoft)
 
-0. Install build tools:
-
-- `sudo apt install cmake ninja-build g++ build-essential`
-- `sudo apt-get install autoconf automake autoconf-archive`
-
-## Install VCPKG Dependencies
+### Install VCPKG Dependencies
 
 Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory. Then run:
 
@@ -41,17 +39,9 @@ cd azulejo-common-lib
 vcpkg install --x-manifest-root=. --feature-flags=manifests
 ```
 
-## VSCode
-
-0. Install `VSCode`
-1. Install VSCode extensions:
-
-- CMake Tools (by Microsoft)
-- C/C++ (by Microsoft)
-
 ## Build
 
-### On Visual Studio
+### On Windows (Visual Studio)
 
 0. Start Visual Studio
 1. Click `continue without code`
@@ -61,7 +51,7 @@ vcpkg install --x-manifest-root=. --feature-flags=manifests
 5. Verify boost and python ENVs in CMakeSettings.json are consistent with your installations
 6. `Build > Build All`
 
-### On VSCode
+### On MacOS (VSCode)
 
 0. Run `CMake: Configure` command and use the appropriate compiler:
 
@@ -73,20 +63,20 @@ vcpkg install --x-manifest-root=. --feature-flags=manifests
 
 ## Install
 
-### On Visual Studio
+### On Windows (Visual Studio)
 
 0. `Build > Install X`
 
-### On VSCode
+### On MacOS (VSCode)
 
 0. Run command: `CMake: Install`
 
 ## Test
 
-### On Visual Studio
+### On Windows (Visual Studio)
 
 In Visual Studio: `Test > Run CTests for X`
 
-### On VSCode
+### On MacOS (VSCode)
 
 Run command: `CMake: Run Tests`
