@@ -19,7 +19,8 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 
 ### On Windows
 
-Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
+0. Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
+1. Install dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
 
 ### On MacOS
 
@@ -31,12 +32,16 @@ Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/communi
 5. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
 6. Install `VSCode`
 7. Install VSCode extensions:
+
 - CMake Tools (by Microsoft)
 - C/C++ (by Microsoft)
 
+8. Copy settings `cp .vscode/settings.mac.json .vscode/settings.json`
+
 ### On Ubuntu
 
-0. Install dependencies: 
+0. Install dependencies:
+
 ```
 sudo apt install -y \
   build-essential autoconf autoconf-archive automake libtool pkg-config cmake git unzip ninja-build curl \
@@ -44,11 +49,15 @@ sudo apt install -y \
   libgdbm-dev liblzma-dev uuid-dev tk-dev xz-utils wget libgomp1
   libgl1-mesa-dev libglu1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxmu-dev libxxf86vm-dev
 ```
+
 1. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
 2. Install `VSCode`
 3. Install VSCode extensions:
+
 - CMake Tools (by Microsoft)
 - C/C++ (by Microsoft)
+
+4. Copy settings `cp .vscode/settings.linux.json .vscode/settings.json`
 
 ## Build
 
@@ -63,7 +72,7 @@ sudo apt install -y \
 6. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
 7. `Build > Build All`
 
-### On MacOS (VSCode)
+### On macOS or Ubuntu (VSCode)
 
 0. Run `CMake: Configure` command and use the appropriate compiler:
 
@@ -79,7 +88,7 @@ sudo apt install -y \
 
 0. `Build > Install X`
 
-### On MacOS (VSCode)
+### On macOS or Ubuntu (VSCode)
 
 0. Run command: `CMake: Install`
 
@@ -89,6 +98,6 @@ sudo apt install -y \
 
 In Visual Studio: `Test > Run CTests for X`
 
-### On MacOS (VSCode)
+### On MacOS or Ubuntu (VSCode)
 
 Run command: `CMake: Run Tests`

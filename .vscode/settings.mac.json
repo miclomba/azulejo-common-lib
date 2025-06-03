@@ -16,7 +16,9 @@
         "PYTHON_VERSION": "python3.11",
         "BOOST_PYTHON_VERSION": "python311",
         "PYTHON3_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/lib",
-        "PYTHON3_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include"
+        "PYTHON3_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include",
+        "CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++",
+        "C_COMPILER": "/usr/local/opt/llvm/bin/clang"
     },
     "files.associations": {
         "*.ipp": "cpp"
