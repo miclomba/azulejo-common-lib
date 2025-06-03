@@ -27,6 +27,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 out/
+build/
 vcpkg_installed/
 
 # Visual Studio 2015/2017 cache/options directory

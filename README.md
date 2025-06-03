@@ -13,6 +13,10 @@ Sample implementations:
 
 ## Prerequisites
 
+### Install VCPKG Dependencies
+
+Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory. Then run:
+
 ### On Windows
 
 Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
@@ -24,20 +28,27 @@ Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/communi
 2. Install build tools: `brew install cmake ninja autoconf automake autoconf-archive libtool pkg-config`
 3. FreeGLUT depends on `X11` so install `XQuartz` by running: `brew install --cask xquartz`
 4. Install `libomp` by running: `brew install libomp llvm`
-5. Install `VSCode`
-6. Install VSCode extensions:
-
+5. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
+6. Install `VSCode`
+7. Install VSCode extensions:
 - CMake Tools (by Microsoft)
 - C/C++ (by Microsoft)
 
-### Install VCPKG Dependencies
+### On Ubuntu
 
-Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory. Then run:
-
+0. Install build essentials: 
 ```
-cd azulejo-common-lib
-vcpkg install --x-manifest-root=. --feature-flags=manifests
+sudo apt install -y \
+  build-essential autoconf autoconf-archive automake libtool pkg-config cmake git unzip ninja-build curl \
+  libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncursesw5-dev libffi-dev \
+  libgdbm-dev liblzma-dev uuid-dev tk-dev xz-utils wget libgomp1
+  libgl1-mesa-dev libglu1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxmu-dev libxxf86vm-dev
 ```
+1. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
+2. Install `VSCode`
+3. Install VSCode extensions:
+- CMake Tools (by Microsoft)
+- C/C++ (by Microsoft)
 
 ## Build
 
@@ -49,7 +60,8 @@ vcpkg install --x-manifest-root=. --feature-flags=manifests
 3. `File > Open > CMake`
 4. If the 'out' directory is not created automatically (Cmake configuration step) then run: `Project > Configure Cache`
 5. Verify boost and python ENVs in CMakeSettings.json are consistent with your installations
-6. `Build > Build All`
+6. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
+7. `Build > Build All`
 
 ### On MacOS (VSCode)
 
