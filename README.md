@@ -15,7 +15,7 @@ Sample implementations:
 
 ### Install VCPKG Dependencies
 
-Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory. Then run:
+Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory.
 
 ### On Windows
 
@@ -36,7 +36,7 @@ Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/communi
 
 ### On Ubuntu
 
-0. Install build essentials: 
+0. Install dependencies: 
 ```
 sudo apt install -y \
   build-essential autoconf autoconf-archive automake libtool pkg-config cmake git unzip ninja-build curl \
