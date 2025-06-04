@@ -6,7 +6,7 @@
         "OMP_INCL_DIR": "/usr/local/opt/libomp/include",
         "OMP_LINK_DIR": "/usr/local/opt/libomp/lib",
         "CMAKE_PREFIX_PATH": "/usr/local/opt/libomp:$CMAKE_PREFIX_PATH",
-        "X_INCL_DIR": "${workspaceFolder}",
+        "X_INCL_DIR": "${workspaceFolder}/include",
         "X_LINK_DIR": "${workspaceFolder}/out",
         "BOOST_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include",
         "BOOST_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/lib",
@@ -21,6 +21,7 @@
         "C_COMPILER": "/usr/local/opt/llvm/bin/clang"
     },
     "files.associations": {
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "fstream": "cpp"
     }
 }
