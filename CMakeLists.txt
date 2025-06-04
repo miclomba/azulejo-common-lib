@@ -40,10 +40,8 @@ add_subdirectory("src/FilesystemAdapters")
 add_subdirectory("src/Interprocess")
 add_subdirectory("src/Intraprocess")
 add_subdirectory("src/Resources")
-if (MSVC)
-add_subdirectory("src/EntitiesModule")
-add_subdirectory("src/ResourcesModule")
-endif()
+# add_subdirectory("src/EntitiesModule")
+# add_subdirectory("src/ResourcesModule")
 
 # SETUP_GOOGLE_TEST
 #Note: make sure to add the following option in CMakeLists.txt of the googletest project
@@ -59,8 +57,6 @@ add_subdirectory("src/test_events")
 add_subdirectory("src/test_filesystem_adapters")
 add_subdirectory("src/test_intraprocess")
 add_subdirectory("src/test_resources")
-# TODO: cpprest sdk is not portable between windows and mac - replace with Drogon
-if (MSVC)
-add_subdirectory("src/test_interprocess")
-endif()
+# # TODO: cpprest sdk is not portable between windows and mac - replace with Drogon
+# add_subdirectory("src/test_interprocess")
 

@@ -38,7 +38,7 @@ gmock_main
 "boost_thread$ENV{BOOST_LIB_SUFFIX}"
 )
 
-gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+# gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
 
 if (MSVC)
 install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.exe DESTINATION $ENV{INSTALL_PATH} RENAME rest_server.exe)

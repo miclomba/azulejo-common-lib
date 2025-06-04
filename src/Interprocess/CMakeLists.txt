@@ -15,7 +15,7 @@ add_library("${PROJECT_NAME}" SHARED
 
 if (MSVC)
 target_link_libraries("${PROJECT_NAME}" 
-"cpprest_2_10d"
+"cpprest_2_10"
 "boost_system$ENV{BOOST_LIB_SUFFIX}"
 )
 elseif(APPLE)

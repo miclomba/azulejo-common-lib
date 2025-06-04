@@ -1,11 +1,11 @@
 project("Intraprocess")
 
-if (APPLE OR UNIX)
+if (APPLE OR UNIX OR MSVC)
 #make sure to have brew install libomp
 find_package(OpenMP REQUIRED)
 endif()
 
-if (APPLE OR UNIX)
+if (APPLE OR UNIX OR MSVC)
 include_directories(
 "$ENV{X_INCL_DIR}"
 "$ENV{OMP_INCL_DIR}"
@@ -21,7 +21,7 @@ add_library("${PROJECT_NAME}" SHARED
 "ThreadPool.cpp" 
 )
 
-if (APPLE OR UNIX)
+if (APPLE OR UNIX OR MSVC)
 target_link_libraries("${PROJECT_NAME}"
 "OpenMP::OpenMP_CXX"
 )
