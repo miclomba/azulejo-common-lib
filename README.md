@@ -20,7 +20,13 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 ### On Windows
 
 0. Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
-1. Install dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
+1. Install `VSCode`
+2. Install VSCode extensions:
+
+- CMake Tools (by Microsoft)
+- C/C++ (by Microsoft)
+
+3. Copy settings `cp .vscode/settings.win.json .vscode/settings.json`
 
 ### On MacOS
 
@@ -61,19 +67,6 @@ sudo apt install -y \
 
 ## Build
 
-### On Windows (Visual Studio)
-
-0. Start Visual Studio
-1. Click `continue without code`
-2. Set configuration to be `x64-Debug`
-3. `File > Open > CMake`
-4. If the 'out' directory is not created automatically (Cmake configuration step) then run: `Project > Configure Cache`
-5. Verify boost and python ENVs in CMakeSettings.json are consistent with your installations
-6. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
-7. `Build > Build All`
-
-### On macOS or Ubuntu (VSCode)
-
 0. Run `CMake: Configure` command and use the appropriate compiler:
 
 - Clang (on macOS)
@@ -84,20 +77,8 @@ sudo apt install -y \
 
 ## Install
 
-### On Windows (Visual Studio)
-
-0. `Build > Install X`
-
-### On macOS or Ubuntu (VSCode)
-
-0. Run command: `CMake: Install`
+Run command: `CMake: Install`
 
 ## Test
 
-### On Windows (Visual Studio)
-
-In Visual Studio: `Test > Run CTests for X`
-
-### On MacOS or Ubuntu (VSCode)
-
-Run command: `CMake: Run Tests`
+Run command: `./start_unit_tests.sh`
