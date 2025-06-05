@@ -1,4 +1,4 @@
-project("test_filesystem_adapters")
+project(test_filesystem_adapters VERSION 1.0.0)
 
 set(DATABASE_ADAPTERS_LIB "$ENV{X_LINK_DIR}/DatabaseAdapters")
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
@@ -21,7 +21,7 @@ link_directories(
 "$ENV{BOOST_LINK_DIR}" 
 )
 
-add_executable("${PROJECT_NAME}"
+add_executable(${PROJECT_NAME}
 "test_entity_deserializer.cpp" 
 "test_entity_serializer.cpp" 
 "test_iserializable_entity.cpp" 
@@ -31,7 +31,7 @@ add_executable("${PROJECT_NAME}"
 "test_resource_serializer.cpp" 
 )
 
-target_link_libraries("${PROJECT_NAME}" 
+target_link_libraries(${PROJECT_NAME}
 "DatabaseAdapters"
 "Entities"
 "FilesystemAdapters"
@@ -41,4 +41,4 @@ gtest_main
 "boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 
-# gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+# gtest_discover_tests(${PROJECT_NAME} DISCOVERY_TIMEOUT 60)
