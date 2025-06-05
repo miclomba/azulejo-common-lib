@@ -1,4 +1,4 @@
-project("Intraprocess")
+project(Intraprocess VERSION 1.0.0)
 
 if (APPLE OR UNIX OR MSVC)
 #make sure to have brew install libomp
@@ -16,16 +16,39 @@ link_directories(
 )
 endif()
 
-add_library("${PROJECT_NAME}" SHARED
+add_library(${PROJECT_NAME} SHARED
 "IOMPRunnable.cpp" 
 "ThreadPool.cpp" 
 )
 
 if (APPLE OR UNIX OR MSVC)
-target_link_libraries("${PROJECT_NAME}"
+target_link_libraries(${PROJECT_NAME}
 "OpenMP::OpenMP_CXX"
 )
 endif()
 
-install(TARGETS ${PROJECT_NAME} DESTINATION $ENV{INSTALL_PATH})
+#############
+## INSTALL ##
+#############
+
+# This should be PUBLIC or PRIVATE — INTERFACE is invalid for compiled targets
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+# Install target and associate it with export set
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Targets    # <-- match this in the EXPORT command
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+# Install the export set (this now works because it matches above)
+install(EXPORT ${PROJECT_NAME}Targets
+    FILE ${PROJECT_NAME}Targets.cmake
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION share/${PROJECT_NAME})
 

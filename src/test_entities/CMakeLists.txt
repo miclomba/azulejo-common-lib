@@ -1,4 +1,4 @@
-project("test_entities")
+project(test_entities VERSION 1.0.0)
 
 set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 
@@ -15,18 +15,18 @@ link_directories(
 "$ENV{BOOST_LINK_DIR}" 
 )
 
-add_executable("${PROJECT_NAME}"
+add_executable(${PROJECT_NAME}
 "test_entity.cpp" 
 "test_entity_hierarchy.cpp" 
 "test_entity_registry.cpp" 
 "test_istreamable_entity.cpp" 
 )
 
-target_link_libraries("${PROJECT_NAME}" 
+target_link_libraries(${PROJECT_NAME}
 "Entities"
 gtest
 gtest_main
 "boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
 )
 
-# gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+# gtest_discover_tests(${PROJECT_NAME} DISCOVERY_TIMEOUT 60)

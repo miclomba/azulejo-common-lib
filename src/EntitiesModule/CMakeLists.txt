@@ -1,4 +1,4 @@
-project("EntitiesModule")
+project(EntitiesModule VERSION 1.0.0)
 
 if (APPLE)
 #make sure to brew install python3
@@ -32,9 +32,13 @@ target_link_libraries("${PROJECT_NAME}"
 "$ENV{PYTHON_VERSION}"
 )
 
-if (MSVC)
-install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.dll DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)
-elseif(APPLE)
-install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/Debug/lib${PROJECT_NAME}.dylib DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)
-endif()
+#############
+## INSTALL ##
+#############
+
+# if (MSVC)
+# install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.dll DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)
+# elseif(APPLE)
+# install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/Debug/lib${PROJECT_NAME}.dylib DESTINATION $ENV{INSTALL_PATH} RENAME ${PROJECT_NAME}.pyd)
+# endif()
 

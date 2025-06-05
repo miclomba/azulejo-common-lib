@@ -17,17 +17,6 @@ Sample implementations:
 
 Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project directory.
 
-### On Windows
-
-0. Download [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
-1. Install `VSCode`
-2. Install VSCode extensions:
-
-- CMake Tools (by Microsoft)
-- C/C++ (by Microsoft)
-
-3. Copy settings `cp .vscode/settings.win.json .vscode/settings.json`
-
 ### On MacOS
 
 0. Install `XCode`
@@ -77,8 +66,12 @@ sudo apt install -y \
 
 ## Install
 
-Run command: `CMake: Install`
+Run: `./scripts/install.sh`
+
+## Uninstall
+
+Run: `./scripts/uninstall.sh`
 
 ## Test
 
-Run command: `./start_unit_tests.sh`
+Run: `./scripts/start_unit_tests.sh`

@@ -1,4 +1,4 @@
-project("test_interprocess")
+project(test_interprocess VERSION 1.0.0)
 
 set(INTERPROCESS_LIB "$ENV{X_LINK_DIR}/Interprocess")
 
@@ -40,6 +40,10 @@ gmock_main
 
 # gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
 
-if (MSVC)
-install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.exe DESTINATION $ENV{INSTALL_PATH} RENAME rest_server.exe)
-endif()
+#############
+## INSTALL ##
+#############
+
+# if (MSVC)
+# install(FILES $ENV{X_LINK_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.exe DESTINATION $ENV{INSTALL_PATH} RENAME rest_server.exe)
+# endif()

@@ -1,4 +1,4 @@
-project("test_resources")
+project(test_resources VERSION 1.0.0)
 
 set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 
@@ -15,14 +15,14 @@ link_directories(
 "$ENV{BOOST_LINK_DIR}" 
 )
 
-add_executable("${PROJECT_NAME}"
+add_executable(${PROJECT_NAME}
 "test_iresource.cpp" 
 )
 
-target_link_libraries("${PROJECT_NAME}" 
+target_link_libraries(${PROJECT_NAME}
 "Resources"
 gtest
 gtest_main
 )
 
-# gtest_discover_tests("${PROJECT_NAME}" DISCOVERY_TIMEOUT 60)
+# gtest_discover_tests(${PROJECT_NAME} DISCOVERY_TIMEOUT 60)
