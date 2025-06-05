@@ -66,12 +66,12 @@ sudo apt install -y \
 
 ## Install
 
-Run command: `CMake: Install`
+Run: `./scripts/install.sh`
 
 ## Uninstall
 
-Run command: `./uninstall.sh`
+Run: `./scripts/uninstall.sh`
 
 ## Test
 
-Run command: `./start_unit_tests.sh`
+Run: `./scripts/start_unit_tests.sh`
