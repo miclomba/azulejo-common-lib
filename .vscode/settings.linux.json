@@ -8,15 +8,12 @@
         "CMAKE_PREFIX_PATH": "/usr/local/opt/libomp:$CMAKE_PREFIX_PATH",
         "X_INCL_DIR": "${workspaceFolder}/include",
         "X_LINK_DIR": "${workspaceFolder}/out",
-        "BOOST_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/include",
-        "BOOST_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/lib",
-        "GTEST_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/debug/lib",
-        "GTEST_LINK_BIN": "${workspaceFolder}/vcpkg_installed/x64-linux/debug/lib/manual-link",
-        "GTEST_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/include",
+        "VCPKG_INCL_DIR": "${workspaceFolder}/../vcpkg/installed/x64-linux/include",
+        "VCPKG_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-linux/lib",
+        "GTEST_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-linux/debug/lib",
+        "GTEST_LINK_BIN": "${workspaceFolder}/../vcpkg/installed/x64-linux/debug/lib/manual-link",
         "PYTHON_VERSION": "python3.11",
-        "BOOST_PYTHON_VERSION": "python311",
-        "PYTHON3_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/lib",
-        "PYTHON3_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-linux/include"
+        "BOOST_PYTHON_VERSION": "python311"
     },
     "files.associations": {
         "*.ipp": "cpp"

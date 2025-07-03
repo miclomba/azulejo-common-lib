@@ -4,12 +4,12 @@ set(ENTITIES_LIB "$ENV{X_LINK_DIR}/Entities")
 
 include_directories(
 "$ENV{X_INCL_DIR}"
-"$ENV{BOOST_INCL_DIR}"
+"$ENV{VCPKG_INCL_DIR}"
 )
 
 link_directories(
 "${ENTITIES_LIB}"
-"$ENV{BOOST_LINK_DIR}" 
+"$ENV{VCPKG_LINK_DIR}" 
 )
 
 add_library(${PROJECT_NAME} SHARED

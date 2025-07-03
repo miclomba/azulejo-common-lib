@@ -2,11 +2,11 @@ project(Entities VERSION 1.0.0)
 
 include_directories(
 "$ENV{X_INCL_DIR}"
-"$ENV{BOOST_INCL_DIR}"
+"$ENV{VCPKG_INCL_DIR}"
 )
 
 link_directories(
-"$ENV{BOOST_LINK_DIR}" 
+"$ENV{VCPKG_LINK_DIR}" 
 )
 
 add_library(${PROJECT_NAME} SHARED
@@ -16,7 +16,7 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} 
-"boost_filesystem$ENV{BOOST_LIB_SUFFIX}"
+"boost_filesystem"
 )
 
 #############

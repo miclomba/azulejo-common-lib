@@ -12,14 +12,12 @@ set(RESOURCES_LIB "$ENV{X_LINK_DIR}/Resources")
 
 include_directories(
 "$ENV{X_INCL_DIR}"
-"$ENV{BOOST_INCL_DIR}"
-"$ENV{PYTHON3_INCL_DIR}"
+"$ENV{VCPKG_INCL_DIR}"
 )
 
 link_directories(
 "${RESOURCES_LIB}"
-"$ENV{BOOST_LINK_DIR}"
-"$ENV{PYTHON3_LINK_DIR}"
+"$ENV{VCPKG_LINK_DIR}"
 )
 
 add_library("${PROJECT_NAME}" SHARED
@@ -28,7 +26,7 @@ add_library("${PROJECT_NAME}" SHARED
 
 target_link_libraries("${PROJECT_NAME}" 
 "Resources"
-"boost_$ENV{BOOST_PYTHON_VERSION}$ENV{BOOST_LIB_SUFFIX}"
+"boost_$ENV{BOOST_PYTHON_VERSION}"
 "$ENV{PYTHON_VERSION}"
 )
 

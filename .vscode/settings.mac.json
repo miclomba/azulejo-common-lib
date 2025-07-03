@@ -8,19 +8,17 @@
         "CMAKE_PREFIX_PATH": "/usr/local/opt/libomp:$CMAKE_PREFIX_PATH",
         "X_INCL_DIR": "${workspaceFolder}/include",
         "X_LINK_DIR": "${workspaceFolder}/out",
-        "BOOST_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include",
-        "BOOST_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/lib",
-        "GTEST_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/debug/lib",
-        "GTEST_LINK_BIN": "${workspaceFolder}/vcpkg_installed/x64-osx/debug/lib/manual-link",
-        "GTEST_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include",
+        "VCPKG_INCL_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/include",
+        "VCPKG_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/lib",
+        "GTEST_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/debug/lib",
+        "GTEST_LINK_BIN": "${workspaceFolder}/../vcpkg/installed/x64-osx/debug/lib/manual-link",
         "PYTHON_VERSION": "python3.11",
         "BOOST_PYTHON_VERSION": "python311",
-        "PYTHON3_LINK_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/lib",
-        "PYTHON3_INCL_DIR": "${workspaceFolder}/vcpkg_installed/x64-osx/include",
         "CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++",
         "C_COMPILER": "/usr/local/opt/llvm/bin/clang"
     },
     "files.associations": {
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "fstream": "cpp"
     }
 }
