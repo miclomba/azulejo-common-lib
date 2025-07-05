@@ -21,7 +21,7 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 
 0. Install `XCode`
 1. Install `clang` by running: `xcode-select --install`
-2. Install build tools: `brew install cmake ninja autoconf automake autoconf-archive libtool pkg-config`
+2. Install build tools: `./scripts/macos_install_dependencies.sh`
 3. FreeGLUT depends on `X11` so install `XQuartz` by running: `brew install --cask xquartz`
 4. Install `libomp` by running: `brew install libomp llvm`
 5. Istall dependencies: `./scripts/vcpkg_install.sh`
@@ -35,16 +35,7 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 
 ### On Ubuntu
 
-0. Install dependencies:
-
-```
-sudo apt install -y \
-  build-essential autoconf autoconf-archive automake libtool pkg-config cmake git unzip ninja-build curl \
-  libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncursesw5-dev libffi-dev \
-  libgdbm-dev liblzma-dev uuid-dev tk-dev xz-utils wget libgomp1
-  libgl1-mesa-dev libglu1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxmu-dev libxxf86vm-dev
-```
-
+0. Install dependencies: `./scripts/linux_install_dependencies.sh`
 1. Istall dependencies: `vcpkg install --x-manifest-root=. --feature-flags=manifests`
 2. Install `VSCode`
 3. Install VSCode extensions:
