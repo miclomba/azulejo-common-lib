@@ -41,3 +41,6 @@ vcpkg install --classic \
   zstd \
   cpprestsdk \
   --triplet "${TRIPLET}"
+
+# Clear cached files and intermediate results
+./scripts/vcpkg_clean_intermediate.sh
