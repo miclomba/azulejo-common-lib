@@ -18,6 +18,7 @@ using LockedResource = filesystem_adapters::ISerializableResource::LockedResourc
 namespace
 {
 	const std::string RESOURCE_EXT = ".bin";
+	const std::string RESOURCE_TMP_EXT = ".tmp";
 }
 
 ResourceSerializer::ResourceSerializer() = default;
@@ -38,13 +39,17 @@ void ResourceSerializer::Serialize(const LockedResource &resource, const std::st
 
 	std::lock_guard<std::mutex> lock(mtx_);
 
-	fs::create_directories(resourcePath);
+	error_code ec;
+	fs::create_directories(resourcePath, ec);
+	if (ec)
+		throw std::runtime_error("ResourceSerializer could not create the directory: " + resourcePath.string());
 
 	if (!resource.UpdateChecksum())
 		return;
 
 	const std::string fileName = key + RESOURCE_EXT;
-	std::ofstream outfile((resourcePath / fileName).string(), std::ios::binary);
+	const std::string tmpFileName = key + RESOURCE_TMP_EXT;
+	std::ofstream outfile((resourcePath / tmpFileName).string(), std::ios::binary);
 	if (!outfile)
 		throw std::runtime_error("Could not open output file: " + (resourcePath / fileName).string());
 
@@ -61,6 +66,12 @@ void ResourceSerializer::Serialize(const LockedResource &resource, const std::st
 	const char *buff = reinterpret_cast<const char *>(data);
 	size_t size = resource.GetElementSize() * resource.GetColumnSize() * resource.GetRowSize();
 	outfile.write(buff, size);
+
+	// move temp file to actual file
+	outfile.close();
+	fs::rename(resourcePath / tmpFileName, resourcePath / fileName, ec);
+	if (ec)
+		throw std::runtime_error("ResourceSerializer could .tmp file to file: " + fileName);
 }
 
 void ResourceSerializer::Unserialize(const std::string &key, const std::string &serializationPath)
@@ -83,6 +94,8 @@ void ResourceSerializer::Unserialize(const std::string &key, const std::string &
 #else
 		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add);
 #endif
-		fs::remove(resourcePath);
+		fs::remove(resourcePath, ec);
+		if (ec)
+			throw std::runtime_error("ResourceSerializer could not remove file: " + resourcePath.string());
 	}
 }
