@@ -78,53 +78,6 @@ TEST(Resource2D, ConstructThrows)
 	EXPECT_THROW(Resource2D resource(variableRowsInput), std::invalid_argument);
 }
 
-TEST(Resource2D, MoveConstruct)
-{
-	Resource2D source(MATRIX_1X1);
-	int sourceChecksum = source.ChecksumProtected();
-
-	// move
-	Resource2D target(std::move(source));
-
-	EXPECT_EQ(*static_cast<int *>(target.Data()), MATRIX_1X1[0][0]);
-	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
-}
-
-TEST(Resource2D, MoveAssign)
-{
-	Resource2D source(MATRIX_1X1);
-	int sourceChecksum = source.ChecksumProtected();
-	Resource2D target(EMPTY_MATRIX_1X1);
-
-	// move assign
-	EXPECT_NO_THROW(target = std::move(source));
-
-	EXPECT_EQ(*static_cast<int *>(target.Data()), MATRIX_1X1[0][0]);
-	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
-}
-
-TEST(Resource2D, CopyConstruct)
-{
-	Resource2D source(MATRIX_1X1);
-
-	// copy
-	Resource2D target(source);
-	EXPECT_EQ(*static_cast<int *>(target.Data()), MATRIX_1X1[0][0]);
-	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
-}
-
-TEST(Resource2D, CopyAssign)
-{
-	Resource2D source(MATRIX_1X1);
-	Resource2D target(EMPTY_MATRIX_1X1);
-
-	// copy assign
-	EXPECT_NO_THROW(target = source);
-
-	EXPECT_EQ(*static_cast<int *>(target.Data()), MATRIX_1X1[0][0]);
-	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
-}
-
 TEST(Resource2D, GetDataIJ)
 {
 	std::vector<std::vector<int>> values = MATRIX_1X1;

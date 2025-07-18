@@ -20,6 +20,8 @@
     "files.associations": {
         "*.ipp": "cpp",
         "fstream": "cpp",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "mutex": "cpp",
+        "shared_mutex": "cpp"
     }
 }

@@ -13,6 +13,8 @@ using boost::system::error_code;
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
 
+using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
+
 namespace
 {
 	const std::string RESOURCE_EXT = ".bin";
@@ -27,7 +29,7 @@ ResourceSerializer *ResourceSerializer::GetInstance()
 	return &instance;
 }
 
-void ResourceSerializer::Serialize(const ISerializableResource &resource, const std::string &key, const std::string &serializationPath)
+void ResourceSerializer::Serialize(const ISerializableResource &serializableResource, const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
@@ -39,6 +41,7 @@ void ResourceSerializer::Serialize(const ISerializableResource &resource, const 
 	if (!fs::exists(resourcePath))
 		fs::create_directories(resourcePath);
 
+	const LockedResource resource = serializableResource.Lock();
 	if (!resource.UpdateChecksum())
 		return;
 

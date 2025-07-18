@@ -16,6 +16,8 @@ namespace
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceDeserializer;
 
+using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
+
 ResourceDeserializer *ResourceDeserializer::instance_ = nullptr;
 
 ResourceDeserializer::ResourceDeserializer() = default;
@@ -98,10 +100,11 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 
 	std::unique_ptr<ISerializableResource> arithmeticContainer = GenerateResource(key);
 
-	arithmeticContainer->SetColumnSize(*(*buff + colSizeOffset));
-	arithmeticContainer->SetRowSize(*(*buff + rowSizeOffset));
+	LockedResource resourceLock = arithmeticContainer->Lock();
+	resourceLock.SetColumnSize(*(*buff + colSizeOffset));
+	resourceLock.SetRowSize(*(*buff + rowSizeOffset));
 	if (size > dataOffset)
-		arithmeticContainer->Assign(*buff + dataOffset, size - dataOffset);
+		resourceLock.Assign(*buff + dataOffset, size - dataOffset);
 
 	return arithmeticContainer;
 }

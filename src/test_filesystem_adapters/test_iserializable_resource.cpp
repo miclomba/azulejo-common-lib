@@ -10,6 +10,8 @@
 #include "FilesystemAdapters/ISerializableResource.h"
 
 using Resource = ContainerResource<int>;
+using filesystem_adapters::ISerializableResource;
+using LockedResource = ISerializableResource::LockedResource;
 
 namespace
 {
@@ -43,51 +45,22 @@ TEST(Resource, RValueParameterConstruct)
 	EXPECT_EQ(ARRAY_1.size(), resource.GetRowSize());
 }
 
-TEST(Resource, MoveConstruct)
+TEST(Resource, Lock)
 {
-	Resource source(ARRAY_1);
-	int sourceChecksum = source.ChecksumProtected();
+	Resource resource(ARRAY_1);
 
-	// move
-	Resource target(std::move(source));
+	LockedResource lockedResource = resource.Lock();
 
-	EXPECT_EQ(*static_cast<int *>(target.Data()), ARRAY_1[0]);
-	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
-}
+	EXPECT_EQ(ARRAY_1.size(), lockedResource.GetRowSize());
+	EXPECT_EQ(ARRAY_1.size(), lockedResource.GetColumnSize());
+	EXPECT_EQ(size_t(4), lockedResource.GetElementSize());
+	EXPECT_EQ(true, lockedResource.GetDirty());
 
-TEST(Resource, MoveAssign)
-{
-	Resource source(ARRAY_1);
-	int sourceChecksum = source.ChecksumProtected();
-	Resource target(EMPTY_ARRAY_1);
+	EXPECT_EQ(*static_cast<int *>(lockedResource.Data()), ARRAY_1[0]);
+	EXPECT_EQ(*static_cast<const int *>(lockedResource.Data()), ARRAY_1[0]);
 
-	// move assign
-	EXPECT_NO_THROW(target = std::move(source));
-
-	EXPECT_EQ(*static_cast<int *>(target.Data()), ARRAY_1[0]);
-	EXPECT_EQ(target.ChecksumProtected(), sourceChecksum);
-}
-
-TEST(Resource, CopyConstruct)
-{
-	Resource source(ARRAY_1);
-
-	// copy
-	Resource target(source);
-	EXPECT_EQ(*static_cast<int *>(target.Data()), ARRAY_1[0]);
-	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
-}
-
-TEST(Resource, CopyAssign)
-{
-	Resource source(ARRAY_1);
-	Resource target(EMPTY_ARRAY_1);
-
-	// copy assign
-	EXPECT_NO_THROW(target = source);
-
-	EXPECT_EQ(*static_cast<int *>(target.Data()), ARRAY_1[0]);
-	EXPECT_EQ(target.ChecksumProtected(), source.ChecksumProtected());
+	lockedResource.Assign(reinterpret_cast<const char *>(ARRAY_1.data()), ARRAY_1.size() * sizeof(int));
+	EXPECT_EQ(*static_cast<int *>(lockedResource.Data()), ARRAY_1[0]);
 }
 
 TEST(Resource, GetData)
