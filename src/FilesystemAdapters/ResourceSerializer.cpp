@@ -1,5 +1,6 @@
 #include "FilesystemAdapters/ResourceSerializer.h"
 
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include "Config/filesystem.hpp"
@@ -17,55 +18,34 @@ namespace
 	const std::string RESOURCE_EXT = ".bin";
 }
 
-ResourceSerializer *ResourceSerializer::instance_ = nullptr;
-
 ResourceSerializer::ResourceSerializer() = default;
 ResourceSerializer::~ResourceSerializer() = default;
 
 ResourceSerializer *ResourceSerializer::GetInstance()
 {
-	if (!instance_)
-		instance_ = new ResourceSerializer();
-	return instance_;
+	static ResourceSerializer instance;
+	return &instance;
 }
 
-void ResourceSerializer::ResetInstance()
-{
-	if (instance_)
-		delete instance_;
-	instance_ = nullptr;
-}
-
-void ResourceSerializer::SetSerializationPath(const std::string &binaryFilePath)
-{
-	serializationPath_ = binaryFilePath;
-}
-
-std::string ResourceSerializer::GetSerializationPath() const
-{
-	if (serializationPath_.empty())
-		throw std::runtime_error("No serialization path set for the ResourceSerializer");
-
-	return serializationPath_.string();
-}
-
-void ResourceSerializer::Serialize(const ISerializableResource &resource, const std::string &key)
+void ResourceSerializer::Serialize(const ISerializableResource &resource, const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
 
-	Path serializationPath = GetSerializationPath();
+	Path resourcePath = serializationPath;
 
-	if (!fs::exists(serializationPath))
-		fs::create_directories(serializationPath);
+	std::lock_guard<std::mutex> lock(mtx_);
+
+	if (!fs::exists(resourcePath))
+		fs::create_directories(resourcePath);
 
 	if (!resource.UpdateChecksum())
 		return;
 
 	const std::string fileName = key + RESOURCE_EXT;
-	std::ofstream outfile((serializationPath / fileName).string(), std::ios::binary);
+	std::ofstream outfile((resourcePath / fileName).string(), std::ios::binary);
 	if (!outfile)
-		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+		throw std::runtime_error("Could not open output file: " + (resourcePath / fileName).string());
 
 	const void *data = resource.Data();
 
@@ -82,13 +62,15 @@ void ResourceSerializer::Serialize(const ISerializableResource &resource, const 
 	outfile.write(buff, size);
 }
 
-void ResourceSerializer::Unserialize(const std::string &key)
+void ResourceSerializer::Unserialize(const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot unserialize resource with empty key");
 
 	const std::string fileName = key + RESOURCE_EXT;
-	Path resourcePath = Path(GetSerializationPath()) / fileName;
+	Path resourcePath = Path(serializationPath) / fileName;
+
+	std::lock_guard<std::mutex> lock(mtx_);
 
 	if (fs::exists(resourcePath))
 	{

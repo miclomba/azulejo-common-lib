@@ -201,12 +201,11 @@ TEST(ResourceDeserializer, DeserializeArray)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
-	serializer->SetSerializationPath(RESOURCE_ROOT);
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource resource(INT_VALUES_ARRAY);
-	serializer->Serialize(resource, RESOURCE_KEY);
+	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -223,7 +222,6 @@ TEST(ResourceDeserializer, DeserializeArray)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	ResourceDeserializer::ResetInstance();
-	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, DeserializeMatrix)
@@ -232,12 +230,11 @@ TEST(ResourceDeserializer, DeserializeMatrix)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
-	serializer->SetSerializationPath(RESOURCE_ROOT);
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource2D resource(INT_VALUES);
-	serializer->Serialize(resource, RESOURCE_KEY);
+	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -254,7 +251,6 @@ TEST(ResourceDeserializer, DeserializeMatrix)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	ResourceDeserializer::ResetInstance();
-	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, DeserializeEmptyArrayResource)
@@ -263,12 +259,11 @@ TEST(ResourceDeserializer, DeserializeEmptyArrayResource)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
-	serializer->SetSerializationPath(RESOURCE_ROOT);
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource resource;
-	serializer->Serialize(resource, RESOURCE_KEY);
+	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -286,7 +281,6 @@ TEST(ResourceDeserializer, DeserializeEmptyArrayResource)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	ResourceDeserializer::ResetInstance();
-	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, DeserializeEmptyMatrixResource)
@@ -295,12 +289,11 @@ TEST(ResourceDeserializer, DeserializeEmptyMatrixResource)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	deserializer->SetSerializationPath(RESOURCE_ROOT);
-	serializer->SetSerializationPath(RESOURCE_ROOT);
 
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource2D resource;
-	serializer->Serialize(resource, RESOURCE_KEY);
+	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -318,7 +311,6 @@ TEST(ResourceDeserializer, DeserializeEmptyMatrixResource)
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 
 	ResourceDeserializer::ResetInstance();
-	ResourceSerializer::ResetInstance();
 }
 
 TEST(ResourceDeserializer, DeserializeThrowsWithoutSerializationPath)

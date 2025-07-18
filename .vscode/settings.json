@@ -19,6 +19,7 @@
     },
     "files.associations": {
         "*.ipp": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "stdexcept": "cpp"
     }
 }
