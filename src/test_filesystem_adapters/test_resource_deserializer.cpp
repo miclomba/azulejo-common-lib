@@ -170,7 +170,7 @@ TEST(ResourceDeserializer, DeserializeArray)
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource resource(INT_VALUES_ARRAY);
-	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
+	serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -197,7 +197,7 @@ TEST(ResourceDeserializer, DeserializeMatrix)
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource2D resource(INT_VALUES);
-	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
+	serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -224,7 +224,7 @@ TEST(ResourceDeserializer, DeserializeEmptyArrayResource)
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource resource;
-	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
+	serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize
@@ -252,7 +252,7 @@ TEST(ResourceDeserializer, DeserializeEmptyMatrixResource)
 	// serialize
 	EXPECT_FALSE(fs::exists(RESOURCE_FILE));
 	Resource2D resource;
-	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
+	serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	// deserialize

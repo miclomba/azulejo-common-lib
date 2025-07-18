@@ -29,7 +29,7 @@ ResourceSerializer *ResourceSerializer::GetInstance()
 	return &instance;
 }
 
-void ResourceSerializer::Serialize(const ISerializableResource &serializableResource, const std::string &key, const std::string &serializationPath)
+void ResourceSerializer::Serialize(const LockedResource &resource, const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
@@ -38,10 +38,8 @@ void ResourceSerializer::Serialize(const ISerializableResource &serializableReso
 
 	std::lock_guard<std::mutex> lock(mtx_);
 
-	if (!fs::exists(resourcePath))
-		fs::create_directories(resourcePath);
+	fs::create_directories(resourcePath);
 
-	const LockedResource resource = serializableResource.Lock();
 	if (!resource.UpdateChecksum())
 		return;
 

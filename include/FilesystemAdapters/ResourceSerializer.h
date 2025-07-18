@@ -38,11 +38,11 @@ namespace filesystem_adapters
 
         /**
          * @brief Serialize a resource with the specified key.
-         * @param resource The resource to serialize.
+         * @param resource The locked resource to serialize.
          * @param key The key associated with the resource.
          * @param serializationPath The file system path to the resource
          */
-        void Serialize(const ISerializableResource &resource, const std::string &key, const std::string &serializationPath);
+        void Serialize(const ISerializableResource::LockedResource &resource, const std::string &key, const std::string &serializationPath);
 
         /**
          * @brief Deserialize a resource with the specified key.

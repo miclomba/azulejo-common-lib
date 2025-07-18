@@ -39,7 +39,7 @@ TEST(ResourceSerializer, SerializeArray)
 
 	// serialize
 	Resource resource(INT_VALUES_ARRAY);
-	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT));
+	EXPECT_NO_THROW(serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT));
 
 	// verify serialization and clean up
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
@@ -55,7 +55,7 @@ TEST(ResourceSerializer, SerializeMatrix)
 
 	// serialize
 	Resource2D resource(INT_VALUES);
-	EXPECT_NO_THROW(serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT));
+	EXPECT_NO_THROW(serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT));
 
 	// verify serialization and clean up
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
@@ -68,7 +68,7 @@ TEST(ResourceSerializer, SerializeThrowsUsingEmptyKey)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	Resource2D resource(INT_VALUES);
-	EXPECT_THROW(serializer->Serialize(resource, "", RESOURCE_ROOT), std::runtime_error);
+	EXPECT_THROW(serializer->Serialize(resource.Lock(), "", RESOURCE_ROOT), std::runtime_error);
 }
 
 TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
@@ -76,7 +76,7 @@ TEST(ResourceSerializer, SerializeThrowsWithoutSerializationPath)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	Resource2D resource(INT_VALUES);
-	EXPECT_THROW(serializer->Serialize(resource, RESOURCE_KEY, ""), std::runtime_error);
+	EXPECT_THROW(serializer->Serialize(resource.Lock(), RESOURCE_KEY, ""), std::runtime_error);
 }
 
 TEST(ResourceSerializer, Unserialize)
@@ -84,7 +84,7 @@ TEST(ResourceSerializer, Unserialize)
 	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
 
 	Resource resource(INT_VALUES_ARRAY);
-	serializer->Serialize(resource, RESOURCE_KEY, RESOURCE_ROOT);
+	serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
 	EXPECT_TRUE(fs::exists(RESOURCE_FILE));
 
 	serializer->Unserialize(RESOURCE_KEY, RESOURCE_ROOT);
