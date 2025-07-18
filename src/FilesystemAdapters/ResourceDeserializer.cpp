@@ -70,28 +70,34 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 	if (!inFile)
 		throw std::runtime_error("Could not open input file: " + (serializationPath / fileName).string());
 
-	inFile.seekg(0, std::ios::end);
-	const int size = inFile.tellg();
-	inFile.seekg(0, std::ios::beg);
+	// throw on failures
+	inFile.exceptions(std::ios::failbit | std::ios::badbit);
+
+	auto size = fs::file_size(serializationPath / fileName);
 
 	size_t colSizeOffset = 0;
 	size_t rowSizeOffset = sizeof(size_t);
 	size_t dataOffset = 2 * sizeof(size_t);
 
-	auto buff = std::make_unique<char *>(new char[size]);
+	auto buff = std::make_unique<char[]>(size);
 
-	inFile.read(*buff + colSizeOffset, sizeof(size_t));
-	inFile.read(*buff + rowSizeOffset, sizeof(size_t));
+	// read headers directly into locals (avoids alignment/aliasing issues)
+	size_t M = 0;
+	size_t N = 0;
+	inFile.read(reinterpret_cast<char *>(&M), sizeof(size_t));
+	inFile.read(reinterpret_cast<char *>(&N), sizeof(size_t));
+
 	if (size > dataOffset)
-		inFile.read(*buff + dataOffset, size - dataOffset);
+		inFile.read(buff.get() + dataOffset, size - dataOffset);
 
 	std::unique_ptr<ISerializableResource> arithmeticContainer = GenerateResource(key);
 
 	LockedResource resourceLock = arithmeticContainer->Lock();
-	resourceLock.SetColumnSize(*(*buff + colSizeOffset));
-	resourceLock.SetRowSize(*(*buff + rowSizeOffset));
+	resourceLock.SetColumnSize(M);
+	resourceLock.SetRowSize(N);
+
 	if (size > dataOffset)
-		resourceLock.Assign(*buff + dataOffset, size - dataOffset);
+		resourceLock.Assign(buff.get() + dataOffset, size - dataOffset);
 
 	return arithmeticContainer;
 }
