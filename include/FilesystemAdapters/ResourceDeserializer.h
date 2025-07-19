@@ -16,6 +16,7 @@
 #include "Config/filesystem.h"
 
 #include "FilesystemAdapters/config.h"
+#include "FilesystemAdapters/FileLock.hpp"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 namespace filesystem_adapters
@@ -40,23 +41,6 @@ namespace filesystem_adapters
          * @return Pointer to the ResourceDeserializer instance.
          */
         static ResourceDeserializer *GetInstance();
-
-        /**
-         * @brief Reset the singleton instance of the ResourceDeserializer.
-         */
-        static void ResetInstance();
-
-        /**
-         * @brief Set the path for resource serialization.
-         * @param binaryFilePath The file path where resources are serialized.
-         */
-        void SetSerializationPath(const std::string &binaryFilePath);
-
-        /**
-         * @brief Get the path for resource serialization.
-         * @return The file path where resources are serialized.
-         */
-        std::string GetSerializationPath() const;
 
         /**
          * @brief Register a resource type with a key and constructor.
@@ -88,9 +72,10 @@ namespace filesystem_adapters
         /**
          * @brief Deserialize a resource by its key.
          * @param key The key of the resource to deserialize.
+         * @param deserializationPath The path to deserialize from.
          * @return A unique pointer to the deserialized resource.
          */
-        std::unique_ptr<ISerializableResource> Deserialize(const std::string &key);
+        std::unique_ptr<ISerializableResource> Deserialize(const std::string &key, const std::string &deserializationPath);
 
         /**
          * @brief Generate a resource instance by its key.
@@ -128,18 +113,6 @@ namespace filesystem_adapters
          * @return Reference to the updated instance (not used).
          */
         ResourceDeserializer &operator=(ResourceDeserializer &&) = delete;
-
-        /**
-         * @brief Get the file extension for resource files.
-         * @return A string representing the resource file extension.
-         */
-        std::string GetResourceExtension() const;
-
-        /** @brief Pointer to the singleton instance of the ResourceDeserializer. */
-        static ResourceDeserializer *instance_;
-
-        /** @brief Path for resource serialization. */
-        Path serializationPath_;
 
         /** @brief Map of keys to resource constructor functions. */
         mutable std::map<std::string, std::function<std::unique_ptr<ISerializableResource>(void)>> keyToResourceMap_;

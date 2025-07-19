@@ -1,71 +1,59 @@
 #include "FilesystemAdapters/ResourceSerializer.h"
 
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include "Config/filesystem.hpp"
 
 #include <boost/system/error_code.hpp>
 
+#include "FilesystemAdapters/FileLock.hpp"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 using boost::system::error_code;
+using filesystem_adapters::GetGlobalFileLock;
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
+
+using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
 
 namespace
 {
 	const std::string RESOURCE_EXT = ".bin";
+	const std::string RESOURCE_TMP_EXT = ".tmp";
 }
-
-ResourceSerializer *ResourceSerializer::instance_ = nullptr;
 
 ResourceSerializer::ResourceSerializer() = default;
 ResourceSerializer::~ResourceSerializer() = default;
 
 ResourceSerializer *ResourceSerializer::GetInstance()
 {
-	if (!instance_)
-		instance_ = new ResourceSerializer();
-	return instance_;
+	static ResourceSerializer instance;
+	return &instance;
 }
 
-void ResourceSerializer::ResetInstance()
-{
-	if (instance_)
-		delete instance_;
-	instance_ = nullptr;
-}
-
-void ResourceSerializer::SetSerializationPath(const std::string &binaryFilePath)
-{
-	serializationPath_ = binaryFilePath;
-}
-
-std::string ResourceSerializer::GetSerializationPath() const
-{
-	if (serializationPath_.empty())
-		throw std::runtime_error("No serialization path set for the ResourceSerializer");
-
-	return serializationPath_.string();
-}
-
-void ResourceSerializer::Serialize(const ISerializableResource &resource, const std::string &key)
+void ResourceSerializer::Serialize(const LockedResource &resource, const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
 
-	Path serializationPath = GetSerializationPath();
+	Path resourcePath = serializationPath;
 
-	if (!fs::exists(serializationPath))
-		fs::create_directories(serializationPath);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
+
+	error_code ec;
+	fs::create_directories(resourcePath, ec);
+	if (ec)
+		throw std::runtime_error("ResourceSerializer could not create the directory: " + resourcePath.string());
 
 	if (!resource.UpdateChecksum())
 		return;
 
 	const std::string fileName = key + RESOURCE_EXT;
-	std::ofstream outfile((serializationPath / fileName).string(), std::ios::binary);
+	const std::string tmpFileName = key + RESOURCE_TMP_EXT;
+	std::ofstream outfile((resourcePath / tmpFileName).string(), std::ios::binary);
 	if (!outfile)
-		throw std::runtime_error("Could not open output file: " + (serializationPath / fileName).string());
+		throw std::runtime_error("Could not open output file: " + (resourcePath / fileName).string());
 
 	const void *data = resource.Data();
 
@@ -80,15 +68,23 @@ void ResourceSerializer::Serialize(const ISerializableResource &resource, const 
 	const char *buff = reinterpret_cast<const char *>(data);
 	size_t size = resource.GetElementSize() * resource.GetColumnSize() * resource.GetRowSize();
 	outfile.write(buff, size);
+
+	// move temp file to actual file
+	outfile.close();
+	fs::rename(resourcePath / tmpFileName, resourcePath / fileName, ec);
+	if (ec)
+		throw std::runtime_error("ResourceSerializer could .tmp file to file: " + fileName);
 }
 
-void ResourceSerializer::Unserialize(const std::string &key)
+void ResourceSerializer::Unserialize(const std::string &key, const std::string &serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot unserialize resource with empty key");
 
 	const std::string fileName = key + RESOURCE_EXT;
-	Path resourcePath = Path(GetSerializationPath()) / fileName;
+	Path resourcePath = Path(serializationPath) / fileName;
+
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (fs::exists(resourcePath))
 	{
@@ -100,6 +96,8 @@ void ResourceSerializer::Unserialize(const std::string &key)
 #else
 		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add);
 #endif
-		fs::remove(resourcePath);
+		fs::remove(resourcePath, ec);
+		if (ec)
+			throw std::runtime_error("ResourceSerializer could not remove file: " + resourcePath.string());
 	}
 }

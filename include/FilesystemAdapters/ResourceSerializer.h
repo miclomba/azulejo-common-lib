@@ -36,34 +36,19 @@ namespace filesystem_adapters
         static ResourceSerializer *GetInstance();
 
         /**
-         * @brief Reset the singleton instance of the ResourceSerializer.
-         */
-        static void ResetInstance();
-
-        /**
-         * @brief Set the path for resource serialization.
-         * @param binaryFilePath The file path where resources will be serialized.
-         */
-        void SetSerializationPath(const std::string &binaryFilePath);
-
-        /**
-         * @brief Get the path for resource serialization.
-         * @return The file path where resources are serialized.
-         */
-        std::string GetSerializationPath() const;
-
-        /**
          * @brief Serialize a resource with the specified key.
-         * @param resource The resource to serialize.
+         * @param resource The locked resource to serialize.
          * @param key The key associated with the resource.
+         * @param serializationPath The file system path to the resource
          */
-        void Serialize(const ISerializableResource &resource, const std::string &key);
+        void Serialize(const ISerializableResource::LockedResource &resource, const std::string &key, const std::string &serializationPath);
 
         /**
          * @brief Deserialize a resource with the specified key.
          * @param key The key associated with the resource to deserialize.
+         * @param serializationPath The file system path to the resource
          */
-        void Unserialize(const std::string &key);
+        void Unserialize(const std::string &key, const std::string &serializationPath);
 
     private:
         /**
@@ -94,12 +79,6 @@ namespace filesystem_adapters
          * @return Reference to the updated instance (not used).
          */
         ResourceSerializer &operator=(ResourceSerializer &&) = delete;
-
-        /** @brief Pointer to the singleton instance of the ResourceSerializer. */
-        static ResourceSerializer *instance_;
-
-        /** @brief Path for resource serialization. */
-        Path serializationPath_;
     };
 
 } // end namespace filesystem_adapters
