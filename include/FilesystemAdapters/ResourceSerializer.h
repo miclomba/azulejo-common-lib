@@ -7,7 +7,6 @@
 #define filesystem_adapters_resourceserializer_h
 
 #include <fstream>
-#include <mutex>
 #include <stdexcept>
 #include <string>
 #include "Config/filesystem.h"
@@ -80,9 +79,6 @@ namespace filesystem_adapters
          * @return Reference to the updated instance (not used).
          */
         ResourceSerializer &operator=(ResourceSerializer &&) = delete;
-
-        /** @brief Mutex for IO. */
-        std::mutex mtx_;
     };
 
 } // end namespace filesystem_adapters

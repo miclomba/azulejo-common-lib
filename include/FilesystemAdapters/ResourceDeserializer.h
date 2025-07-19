@@ -10,13 +10,13 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
 #include "Config/filesystem.h"
 
 #include "FilesystemAdapters/config.h"
+#include "FilesystemAdapters/FileLock.hpp"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 namespace filesystem_adapters
@@ -116,9 +116,6 @@ namespace filesystem_adapters
 
         /** @brief Map of keys to resource constructor functions. */
         mutable std::map<std::string, std::function<std::unique_ptr<ISerializableResource>(void)>> keyToResourceMap_;
-
-        /** @brief Mutex for IO. */
-        mutable std::recursive_mutex mtx_;
     };
 
 #include "FilesystemAdapters/ResourceDeserializer.hpp"

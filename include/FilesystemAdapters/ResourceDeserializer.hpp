@@ -7,7 +7,7 @@ void ResourceDeserializer::RegisterResource(const std::string &key, std::functio
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when registering resource with ResourceDeserializer");
 
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(filesystem_adapters::GetGlobalFileLock());
 
 	if (keyToResourceMap_.find(key) != keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is already registered with the ResourceDeserializer");

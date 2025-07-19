@@ -7,9 +7,11 @@
 
 #include <boost/system/error_code.hpp>
 
+#include "FilesystemAdapters/FileLock.hpp"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 using boost::system::error_code;
+using filesystem_adapters::GetGlobalFileLock;
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceSerializer;
 
@@ -37,7 +39,7 @@ void ResourceSerializer::Serialize(const LockedResource &resource, const std::st
 
 	Path resourcePath = serializationPath;
 
-	std::lock_guard<std::mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	error_code ec;
 	fs::create_directories(resourcePath, ec);
@@ -82,7 +84,7 @@ void ResourceSerializer::Unserialize(const std::string &key, const std::string &
 	const std::string fileName = key + RESOURCE_EXT;
 	Path resourcePath = Path(serializationPath) / fileName;
 
-	std::lock_guard<std::mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (fs::exists(resourcePath))
 	{

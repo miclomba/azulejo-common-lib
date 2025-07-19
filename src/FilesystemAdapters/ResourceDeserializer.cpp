@@ -6,6 +6,7 @@
 #include <string>
 #include "Config/filesystem.hpp"
 
+#include "FilesystemAdapters/FileLock.hpp"
 #include "FilesystemAdapters/ISerializableResource.h"
 
 namespace
@@ -13,6 +14,7 @@ namespace
 	const std::string RESOURCE_EXT = ".bin";
 } // end namespace anonymous
 
+using filesystem_adapters::GetGlobalFileLock;
 using filesystem_adapters::ISerializableResource;
 using filesystem_adapters::ResourceDeserializer;
 
@@ -32,7 +34,7 @@ void ResourceDeserializer::UnregisterResource(const std::string &key)
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when unregistering resource with ResourceDeserializer");
 
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDeserializer");
@@ -42,14 +44,14 @@ void ResourceDeserializer::UnregisterResource(const std::string &key)
 
 bool ResourceDeserializer::HasSerializationKey(const std::string &key) const
 {
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	return keyToResourceMap_.find(key) != keyToResourceMap_.cend();
 }
 
 void ResourceDeserializer::UnregisterAll()
 {
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	keyToResourceMap_.clear();
 }
@@ -59,7 +61,7 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
 
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	Path serializationPath = deserializationPath;
 	if (serializationPath.empty())
@@ -107,7 +109,7 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::GenerateResource(co
 	if (key.empty())
 		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDeserializer");
 
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
 		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDeserializer");
