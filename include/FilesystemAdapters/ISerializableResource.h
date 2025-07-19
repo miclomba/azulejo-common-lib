@@ -83,30 +83,30 @@ namespace filesystem_adapters
          * @brief Copy constructor.
          * @param other The ISerializableResource instance to copy from.
          */
-        ISerializableResource(const ISerializableResource &other) = delete;
+        ISerializableResource(const ISerializableResource &other);
 
         /**
          * @brief Copy assignment operator.
          * @param other The ISerializableResource instance to copy from.
          * @return Reference to the updated ISerializableResource instance.
          */
-        ISerializableResource &operator=(const ISerializableResource &other) = delete;
+        ISerializableResource &operator=(const ISerializableResource &other);
 
         /**
          * @brief Move constructor.
          * @param other The ISerializableResource instance to move from.
          */
-        ISerializableResource(ISerializableResource &&other) = delete;
+        ISerializableResource(ISerializableResource &&other);
 
         /**
          * @brief Move assignment operator.
          * @param other The ISerializableResource instance to move from.
          * @return Reference to the updated ISerializableResource instance.
          */
-        ISerializableResource &operator=(ISerializableResource &&other) = delete;
+        ISerializableResource &operator=(ISerializableResource &&other);
 
         /** @brief IO lock */
-        std::mutex mtx_;
+        std::shared_ptr<std::mutex> mtx_;
     };
 
 } // end namespace filesystem_adapters

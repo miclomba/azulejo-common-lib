@@ -3,8 +3,12 @@
 using filesystem_adapters::ISerializableResource;
 using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
 
-ISerializableResource::ISerializableResource() = default;
+ISerializableResource::ISerializableResource() : mtx_{std::make_shared<std::mutex>()} {};
 ISerializableResource::~ISerializableResource() = default;
+ISerializableResource::ISerializableResource(const ISerializableResource &) = default;
+ISerializableResource &ISerializableResource::operator=(const ISerializableResource &) = default;
+ISerializableResource::ISerializableResource(ISerializableResource &&) = default;
+ISerializableResource &ISerializableResource::operator=(ISerializableResource &&) = default;
 
 LockedResource ISerializableResource::Lock()
 {
@@ -16,7 +20,7 @@ const LockedResource ISerializableResource::Lock() const
     return LockedResource(const_cast<ISerializableResource &>(*this));
 }
 
-LockedResource::LockedResource(ISerializableResource &o) : obj_(&o), lk_(o.mtx_) {}
+LockedResource::LockedResource(ISerializableResource &o) : obj_(&o), lk_(*o.mtx_) {}
 size_t LockedResource::GetColumnSize() const { return obj_->GetColumnSize(); };
 size_t LockedResource::GetRowSize() const { return obj_->GetRowSize(); };
 bool LockedResource::GetDirty() const { return obj_->GetDirty(); };
