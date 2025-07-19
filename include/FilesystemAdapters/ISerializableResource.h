@@ -6,6 +6,7 @@
 #ifndef filesystem_adapters_iserializableresource_h
 #define filesystem_adapters_iserializableresource_h
 
+#include <memory>
 #include <mutex>
 
 #include "FilesystemAdapters/config.h"

@@ -88,14 +88,14 @@ void ResourceSerializer::Unserialize(const std::string &key, const std::string &
 
 	if (fs::exists(resourcePath))
 	{
-#if defined(__APPLE__) || defined(__MACH__)
 		error_code ec;
+#if defined(__APPLE__) || defined(__MACH__)
 		fs::permissions(resourcePath, fs::perms::all_all, ec);
+#else
+		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add, ec);
+#endif
 		if (ec)
 			throw std::runtime_error("ResourceSerializer could not set permissions on file: " + resourcePath.string());
-#else
-		fs::permissions(resourcePath, fs::perms::all, fs::perm_options::add);
-#endif
 		fs::remove(resourcePath, ec);
 		if (ec)
 			throw std::runtime_error("ResourceSerializer could not remove file: " + resourcePath.string());
