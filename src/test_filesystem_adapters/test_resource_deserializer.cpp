@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <vector>
 #include "Config/filesystem.hpp"
 
@@ -300,4 +301,51 @@ TEST(ResourceDeserializer, DeserializeThrowsWithEmptyKey)
 	EXPECT_THROW(deserializer->Deserialize("", RESOURCE_ROOT), std::runtime_error);
 
 	deserializer->UnregisterAll();
+}
+
+TEST(ResourceDeserializer, DeserializeWhileSerializing)
+{
+	ResourceDeserializer *deserializer = ResourceDeserializer::GetInstance();
+	ResourceSerializer *serializer = ResourceSerializer::GetInstance();
+
+	const int runCount = 10;
+	for (int i = 0; i < runCount; ++i)
+	{
+		// serialize
+		EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+		Resource2D resource;
+
+		std::vector<std::thread> threads;
+		threads.push_back(std::thread(
+			[serializer, deserializer, &resource, &threads]()
+			{
+				serializer->Serialize(resource.Lock(), RESOURCE_KEY, RESOURCE_ROOT);
+				EXPECT_TRUE(fs::exists(RESOURCE_FILE));
+
+				threads.push_back(std::thread(
+					[deserializer]()
+					{
+						deserializer->RegisterResource<int>(RESOURCE_KEY, RESOURCE_2D_CONSTRUCTOR);
+						std::unique_ptr<ISerializableResource> rsrc = deserializer->Deserialize(RESOURCE_KEY, RESOURCE_ROOT);
+						auto vecIntResource = static_cast<Resource2D *>(rsrc.get());
+						EXPECT_TRUE(vecIntResource);
+					}));
+			}));
+
+		// wait for both threads to start
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+		// join threads
+		for (auto &th : threads)
+			th.join();
+
+		// clean up
+		fs::remove(RESOURCE_FILE);
+		EXPECT_FALSE(fs::exists(RESOURCE_FILE));
+
+		deserializer->UnregisterAll();
+	}
+
+	// wait for OS to catch up
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
