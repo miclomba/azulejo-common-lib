@@ -47,13 +47,12 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 
 ## Build
 
-0. Run `CMake: Configure` command and use the appropriate compiler:
+0. Run VSCode's `CMake: Configure` command and use the appropriate compiler:
 
 - Clang (on macOS)
 - GCC (on Linux)
-- Visual Studio (on Windows)
 
-1. Run `CMake: Build`
+1. Run VSCode's `CMake: Build`
 
 ## Install
 

@@ -33,7 +33,6 @@ gtest_main
 gmock_main
 "boost_chrono"
 "boost_filesystem"
-"boost_system"
 "boost_thread"
 )
 

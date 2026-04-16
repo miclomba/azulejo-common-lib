@@ -27,7 +27,6 @@ target_link_libraries(${PROJECT_NAME}
 "Entities"
 "Resources"
 "boost_filesystem"
-"boost_system"
 )
 
 #############

@@ -16,12 +16,11 @@ add_library(${PROJECT_NAME} SHARED
 if (MSVC)
 target_link_libraries(${PROJECT_NAME}
 "cpprest_2_10"
-"boost_system"
 )
 elseif(APPLE)
 target_link_libraries(${PROJECT_NAME}
 "cpprest"
-"boost_system"
+# "boost_system"
 )
 endif()
 
