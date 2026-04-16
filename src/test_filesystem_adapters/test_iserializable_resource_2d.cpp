@@ -47,7 +47,7 @@ TEST(Resource2D, Construct)
 
 TEST(Resource2D, LValueParameterConstruct)
 {
-	EXPECT_NO_THROW(Resource2D(MATRIX_1X1));
+	EXPECT_NO_THROW(Resource2D{MATRIX_1X1});
 	Resource2D resource(MATRIX_1X1);
 
 	EXPECT_EQ(resource.GetColumnSize(), MATRIX_1X1.size());

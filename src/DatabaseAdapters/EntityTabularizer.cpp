@@ -92,8 +92,7 @@ void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity &enti
 
 	entity.Save(tree, GetDatabase());
 
-	std::vector<std::string> keys = entity.GetAggregatedMemberKeys<ITabularizableEntity>();
-	for (const std::string &key : keys)
+	for (auto keys = entity.GetAggregatedMemberKeys<ITabularizableEntity>(); const std::string &key : keys)
 	{
 		Entity::SharedEntity &member = entity.GetAggregatedMember(key);
 		auto memberPtr = dynamic_cast<ITabularizableEntity *>(member.get());

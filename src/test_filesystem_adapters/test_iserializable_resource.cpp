@@ -29,7 +29,7 @@ TEST(Resource, Construct)
 
 TEST(Resource, LValueParameterConstruct)
 {
-	EXPECT_NO_THROW(Resource(ARRAY_1));
+	EXPECT_NO_THROW(Resource{ARRAY_1});
 	Resource resource(ARRAY_1);
 
 	EXPECT_EQ(ARRAY_1.size(), resource.GetRowSize());

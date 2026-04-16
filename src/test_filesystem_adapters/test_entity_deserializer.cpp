@@ -51,8 +51,7 @@ namespace
 		{
 			std::map<Key, ISerializableEntity *> serializableMemberMap;
 
-			std::vector<std::string> keys = GetAggregatedMemberKeys<ISerializableEntity>();
-			for (const std::string &key : keys)
+			for (auto keys = GetAggregatedMemberKeys<ISerializableEntity>(); const std::string &key : keys)
 			{
 				Entity::SharedEntity &member = GetAggregatedMember(key);
 				auto memberPtr = dynamic_cast<ISerializableEntity *>(member.get());

@@ -31,8 +31,7 @@ public:
 			this->SetRowSize(data[0].size());
 		this->data_.resize(this->GetColumnSize() * this->GetRowSize());
 
-		size_t i = 0;
-		for (const std::vector<T>& row : data)
+		for (size_t i = 0; const std::vector<T>& row : data)
 		{
 			if (this->GetRowSize() != row.size())
 				throw std::invalid_argument("Non-square matrix provided as input during Resource construction");

@@ -7,7 +7,7 @@
         "OMP_LINK_DIR": "/usr/local/opt/libomp/lib",
         "CMAKE_PREFIX_PATH": "/usr/local/opt/libomp:$CMAKE_PREFIX_PATH",
         "X_INCL_DIR": "${workspaceFolder}/include",
-        "X_LINK_DIR": "${workspaceFolder}/out",
+        "X_LINK_DIR": "${workspaceFolder}/out/src",
         "VCPKG_INCL_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/include",
         "VCPKG_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/lib",
         "GTEST_LINK_DIR": "${workspaceFolder}/../vcpkg/installed/x64-osx/debug/lib",

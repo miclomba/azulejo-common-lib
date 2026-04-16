@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(X VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 message(STATUS "INSTALL_PATH: $ENV{INSTALL_PATH}")
 message(STATUS "OMP_INCL_DIR: $ENV{OMP_INCL_DIR}")

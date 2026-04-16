@@ -76,8 +76,7 @@ int fake_tcp_main(int argc, char *argv[])
 			{
 				if (c->HasReceivedMessages())
 				{
-					auto receivedMessage = c->GetOneMessage();
-					for (char c : receivedMessage)
+					for (auto receivedMessage = c->GetOneMessage(); char c : receivedMessage)
 						std::cout << c;
 					std::cout << '\n';
 				}

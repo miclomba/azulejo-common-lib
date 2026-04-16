@@ -83,8 +83,7 @@ namespace
 		{
 			std::map<Key, ITabularizableEntity *> tabularizableMemberMap;
 
-			std::vector<std::string> keys = GetAggregatedMemberKeys<ITabularizableEntity>();
-			for (const std::string &key : keys)
+			for (auto keys = GetAggregatedMemberKeys<ITabularizableEntity>(); const std::string &key : keys)
 			{
 				std::shared_ptr<TabEntity> member = GetAggregateMember(key);
 				tabularizableMemberMap.insert(std::make_pair(key, member.get()));

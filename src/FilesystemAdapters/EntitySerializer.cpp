@@ -60,8 +60,7 @@ void EntitySerializer::SerializeWithParentKey(const ISerializableEntity &entity,
 
 	entity.Save(tree, absolutePath);
 
-	std::vector<std::string> keys = entity.GetAggregatedMemberKeys<ISerializableEntity>();
-	for (const std::string &key : keys)
+	for (auto keys = entity.GetAggregatedMemberKeys<ISerializableEntity>(); const std::string &key : keys)
 	{
 		Entity::SharedEntity &member = entity.GetAggregatedMember(key);
 		auto memberPtr = dynamic_cast<ISerializableEntity *>(member.get());
