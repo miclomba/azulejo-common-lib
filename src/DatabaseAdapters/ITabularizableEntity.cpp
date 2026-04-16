@@ -27,15 +27,13 @@ SharedEntity &ITabularizableEntity::GetAggregatedMember(const Key &key) const
 {
 	MemberMap &members = Entity::GetAggregatedMembers();
 
-	auto found = members.find(key);
-	if (found == members.cend())
+	if (auto found = members.find(key); found == members.cend())
 		throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 
 	if (members[key])
 		return members[key];
 
-	EntityDetabularizer *detabularizer = EntityDetabularizer::GetInstance();
-	if (detabularizer->GetRegistry().HasRegisteredKey(key))
+	if (auto detabularizer = EntityDetabularizer::GetInstance(); detabularizer->GetRegistry().HasRegisteredKey(key))
 	{
 		std::unique_ptr<ITabularizableEntity> entity = detabularizer->GetRegistry().GenerateEntity(key);
 

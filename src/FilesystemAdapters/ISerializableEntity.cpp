@@ -27,8 +27,7 @@ SharedEntity &ISerializableEntity::GetAggregatedMember(const Key &key) const
 {
 	MemberMap &members = Entity::GetAggregatedMembers();
 
-	auto found = members.find(key);
-	if (found == members.cend())
+	if (auto found = members.find(key); found == members.cend())
 		throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
 
 	if (members[key])

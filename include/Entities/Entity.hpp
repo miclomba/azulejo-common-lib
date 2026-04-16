@@ -7,8 +7,7 @@ void Entity::AggregateMember(std::shared_ptr<T> sharedObj)
 
 	Key key = sharedObj->GetKey();
 
-	auto found = membersMap_.find(key);
-	if (found != membersMap_.cend())
+	if (auto found = membersMap_.find(key); found != membersMap_.cend())
 		throw std::runtime_error("Cannot aggregate entity using key=" + key + " because this key is already in use.");
 
 	membersMap_[key] = std::move(sharedObj);

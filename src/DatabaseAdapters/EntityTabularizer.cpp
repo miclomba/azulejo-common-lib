@@ -36,9 +36,7 @@ namespace
 
 		ResourceTabularizer *resourceTabularizer = ResourceTabularizer::GetInstance();
 
-		bool resourceTabularizerIsOpen = resourceTabularizer->GetDatabase().IsOpen();
-
-		if (!resourceTabularizerIsOpen)
+		if (bool resourceTabularizerIsOpen = resourceTabularizer->GetDatabase().IsOpen(); !resourceTabularizerIsOpen)
 		{
 			resourceTabularizer->OpenDatabase(database.GetPath());
 			resourceTabularizer->Tabularize(hierarchyBlob, ENTITY_HIERARCHY_BLOB_KEY);

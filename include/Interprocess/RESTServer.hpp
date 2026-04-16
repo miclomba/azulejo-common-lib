@@ -30,9 +30,7 @@ void RESTServer_t::HandleRequest(
         {
             try
             {
-                const web::json::value& jValue = task.get();
-
-                if (!jValue.is_null())
+                if (const web::json::value& jValue = task.get(); !jValue.is_null())
                     action(jValue, answer);
             }
             catch (const web::http::http_exception& e)
@@ -164,8 +162,7 @@ void RESTServer_t::DELHandler(const web::json::value& jValue, web::json::value& 
         {
             utility::string_t key = e.as_string();
 
-            auto pos = dictionary_.find(key);
-            if (pos == dictionary_.end())
+            if (auto pos = dictionary_.find(key); pos == dictionary_.end())
             {
                 answer[key] = web::json::value::string(FAILED_MSG);
             }

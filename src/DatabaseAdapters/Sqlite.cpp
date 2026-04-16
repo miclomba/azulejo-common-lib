@@ -41,8 +41,7 @@ void Sqlite::Open(const Path &dbPath)
 	if (dbPath.empty())
 		throw std::runtime_error("Could not create (open) SQLite3 DB from empty path");
 
-	int result = sqlite3_open(dbPath.string().c_str(), &db_);
-	if (result != SQLITE_OK)
+	if (int result = sqlite3_open(dbPath.string().c_str(), &db_); result != SQLITE_OK)
 		throw std::runtime_error("Could not create (open) SQLite3 DB at " + dbPath.string());
 
 	dbPath_ = dbPath;
@@ -53,8 +52,7 @@ void Sqlite::Close()
 	if (!db_)
 		throw std::runtime_error("Cannot close sqlite3 db because given db is nullptr");
 
-	int result = sqlite3_close(db_);
-	if (result != SQLITE_OK)
+	if (int result = sqlite3_close(db_); result != SQLITE_OK)
 		throw std::runtime_error("Could not create (close) SQLite3 DB");
 
 	db_ = nullptr;
@@ -81,7 +79,7 @@ void Sqlite::Execute(const std::string &sql, boost::optional<Sqlite::RowCallback
 
 	char *error;
 	int res = sqlite3_exec(db_, sql.c_str(), RowCallbackWrapper, callback, &error);
-
+	
 	if (res != SQLITE_OK)
 	{
 		std::string errorStr(error);

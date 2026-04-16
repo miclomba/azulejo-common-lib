@@ -60,8 +60,7 @@ namespace entity
 
 	SharedEntity &Entity::GetAggregatedMember(const Key &key) const
 	{
-		auto found = membersMap_.find(key);
-		if (found != membersMap_.cend())
+		if (auto found = membersMap_.find(key); found != membersMap_.cend())
 			return membersMap_[key];
 
 		throw std::runtime_error("Could not find entity using key=" + key + " because this key is not in use.");
@@ -69,8 +68,7 @@ namespace entity
 
 	void Entity::AggregateMember(const Key &key)
 	{
-		auto found = membersMap_.find(key);
-		if (found != membersMap_.cend())
+		if (auto found = membersMap_.find(key); found != membersMap_.cend())
 			throw std::runtime_error("Cannot aggregate entity using key=" + key + " because this key is already in use.");
 
 		membersMap_[key] = nullptr;
@@ -78,8 +76,7 @@ namespace entity
 
 	void Entity::RemoveMember(const Key &key)
 	{
-		auto found = membersMap_.find(key);
-		if (found == membersMap_.cend())
+		if (auto found = membersMap_.find(key); found == membersMap_.cend())
 			throw std::runtime_error("Cannot remove entity using key=" + key + " because this key is not in use.");
 
 		membersMap_.erase(key);
@@ -92,8 +89,7 @@ namespace entity
 
 		Key key = sharedObj->GetKey();
 
-		auto found = membersMap_.find(key);
-		if (found == membersMap_.cend())
+		if (auto found = membersMap_.find(key); found == membersMap_.cend())
 			throw std::runtime_error("Cannot remove entity using key=" + key + " because this key is not in use.");
 
 		membersMap_.erase(key);

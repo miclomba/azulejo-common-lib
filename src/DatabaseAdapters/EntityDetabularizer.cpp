@@ -67,8 +67,7 @@ namespace
 	{
 		std::string parentKeyPath;
 
-		size_t pos = keyPath.find_last_of('.');
-		if (pos != std::string::npos)
+		if (size_t pos = keyPath.find_last_of('.'); pos != std::string::npos)
 			parentKeyPath = keyPath.substr(0, pos);
 
 		return parentKeyPath;
