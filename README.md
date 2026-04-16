@@ -25,6 +25,7 @@ Install [vcpkg](https://github.com/microsoft/vcpkg) adjacent to your project dir
 3. FreeGLUT depends on `X11` so install `XQuartz` by running: `brew install --cask xquartz`
 4. Install `libomp` by running: `brew install libomp llvm`
 5. Istall dependencies: `./scripts/vcpkg_install.sh`
+    - __NOTE__: The latest supported version of `boost` is `v1.90`. Note that vcpkg always downloads latest which may lead to configure and build errors.
 6. Install `VSCode`
 7. Install VSCode extensions:
 
