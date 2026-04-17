@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "Events/IEventConsumer.h"
@@ -21,7 +22,7 @@ EventChannel &EventChannel::operator=(const EventChannel &) = default;
 EventChannel::EventChannel(EventChannel &&) = default;
 EventChannel &EventChannel::operator=(EventChannel &&) = default;
 
-void EventChannel::RegisterEmitter(const std::string &emitterKey, const std::shared_ptr<IEventEmitter> emitter)
+void EventChannel::RegisterEmitter(const std::string_view emitterKey, const std::shared_ptr<IEventEmitter> emitter)
 {
 	if (emitterKey.empty())
 		throw std::invalid_argument("Cannot register emitter with empty key in EventChannel.");
@@ -29,7 +30,7 @@ void EventChannel::RegisterEmitter(const std::string &emitterKey, const std::sha
 		throw std::invalid_argument("Cannot register NULL emitter in EventChannel.");
 
 	if (IsEmitterRegistered(emitterKey))
-		throw std::runtime_error("IEventEmitter with key=" + emitterKey + " is already registered in this EventChannel");
+		throw std::runtime_error("IEventEmitter with key is already registered in this EventChannel");
 
 	for (auto iter = consumerMap_.begin(); iter != consumerMap_.end(); ++iter)
 	{
@@ -39,32 +40,32 @@ void EventChannel::RegisterEmitter(const std::string &emitterKey, const std::sha
 			emitter->Connect(ieventConsumer.lock());
 	}
 
-	emitterMap_[emitterKey] = emitter;
+	emitterMap_[std::string(emitterKey)] = emitter;
 }
 
-void EventChannel::UnregisterEmitter(const std::string &emitterKey)
+void EventChannel::UnregisterEmitter(const std::string_view emitterKey)
 {
 	if (emitterKey.empty())
 		throw std::invalid_argument("Cannot unregister emitter with empty key in EventChannel.");
 
 	if (!IsEmitterRegistered(emitterKey))
-		throw std::runtime_error("IEventEmitter with key=" + emitterKey + " is not registered in this EventChannel");
-	emitterMap_.erase(emitterKey);
+		throw std::runtime_error("IEventEmitter with key is not registered in this EventChannel");
+	emitterMap_.erase(std::string(emitterKey));
 }
 
-bool EventChannel::IsEmitterRegistered(const std::string &emitterKey) const
+bool EventChannel::IsEmitterRegistered(const std::string_view emitterKey) const
 {
 	return emitterMap_.find(emitterKey) != emitterMap_.cend() ? true : false;
 }
 
-void EventChannel::RegisterConsumer(const std::string &consumerKey, const std::string &emitterKey, const std::shared_ptr<IEventConsumer> consumer)
+void EventChannel::RegisterConsumer(const std::string_view consumerKey, const std::string_view emitterKey, const std::shared_ptr<IEventConsumer> consumer)
 {
 	if (consumerKey.empty() || emitterKey.empty())
 		throw std::invalid_argument("Cannot register consumer with empty key in EventChannel.");
 	if (!consumer)
 		throw std::invalid_argument("Cannot register NULL consumer in EventChannel.");
 
-	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
+	auto key = std::make_pair(std::string(consumerKey), std::string(emitterKey));
 	if (IsConsumerRegistered(consumerKey, emitterKey))
 		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is already registered in this EventChannel");
 
@@ -81,19 +82,19 @@ void EventChannel::RegisterConsumer(const std::string &consumerKey, const std::s
 	consumerMap_[key] = consumer;
 }
 
-void EventChannel::UnregisterConsumer(const std::string &consumerKey, const std::string &emitterKey)
+void EventChannel::UnregisterConsumer(const std::string_view consumerKey, const std::string_view emitterKey)
 {
 	if (consumerKey.empty() || emitterKey.empty())
 		throw std::invalid_argument("Cannot unregister consumer with empty key in EventChannel.");
 
-	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
+	auto key = std::make_pair(std::string(consumerKey), std::string(emitterKey));
 	if (!IsConsumerRegistered(consumerKey, emitterKey))
-		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is not registered in this EventChannel");
+		throw std::runtime_error("IEventConsumer with key is not registered in this EventChannel");
 	consumerMap_.erase(key);
 }
 
-bool EventChannel::IsConsumerRegistered(const std::string &consumerKey, const std::string &emitterKey) const
+bool EventChannel::IsConsumerRegistered(const std::string_view consumerKey, const std::string_view emitterKey) const
 {
-	std::pair<std::string, std::string> key = std::make_pair(consumerKey, emitterKey);
+	auto key = std::make_pair(std::string(consumerKey), std::string(emitterKey));
 	return consumerMap_.find(key) != consumerMap_.cend() ? true : false;
 }

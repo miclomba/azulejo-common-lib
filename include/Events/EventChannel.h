@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "Events/config.h"
@@ -69,13 +70,13 @@ namespace events
          * @param emitterKey The key associated with the emitter.
          * @param emitter A shared pointer to the event emitter.
          */
-        void RegisterEmitter(const std::string &emitterKey, const std::shared_ptr<IEventEmitter> emitter);
+        void RegisterEmitter(const std::string_view emitterKey, const std::shared_ptr<IEventEmitter> emitter);
 
         /**
          * @brief Unregister an event emitter using its key.
          * @param emitterKey The key of the emitter to unregister.
          */
-        void UnregisterEmitter(const std::string &emitterKey);
+        void UnregisterEmitter(const std::string_view emitterKey);
 
         /**
          * @brief Register an event consumer to a specific emitter.
@@ -83,14 +84,14 @@ namespace events
          * @param emitterKey The key of the emitter to connect the consumer to.
          * @param consumer A shared pointer to the event consumer.
          */
-        void RegisterConsumer(const std::string &consumerKey, const std::string &emitterKey, const std::shared_ptr<IEventConsumer> consumer);
+        void RegisterConsumer(const std::string_view consumerKey, const std::string_view emitterKey, const std::shared_ptr<IEventConsumer> consumer);
 
         /**
          * @brief Unregister an event consumer from a specific emitter.
          * @param consumerKey The key associated with the consumer.
          * @param emitterKey The key of the emitter to disconnect the consumer from.
          */
-        void UnregisterConsumer(const std::string &consumerKey, const std::string &emitterKey);
+        void UnregisterConsumer(const std::string_view consumerKey, const std::string_view emitterKey);
 
     protected:
         /**
@@ -98,7 +99,7 @@ namespace events
          * @param emitterKey The key of the emitter to check.
          * @return True if the emitter is registered, false otherwise.
          */
-        bool IsEmitterRegistered(const std::string &emitterKey) const;
+        bool IsEmitterRegistered(const std::string_view emitterKey) const;
 
         /**
          * @brief Check if a consumer is registered to a specific emitter.
@@ -106,14 +107,14 @@ namespace events
          * @param emitterKey The key of the emitter to check.
          * @return True if the consumer is registered to the emitter, false otherwise.
          */
-        bool IsConsumerRegistered(const std::string &consumerKey, const std::string &emitterKey) const;
+        bool IsConsumerRegistered(const std::string_view consumerKey, const std::string_view emitterKey) const;
 
     private:
         /** @brief Map of emitter keys to weak pointers of event emitters. */
-        std::map<std::string, std::weak_ptr<IEventEmitter>> emitterMap_;
+        std::map<std::string, std::weak_ptr<IEventEmitter>, std::less<>> emitterMap_;
 
         /** @brief Map of consumer-emitter pairs to weak pointers of event consumers. */
-        std::map<std::pair<std::string, std::string>, std::weak_ptr<IEventConsumer>> consumerMap_;
+        std::map<std::pair<std::string, std::string>, std::weak_ptr<IEventConsumer>, std::less<>> consumerMap_;
     };
 
 } // end namespace events
