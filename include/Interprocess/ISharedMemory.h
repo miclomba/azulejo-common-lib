@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "Interprocess/config.h"
 
@@ -92,13 +93,13 @@ namespace interprocess
          * @param name The name of the shared memory segment.
          * @param size The size of the shared memory segment in bytes.
          */
-        void Create(const std::string &name, const size_t size);
+        void Create(const std::string_view name, const size_t size);
 
         /**
          * @brief Open an existing shared memory segment.
          * @param name The name of the shared memory segment to open.
          */
-        void Open(const std::string &name);
+        void Open(const std::string_view name);
 
     private:
         /** @brief Shared pointer to the Boost shared memory object. */

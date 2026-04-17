@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -33,7 +34,7 @@ bool ISharedMemory::Destroy()
 	return destroyed;
 }
 
-void ISharedMemory::Create(const std::string &name, const size_t size)
+void ISharedMemory::Create(const std::string_view name, const size_t size)
 {
 	using namespace boost::interprocess;
 
@@ -46,11 +47,11 @@ void ISharedMemory::Create(const std::string &name, const size_t size)
 
 	try
 	{
-		shmem_ = std::make_shared<shared_memory_object>(create_only, name.c_str(), read_write);
+		shmem_ = std::make_shared<shared_memory_object>(create_only, std::string(name).c_str(), read_write);
 	}
 	catch (std::exception &)
 	{
-		throw std::runtime_error("Shared memory cannot be allocated because " + name + " is already allocated");
+		throw std::runtime_error("Shared memory cannot be allocated because it is already allocated");
 	}
 
 	size_t currentSize = GetSharedSize();
@@ -62,7 +63,7 @@ void ISharedMemory::Create(const std::string &name, const size_t size)
 	isShmemOwner_ = true;
 }
 
-void ISharedMemory::Open(const std::string &name)
+void ISharedMemory::Open(const std::string_view name)
 {
 	using namespace boost::interprocess;
 
@@ -71,11 +72,11 @@ void ISharedMemory::Open(const std::string &name)
 
 	try
 	{
-		shmem_ = std::make_shared<shared_memory_object>(open_only, name.c_str(), read_write);
+		shmem_ = std::make_shared<shared_memory_object>(open_only, std::string(name).c_str(), read_write);
 	}
 	catch (std::exception &)
 	{
-		throw std::runtime_error("Shared memory cannot be allocated because " + name + " is already allocated");
+		throw std::runtime_error("Shared memory cannot be allocated because it is already allocated");
 	}
 }
 
