@@ -36,10 +36,10 @@ namespace
 	{
 		for (const std::pair<utility::string_t, web::json::value> &e : jValue.as_object())
 		{
-			if (e.second.is_string())
+			auto& [key, val] = e;
+			if (val.is_string())
 			{
-				utility::string_t key = e.first;
-				utility::string_t value = e.second.as_string();
+				utility::string_t value = val.as_string();
 				dictionary[key] = value;
 			}
 		}

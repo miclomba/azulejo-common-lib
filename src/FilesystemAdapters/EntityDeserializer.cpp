@@ -31,9 +31,7 @@ namespace
 	{
 		for (const std::pair<std::string, pt::ptree> &keyValue : tree)
 		{
-			std::string nodeKey = keyValue.first;
-			pt::ptree node = keyValue.second;
-
+			auto& [nodeKey, node] = keyValue;
 			if (nodeKey == key)
 			{
 				return nodeKey;
@@ -116,7 +114,7 @@ void EntityDeserializer::LoadWithParentKey(ISerializableEntity &entity, const st
 
 	for (const std::pair<std::string, pt::ptree> &child : *tree)
 	{
-		std::string key = child.first;
+		auto& [key, _] = child;
 		if (!registry_.HasRegisteredKey(key))
 			continue;
 

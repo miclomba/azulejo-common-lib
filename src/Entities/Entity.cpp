@@ -20,8 +20,10 @@ namespace entity
 	Entity::Entity(Entity &&) = default;
 	Entity::Entity(const Entity &other) : key_(other.key_)
 	{
-		for (const std::pair<Key, SharedEntity> &e : other.membersMap_)
-			membersMap_[e.first] = other.ConstructEntity(*e.second);
+		for (const std::pair<Key, SharedEntity> &e : other.membersMap_) {
+			auto& [key, sharedEntity] = e;
+			membersMap_[key] = other.ConstructEntity(*sharedEntity);
+		}
 	}
 
 	Entity &Entity::operator=(Entity &&) = default;
@@ -33,8 +35,10 @@ namespace entity
 		key_ = other.key_;
 
 		membersMap_.clear();
-		for (const std::pair<Key, SharedEntity> &e : other.membersMap_)
-			membersMap_[e.first] = other.ConstructEntity(*e.second);
+		for (const std::pair<Key, SharedEntity> &e : other.membersMap_) {
+			auto& [key, sharedEntity] = e;
+			membersMap_[key] = other.ConstructEntity(*sharedEntity);
+		}
 
 		return *this;
 	}

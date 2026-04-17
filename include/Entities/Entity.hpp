@@ -30,8 +30,9 @@ std::vector<Entity::Key> Entity::GetAggregatedMemberKeys() const
 	std::vector<Key> keys;
 	for (const std::pair<Key, SharedEntity>& e : membersMap_)
 	{
-		if (dynamic_cast<T*>(e.second.get()))
-			keys.push_back(e.first);
+		auto& [key, sharedEntity] = e;
+		if (dynamic_cast<T*>(sharedEntity.get()))
+			keys.push_back(key);
 	}
 	return keys;
 }

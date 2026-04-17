@@ -65,9 +65,8 @@ void EventChannel::RegisterConsumer(const std::string_view consumerKey, const st
 	if (!consumer)
 		throw std::invalid_argument("Cannot register NULL consumer in EventChannel.");
 
-	auto key = std::make_pair(std::string(consumerKey), std::string(emitterKey));
 	if (IsConsumerRegistered(consumerKey, emitterKey))
-		throw std::runtime_error("IEventConsumer with key=[" + key.first + "," + key.second + "] is already registered in this EventChannel");
+		throw std::runtime_error("IEventConsumer with key=[" + std::string(consumerKey) + "," + std::string(emitterKey) + "] is already registered in this EventChannel");
 
 	for (auto iter = emitterMap_.begin(); iter != emitterMap_.end(); ++iter)
 	{
@@ -79,6 +78,7 @@ void EventChannel::RegisterConsumer(const std::string_view consumerKey, const st
 		}
 	}
 
+	auto key = std::make_pair(std::string(consumerKey), std::string(emitterKey));
 	consumerMap_[key] = consumer;
 }
 

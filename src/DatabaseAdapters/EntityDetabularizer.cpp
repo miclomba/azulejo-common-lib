@@ -42,13 +42,11 @@ namespace
 		return std::make_unique<EntityHierarchyBlob>();
 	};
 
-	std::string GetKeyPath(const Key &key, const pt::ptree &tree)
+	std::string GetKeyPath(const std::string_view key, const pt::ptree &tree)
 	{
 		for (const std::pair<std::string, pt::ptree> &keyValue : tree)
 		{
-			std::string nodeKey = keyValue.first;
-			pt::ptree node = keyValue.second;
-
+			auto& [nodeKey, node] = keyValue;
 			if (nodeKey == key)
 			{
 				return nodeKey;
@@ -182,7 +180,7 @@ void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity &entity, const 
 
 	for (const std::pair<std::string, pt::ptree> &child : *tree)
 	{
-		std::string key = child.first;
+		auto& [key, _] = child;
 		if (!registry_.HasRegisteredKey(key))
 			continue;
 

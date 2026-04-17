@@ -47,9 +47,10 @@ namespace entity
 			que.pop();
 			for (const std::pair<Key, SharedEntity> &e : front->GetAggregatedMembers())
 			{
-				auto se = std::dynamic_pointer_cast<IStreamableEntity>(e.second);
+				auto& [key, sharedEntity] = e;
+				auto se = std::dynamic_pointer_cast<IStreamableEntity>(sharedEntity);
 				if (!se)
-					throw std::runtime_error("Attempted to stream a non-streamable entity: " + e.first);
+					throw std::runtime_error("Attempted to stream a non-streamable entity: " + key);
 				que.push(se.get());
 			}
 			to << front->ToString() << DELIM;
