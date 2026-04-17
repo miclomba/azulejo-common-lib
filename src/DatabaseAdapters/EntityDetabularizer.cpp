@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include "Config/filesystem.hpp"
 
@@ -63,7 +64,7 @@ namespace
 		return "";
 	}
 
-	std::string GetParentKeyPath(const std::string &keyPath)
+	std::string GetParentKeyPath(const std::string_view keyPath)
 	{
 		std::string parentKeyPath;
 
@@ -169,9 +170,9 @@ void EntityDetabularizer::LoadEntity(ITabularizableEntity &entity)
 	LoadWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
-void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity &entity, const Key &parentKey)
+void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity &entity, const std::string_view parentKey)
 {
-	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : std::string(parentKey) + "." + entity.GetKey();
 
 	boost::optional<pt::ptree &> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)

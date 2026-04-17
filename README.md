@@ -1,6 +1,6 @@
 # azulejo-common-lib
 
-A library for composing C++ class systems that use aggregation as a basis for class member
+A library for composing C++20 class systems that use aggregation as a basis for class member
 association. Aggregated members benefit from recursive functions that automate serialization
 and storage in relational databases. In addition, the library provides channels for event
 driven communication along with concurrency, parallelism, and interprocess utilities (TCP,

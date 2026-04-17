@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 #include "Config/filesystem.hpp"
 
 #include "DatabaseAdapters/ITabularizableResource.h"
@@ -77,17 +79,17 @@ Sqlite &ResourceDetabularizer::GetDatabase()
 	return databaseAdapter_;
 }
 
-void ResourceDetabularizer::UnregisterResource(const std::string &key)
+void ResourceDetabularizer::UnregisterResource(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when unregistering resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when unregistering resource with ResourceDetabularizer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDetabularizer");
+		throw std::runtime_error("Key not already registered with the ResourceDetabularizer");
 
-	keyToResourceMap_.erase(key);
+	keyToResourceMap_.erase(std::string(key));
 }
 
-bool ResourceDetabularizer::HasTabularizationKey(const std::string &key) const
+bool ResourceDetabularizer::HasTabularizationKey(const std::string_view key) const
 {
 	return keyToResourceMap_.find(key) != keyToResourceMap_.cend();
 }
@@ -97,15 +99,15 @@ void ResourceDetabularizer::UnregisterAll()
 	keyToResourceMap_.clear();
 }
 
-std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(const std::string &key)
+std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when detabularizing resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when detabularizing resource with ResourceDetabularizer");
 
 	if (!databaseAdapter_.IsOpen())
 		throw std::runtime_error("Cannot detabularize resource because the database is not open");
 
-	const std::string sql = "SELECT " + P_KEY + ", " + ROW_KEY + ", " + M_KEY + ", " + N_KEY + ", " + SIZE_OF_KEY + " FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + key + "';";
+	const std::string sql = "SELECT " + P_KEY + ", " + ROW_KEY + ", " + M_KEY + ", " + N_KEY + ", " + SIZE_OF_KEY + " FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + std::string(key) + "';";
 
 	int iRow = -1;
 	size_t m, n, sizeOf;
@@ -136,14 +138,14 @@ std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(cons
 	return resource;
 }
 
-std::unique_ptr<ITabularizableResource> ResourceDetabularizer::GenerateResource(const std::string &key) const
+std::unique_ptr<ITabularizableResource> ResourceDetabularizer::GenerateResource(const std::string_view key) const
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when generating resource with ResourceDetabularizer");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDetabularizer");
+		throw std::runtime_error("Key is not registered with the ResourceDetabularizer");
 
-	std::unique_ptr<ITabularizableResource> resource = keyToResourceMap_[key]();
+	std::unique_ptr<ITabularizableResource> resource = keyToResourceMap_[std::string(key)]();
 
 	return resource;
 }

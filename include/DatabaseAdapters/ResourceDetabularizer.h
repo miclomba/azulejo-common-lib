@@ -12,6 +12,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include "Config/filesystem.h"
 
@@ -70,13 +71,13 @@ namespace database_adapters
          * @param constructor The constructor function for creating instances of the resource type.
          */
         template <typename T>
-        void RegisterResource(const std::string &key, std::function<std::unique_ptr<ITabularizableResource>(void)> constructor);
+        void RegisterResource(const std::string_view key, std::function<std::unique_ptr<ITabularizableResource>(void)> constructor);
 
         /**
          * @brief Unregister a resource type by its key.
          * @param key The key of the resource type to unregister.
          */
-        void UnregisterResource(const std::string &key);
+        void UnregisterResource(const std::string_view key);
 
         /**
          * @brief Unregister all resource types.
@@ -88,21 +89,21 @@ namespace database_adapters
          * @param key The key to check for.
          * @return True if the key is registered, false otherwise.
          */
-        bool HasTabularizationKey(const std::string &key) const;
+        bool HasTabularizationKey(const std::string_view key) const;
 
         /**
          * @brief Detabularize a resource by its key.
          * @param key The key of the resource to detabularize.
          * @return A unique pointer to the detabularized resource.
          */
-        std::unique_ptr<ITabularizableResource> Detabularize(const std::string &key);
+        std::unique_ptr<ITabularizableResource> Detabularize(const std::string_view key);
 
         /**
          * @brief Generate a resource instance by its key.
          * @param key The key of the resource to generate.
          * @return A unique pointer to the generated resource.
          */
-        std::unique_ptr<ITabularizableResource> GenerateResource(const std::string &key) const;
+        std::unique_ptr<ITabularizableResource> GenerateResource(const std::string_view key) const;
 
     private:
         /**
@@ -138,7 +139,7 @@ namespace database_adapters
         static ResourceDetabularizer *instance_;
 
         /** @brief Map of keys to resource constructor functions. */
-        mutable std::map<std::string, std::function<std::unique_ptr<ITabularizableResource>(void)>> keyToResourceMap_;
+        mutable std::map<std::string, std::function<std::unique_ptr<ITabularizableResource>(void)>, std::less<>> keyToResourceMap_;
 
         /** @brief SQLite database adapter. */
         Sqlite databaseAdapter_;

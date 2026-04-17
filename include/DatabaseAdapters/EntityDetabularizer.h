@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include "Config/filesystem.h"
 
@@ -118,7 +119,7 @@ namespace database_adapters
          * @param entity The entity to load data into.
          * @param parentKey The key of the parent entity (default is an empty string).
          */
-        void LoadWithParentKey(ITabularizableEntity &entity, const entity::Entity::Key &parentKey = "");
+        void LoadWithParentKey(ITabularizableEntity &entity, const std::string_view parentKey = "");
 
         /** @brief Pointer to the singleton instance of the EntityDetabularizer. */
         static EntityDetabularizer *instance_;

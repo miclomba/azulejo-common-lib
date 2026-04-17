@@ -7,6 +7,7 @@
 #define database_adapters_resourcetabularizer_h
 
 #include <string>
+#include <string_view>
 #include "Config/filesystem.h"
 
 #include "DatabaseAdapters/config.h"
@@ -45,13 +46,13 @@ namespace database_adapters
          * @param resource The tabularizable resource to save as a database table.
          * @param key The key associated with the resource.
          */
-        void Tabularize(const ITabularizableResource &resource, const std::string &key);
+        void Tabularize(const ITabularizableResource &resource, const std::string_view key);
 
         /**
          * @brief Remove a resource from the database by its key.
          * @param key The key associated with the resource to remove.
          */
-        void Untabularize(const std::string &key);
+        void Untabularize(const std::string_view key);
 
         /**
          * @brief Close the currently opened database.

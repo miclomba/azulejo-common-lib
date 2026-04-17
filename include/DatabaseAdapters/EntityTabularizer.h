@@ -7,6 +7,7 @@
 #define database_adapters_entitytabularizer_h
 
 #include <string>
+#include <string_view>
 #include "Config/filesystem.h"
 
 #include "DatabaseAdapters/config.h"
@@ -107,7 +108,7 @@ namespace database_adapters
          * @param entity The entity to tabularize.
          * @param parentKey The key of the parent entity (default is an empty string).
          */
-        void TabularizeWithParentKey(const ITabularizableEntity &entity, const entity::Entity::Key &parentKey = "");
+        void TabularizeWithParentKey(const ITabularizableEntity &entity, const std::string_view parentKey = "");
 
         /** @brief Pointer to the singleton instance of the EntityTabularizer. */
         static EntityTabularizer *instance_;

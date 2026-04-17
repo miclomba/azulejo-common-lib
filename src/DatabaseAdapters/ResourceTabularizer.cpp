@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include "Config/filesystem.hpp"
 
 #include "DatabaseAdapters/ITabularizableResource.h"
@@ -78,7 +79,7 @@ Sqlite &ResourceTabularizer::GetDatabase()
 	return databaseAdapter_;
 }
 
-void ResourceTabularizer::Tabularize(const ITabularizableResource &resource, const std::string &key)
+void ResourceTabularizer::Tabularize(const ITabularizableResource &resource, const std::string_view key)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot tabularize resource with empty key");
@@ -93,13 +94,13 @@ void ResourceTabularizer::Tabularize(const ITabularizableResource &resource, con
 	const std::string N = std::to_string(resource.GetRowSize());
 	const std::string SIZE_OF = std::to_string(resource.GetElementSize());
 
-	const std::string sql = "INSERT INTO " + TABLE_NAME + " (" + P_KEY + "," + M_KEY + "," + N_KEY + "," + SIZE_OF_KEY + "," + DATA_KEY + ") VALUES ('" + key + "'," + M + "," + N + "," + SIZE_OF + ",?);";
+	const std::string sql = "INSERT INTO " + TABLE_NAME + " (" + P_KEY + "," + M_KEY + "," + N_KEY + "," + SIZE_OF_KEY + "," + DATA_KEY + ") VALUES ('" + std::string(key) + "'," + M + "," + N + "," + SIZE_OF + ",?);";
 	const size_t size = resource.GetElementSize() * resource.GetColumnSize() * resource.GetRowSize();
 
 	SqliteBlob::InsertBlob(databaseAdapter_, sql, resource.Data(), size);
 }
 
-void ResourceTabularizer::Untabularize(const std::string &key)
+void ResourceTabularizer::Untabularize(const std::string_view key)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot untabularize resource with empty key");
@@ -107,6 +108,6 @@ void ResourceTabularizer::Untabularize(const std::string &key)
 	if (!databaseAdapter_.IsOpen())
 		throw std::runtime_error("Cannot untabularize resource because the database is not open");
 
-	std::string sql = "DELETE FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + key + "';";
+	std::string sql = "DELETE FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + std::string(key) + "';";
 	GetDatabase().Execute(sql);
 }

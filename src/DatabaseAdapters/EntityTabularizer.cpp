@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include "Config/filesystem.hpp"
 
@@ -82,9 +83,9 @@ void EntityTabularizer::Tabularize(const ITabularizableEntity &entity)
 	TabularizeWithParentKey(entity, "");
 }
 
-void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity &entity, const Key &parentKey)
+void EntityTabularizer::TabularizeWithParentKey(const ITabularizableEntity &entity, const std::string_view parentKey)
 {
-	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : std::string(parentKey) + "." + entity.GetKey();
 
 	pt::ptree &tree = hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
 
