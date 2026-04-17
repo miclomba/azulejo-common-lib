@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include "Config/filesystem.hpp"
 
 #include "FilesystemAdapters/FileLock.hpp"
@@ -29,20 +30,20 @@ ResourceDeserializer *ResourceDeserializer::GetInstance()
 	return &instance;
 }
 
-void ResourceDeserializer::UnregisterResource(const std::string &key)
+void ResourceDeserializer::UnregisterResource(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when unregistering resource with ResourceDeserializer");
+		throw std::runtime_error("Key is empty when unregistering resource with ResourceDeserializer");
 
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key=" + key + " not already registered with the ResourceDeserializer");
+		throw std::runtime_error("Key not already registered with the ResourceDeserializer");
 
-	keyToResourceMap_.erase(key);
+	keyToResourceMap_.erase(std::string(key));
 }
 
-bool ResourceDeserializer::HasSerializationKey(const std::string &key) const
+bool ResourceDeserializer::HasSerializationKey(const std::string_view key) const
 {
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
@@ -56,18 +57,18 @@ void ResourceDeserializer::UnregisterAll()
 	keyToResourceMap_.clear();
 }
 
-std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const std::string &key, const std::string &deserializationPath)
+std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const std::string_view key, const std::string_view deserializationPath)
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when deserializing resource with ResourceDeserializer");
+		throw std::runtime_error("Key is empty when deserializing resource with ResourceDeserializer");
 
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
-	Path serializationPath = deserializationPath;
+	Path serializationPath = std::string(deserializationPath);
 	if (serializationPath.empty())
 		throw std::runtime_error("Serialization path is empty when deserializaing resource with ResourceDeserializer");
 
-	std::string fileName = key + RESOURCE_EXT;
+	std::string fileName = std::string(key) + RESOURCE_EXT;
 	std::ifstream inFile((serializationPath / fileName).string(), std::ios::binary);
 	if (!inFile)
 		throw std::runtime_error("Could not open input file: " + (serializationPath / fileName).string());
@@ -104,17 +105,17 @@ std::unique_ptr<ISerializableResource> ResourceDeserializer::Deserialize(const s
 	return arithmeticContainer;
 }
 
-std::unique_ptr<ISerializableResource> ResourceDeserializer::GenerateResource(const std::string &key) const
+std::unique_ptr<ISerializableResource> ResourceDeserializer::GenerateResource(const std::string_view key) const
 {
 	if (key.empty())
-		throw std::runtime_error("Key (" + key + ") is empty when generating resource with ResourceDeserializer");
+		throw std::runtime_error("Key is empty when generating resource with ResourceDeserializer");
 
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key=" + key + " is not registered with the ResourceDeserializer");
+		throw std::runtime_error("Key is not registered with the ResourceDeserializer");
 
-	std::unique_ptr<ISerializableResource> resource = keyToResourceMap_[key]();
+	std::unique_ptr<ISerializableResource> resource = keyToResourceMap_[std::string(key)]();
 
 	return resource;
 }

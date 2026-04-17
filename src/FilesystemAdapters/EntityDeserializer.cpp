@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <boost/property_tree/json_parser.hpp>
@@ -48,7 +49,7 @@ namespace
 		return "";
 	}
 
-	std::string GetParentKeyPath(const std::string &keyPath)
+	std::string GetParentKeyPath(const std::string_view keyPath)
 	{
 		std::string parentKeyPath;
 
@@ -100,9 +101,9 @@ void EntityDeserializer::LoadEntity(ISerializableEntity &entity)
 	LoadWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
-void EntityDeserializer::LoadWithParentKey(ISerializableEntity &entity, const Key &parentKey)
+void EntityDeserializer::LoadWithParentKey(ISerializableEntity &entity, const std::string_view parentKey)
 {
-	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : std::string(parentKey) + "." + entity.GetKey();
 
 	boost::optional<pt::ptree &> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)

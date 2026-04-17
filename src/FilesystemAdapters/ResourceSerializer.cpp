@@ -3,6 +3,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include "Config/filesystem.hpp"
 
 #include <boost/system/error_code.hpp>
@@ -32,12 +33,12 @@ ResourceSerializer *ResourceSerializer::GetInstance()
 	return &instance;
 }
 
-void ResourceSerializer::Serialize(const LockedResource &resource, const std::string &key, const std::string &serializationPath)
+void ResourceSerializer::Serialize(const LockedResource &resource, const std::string_view key, const std::string_view serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot serialize resource with empty key");
 
-	Path resourcePath = serializationPath;
+	Path resourcePath = std::string(serializationPath);
 
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());
 
@@ -49,8 +50,9 @@ void ResourceSerializer::Serialize(const LockedResource &resource, const std::st
 	if (!resource.UpdateChecksum())
 		return;
 
-	const std::string fileName = key + RESOURCE_EXT;
-	const std::string tmpFileName = key + RESOURCE_TMP_EXT;
+	const std::string keyStr = std::string(key);
+	const std::string fileName = keyStr + RESOURCE_EXT;
+	const std::string tmpFileName = keyStr + RESOURCE_TMP_EXT;
 	std::ofstream outfile((resourcePath / tmpFileName).string(), std::ios::binary);
 	if (!outfile)
 		throw std::runtime_error("Could not open output file: " + (resourcePath / fileName).string());
@@ -76,12 +78,12 @@ void ResourceSerializer::Serialize(const LockedResource &resource, const std::st
 		throw std::runtime_error("ResourceSerializer could .tmp file to file: " + fileName);
 }
 
-void ResourceSerializer::Unserialize(const std::string &key, const std::string &serializationPath)
+void ResourceSerializer::Unserialize(const std::string_view key, const std::string_view serializationPath)
 {
 	if (key.empty())
 		throw std::runtime_error("Cannot unserialize resource with empty key");
 
-	const std::string fileName = key + RESOURCE_EXT;
+	const std::string fileName = std::string(key) + RESOURCE_EXT;
 	Path resourcePath = Path(serializationPath) / fileName;
 
 	std::lock_guard<std::recursive_mutex> lock(GetGlobalFileLock());

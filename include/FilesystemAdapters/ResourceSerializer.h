@@ -9,6 +9,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include "Config/filesystem.h"
 
 #include "FilesystemAdapters/config.h"
@@ -41,14 +42,14 @@ namespace filesystem_adapters
          * @param key The key associated with the resource.
          * @param serializationPath The file system path to the resource
          */
-        void Serialize(const ISerializableResource::LockedResource &resource, const std::string &key, const std::string &serializationPath);
+        void Serialize(const ISerializableResource::LockedResource &resource, const std::string_view key, const std::string_view serializationPath);
 
         /**
          * @brief Deserialize a resource with the specified key.
          * @param key The key associated with the resource to deserialize.
          * @param serializationPath The file system path to the resource
          */
-        void Unserialize(const std::string &key, const std::string &serializationPath);
+        void Unserialize(const std::string_view key, const std::string_view serializationPath);
 
     private:
         /**

@@ -7,6 +7,7 @@
 #define filesystem_adapters_entityserializer_h
 
 #include <string>
+#include <string_view>
 #include "Config/filesystem.h"
 #include "FilesystemAdapters/config.h"
 
@@ -90,7 +91,7 @@ namespace filesystem_adapters
          * @param entity The entity to serialize.
          * @param parentKey The key of the parent entity (default is an empty string).
          */
-        void SerializeWithParentKey(const ISerializableEntity &entity, const entity::Entity::Key &parentKey = "");
+        void SerializeWithParentKey(const ISerializableEntity &entity, const std::string_view parentKey = "");
 
         /** @brief Pointer to the singleton instance of the EntitySerializer. */
         static EntitySerializer *instance_;

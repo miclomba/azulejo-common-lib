@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include "Config/filesystem.h"
 
@@ -103,7 +104,7 @@ namespace filesystem_adapters
          * @param entity The entity to load data into.
          * @param parentKey The key of the parent entity (default is an empty string).
          */
-        void LoadWithParentKey(ISerializableEntity &entity, const entity::Entity::Key &parentKey = "");
+        void LoadWithParentKey(ISerializableEntity &entity, const std::string_view parentKey = "");
 
         /** @brief Pointer to the singleton instance of the EntityDeserializer. */
         static EntityDeserializer *instance_;

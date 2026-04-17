@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <boost/property_tree/json_parser.hpp>
@@ -47,9 +48,9 @@ void EntitySerializer::Serialize(const ISerializableEntity &entity)
 	SerializeWithParentKey(entity, "");
 }
 
-void EntitySerializer::SerializeWithParentKey(const ISerializableEntity &entity, const Key &parentKey)
+void EntitySerializer::SerializeWithParentKey(const ISerializableEntity &entity, const std::string_view parentKey)
 {
-	std::string searchPath = parentKey.empty() ? entity.GetKey() : parentKey + "." + entity.GetKey();
+	std::string searchPath = parentKey.empty() ? entity.GetKey() : std::string(parentKey) + "." + entity.GetKey();
 
 	pt::ptree &tree = hierarchy_.GetSerializationStructure().put_child(searchPath, pt::ptree());
 

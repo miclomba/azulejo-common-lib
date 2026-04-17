@@ -12,6 +12,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <typeinfo>
 #include "Config/filesystem.h"
 
@@ -49,13 +50,13 @@ namespace filesystem_adapters
          * @param constructor The constructor function for creating instances of the resource type.
          */
         template <typename T>
-        void RegisterResource(const std::string &key, std::function<std::unique_ptr<ISerializableResource>(void)> constructor);
+        void RegisterResource(const std::string_view key, std::function<std::unique_ptr<ISerializableResource>(void)> constructor);
 
         /**
          * @brief Unregister a resource type by its key.
          * @param key The key of the resource type to unregister.
          */
-        void UnregisterResource(const std::string &key);
+        void UnregisterResource(const std::string_view key);
 
         /**
          * @brief Unregister all resource types.
@@ -67,7 +68,7 @@ namespace filesystem_adapters
          * @param key The key to check for.
          * @return True if the key is registered, false otherwise.
          */
-        bool HasSerializationKey(const std::string &key) const;
+        bool HasSerializationKey(const std::string_view key) const;
 
         /**
          * @brief Deserialize a resource by its key.
@@ -75,14 +76,14 @@ namespace filesystem_adapters
          * @param deserializationPath The path to deserialize from.
          * @return A unique pointer to the deserialized resource.
          */
-        std::unique_ptr<ISerializableResource> Deserialize(const std::string &key, const std::string &deserializationPath);
+        std::unique_ptr<ISerializableResource> Deserialize(const std::string_view key, const std::string_view deserializationPath);
 
         /**
          * @brief Generate a resource instance by its key.
          * @param key The key of the resource to generate.
          * @return A unique pointer to the generated resource.
          */
-        std::unique_ptr<ISerializableResource> GenerateResource(const std::string &key) const;
+        std::unique_ptr<ISerializableResource> GenerateResource(const std::string_view key) const;
 
     private:
         /**
@@ -115,7 +116,7 @@ namespace filesystem_adapters
         ResourceDeserializer &operator=(ResourceDeserializer &&) = delete;
 
         /** @brief Map of keys to resource constructor functions. */
-        mutable std::map<std::string, std::function<std::unique_ptr<ISerializableResource>(void)>> keyToResourceMap_;
+        mutable std::map<std::string, std::function<std::unique_ptr<ISerializableResource>(void)>, std::less<>> keyToResourceMap_;
     };
 
 #include "FilesystemAdapters/ResourceDeserializer.hpp"
