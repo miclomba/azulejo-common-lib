@@ -33,10 +33,10 @@ void EventChannel::RegisterEmitter(const std::string &emitterKey, const std::sha
 
 	for (auto iter = consumerMap_.begin(); iter != consumerMap_.end(); ++iter)
 	{
-		const std::pair<std::string, std::string> consumerKey = iter->first;
-		std::weak_ptr<IEventConsumer> consumer = iter->second;
-		if (consumerKey.second == emitterKey && !consumer.expired())
-			emitter->Connect(consumer.lock());
+		auto& [consumerEmitterNamePair, ieventConsumer] = *iter;
+		auto& [consumerName, emitterName] = consumerEmitterNamePair;
+		if (emitterName == emitterKey && !ieventConsumer.expired())
+			emitter->Connect(ieventConsumer.lock());
 	}
 
 	emitterMap_[emitterKey] = emitter;
@@ -70,11 +70,10 @@ void EventChannel::RegisterConsumer(const std::string &consumerKey, const std::s
 
 	for (auto iter = emitterMap_.begin(); iter != emitterMap_.end(); ++iter)
 	{
-		const std::string &key = iter->first;
-		std::weak_ptr<IEventEmitter> emitter = iter->second;
-		if (key == emitterKey && !emitter.expired())
+		auto& [emitterName, ieventEmitter] = *iter;
+		if (emitterName == emitterKey && !ieventEmitter.expired())
 		{
-			std::shared_ptr<IEventEmitter> eventEmitter = emitter.lock();
+			std::shared_ptr<IEventEmitter> eventEmitter = ieventEmitter.lock();
 			eventEmitter->Connect(consumer);
 		}
 	}

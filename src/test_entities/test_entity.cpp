@@ -277,7 +277,8 @@ TEST(Entity, GetAggregatedMembers)
 	std::map<Key, SharedEntity> &members = ea.GetProtectedMembers();
 
 	auto iter = members.find(MEMBER_KEY);
-	SharedEntity member = iter->second;
+	auto [entityKey, sharedEntity] = *iter;
+	SharedEntity member = sharedEntity;
 
 	EXPECT_EQ(ea.GetExpectedTypeBCount(), members.size());
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);
@@ -291,7 +292,8 @@ TEST(Entity, GetAggregatedMembersFromConst)
 	const std::map<Key, SharedEntity> &members = ea.GetProtectedMembers();
 
 	auto iter = members.find(MEMBER_KEY);
-	SharedEntity member = iter->second;
+	auto [entityKey, sharedEntity] = *iter;
+	SharedEntity member = sharedEntity;
 
 	EXPECT_EQ(ea.GetExpectedTypeBCount(), members.size());
 	EXPECT_EQ(member->GetKey(), MEMBER_KEY);

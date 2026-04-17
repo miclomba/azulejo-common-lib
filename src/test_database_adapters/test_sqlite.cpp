@@ -110,11 +110,10 @@ TEST_F(SqliteF, IntegrationTest)
 	db.Execute(sql);
 
 	auto col = TABLE.find(COLUMN_NAMES[1]);
-	const std::string &colName = col->first;
-	const std::vector<std::string> &colValues = col->second;
-	for (size_t i = 0; i < col->second.size(); ++i)
+	auto& [colName, vectorColValues] = *col;
+	for (size_t i = 0; i < vectorColValues.size(); ++i)
 	{
-		sql = "INSERT INTO " + TABLE_NAME + " (" + colName + ") VALUES ('" + colValues.at(i) + "');";
+		sql = "INSERT INTO " + TABLE_NAME + " (" + colName + ") VALUES ('" + vectorColValues.at(i) + "');";
 		db.Execute(sql);
 	}
 
@@ -126,8 +125,9 @@ TEST_F(SqliteF, IntegrationTest)
 		for (int i = 0; i < numCols; ++i)
 		{
 			EXPECT_EQ(colNames[i], COLUMN_NAMES[i]);
-			auto col = TABLE.find(COLUMN_NAMES[i]);
-			const std::vector<std::string> &columnValues = col->second;
+			auto column = TABLE.find(COLUMN_NAMES[i]);
+			auto& [colName, vectorColValues] = *column;
+			const std::vector<std::string> &columnValues = vectorColValues;
 			EXPECT_EQ(colValues[i], columnValues[row]);
 		}
 		++row;
