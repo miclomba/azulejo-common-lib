@@ -1,6 +1,6 @@
 
 template<typename T>
-void ResourceDetabularizer::RegisterResource(const std::string_view key, std::function<std::unique_ptr<ITabularizableResource>(void)> constructor)
+void ResourceLoader::RegisterResource(const std::string_view key, std::function<std::unique_ptr<IPersistableResource>(void)> constructor)
 {
 	if (!std::is_arithmetic<T>::value)
 		throw std::runtime_error("Type (" + std::string(typeid(T).name()) + ") is not an arithmetic container when registering resource with ResourceDeserializer");

@@ -1,10 +1,10 @@
 /**
- * @file ITabularizableEntity.h
- * @brief Declaration of the ITabularizableEntity interface for database tabularization.
+ * @file IPersistableEntity.h
+ * @brief Declaration of the IPersistableEntity interface for database persistence.
  */
 
-#ifndef database_adapters_itabularizableentity_h
-#define database_adapters_itabularizableentity_h
+#ifndef database_adapters_ipersistableentity_h
+#define database_adapters_ipersistableentity_h
 
 #include <map>
 #include <memory>
@@ -17,61 +17,61 @@
 namespace database_adapters
 {
 
-    class EntityDetabularizer;
-    class EntityTabularizer;
+    class EntityLoader;
+    class EntityPersister;
     class Sqlite;
 
     /**
-     * @class ITabularizableEntity
+     * @class IPersistableEntity
      * @brief An interface for entities that can be saved to and loaded from database tables.
      *
      * Inherits from the `entity::Entity` class and provides methods for tabular data management.
      */
-    class DATABASE_ADAPTERS_DLL_EXPORT ITabularizableEntity : public virtual entity::Entity
+    class DATABASE_ADAPTERS_DLL_EXPORT IPersistableEntity : public virtual entity::Entity
     {
     public:
         /**
-         * @brief Allows EntityTabularizer and EntityDetabularizer access to private and protected members.
+         * @brief Allows EntityPersister and EntityLoader access to private and protected members.
          */
-        friend class EntityTabularizer;
-        friend class EntityDetabularizer;
+        friend class EntityPersister;
+        friend class EntityLoader;
 
     public:
         /**
-         * @brief Default constructor for the ITabularizableEntity class.
+         * @brief Default constructor for the IPersistableEntity class.
          */
-        ITabularizableEntity();
+        IPersistableEntity();
 
         /**
-         * @brief Destructor for the ITabularizableEntity class.
+         * @brief Destructor for the IPersistableEntity class.
          */
-        virtual ~ITabularizableEntity();
+        virtual ~IPersistableEntity();
 
         /**
          * @brief Copy constructor.
-         * @param other The ITabularizableEntity instance to copy from.
+         * @param other The IPersistableEntity instance to copy from.
          */
-        ITabularizableEntity(const ITabularizableEntity &other);
+        IPersistableEntity(const IPersistableEntity &other);
 
         /**
          * @brief Copy assignment operator.
-         * @param other The ITabularizableEntity instance to copy from.
-         * @return Reference to the updated ITabularizableEntity instance.
+         * @param other The IPersistableEntity instance to copy from.
+         * @return Reference to the updated IPersistableEntity instance.
          */
-        ITabularizableEntity &operator=(const ITabularizableEntity &other);
+        IPersistableEntity &operator=(const IPersistableEntity &other);
 
         /**
          * @brief Move constructor.
-         * @param other The ITabularizableEntity instance to move from.
+         * @param other The IPersistableEntity instance to move from.
          */
-        ITabularizableEntity(ITabularizableEntity &&other);
+        IPersistableEntity(IPersistableEntity &&other);
 
         /**
          * @brief Move assignment operator.
-         * @param other The ITabularizableEntity instance to move from.
-         * @return Reference to the updated ITabularizableEntity instance.
+         * @param other The IPersistableEntity instance to move from.
+         * @return Reference to the updated IPersistableEntity instance.
          */
-        ITabularizableEntity &operator=(ITabularizableEntity &&other);
+        IPersistableEntity &operator=(IPersistableEntity &&other);
 
         /**
          * @brief Save the entity data to a database.
@@ -98,4 +98,4 @@ namespace database_adapters
 
 } // end namespace database_adapters
 
-#endif // database_adapters_itabularizableentity_h
+#endif // database_adapters_ipersistableentity_h

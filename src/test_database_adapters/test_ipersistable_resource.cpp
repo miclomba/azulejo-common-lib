@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 
-using database_adapters::ITabularizableResource;
+using database_adapters::IPersistableResource;
 
 namespace
 {
-	struct TypeA : public ITabularizableResource
+	struct TypeA : public IPersistableResource
 	{
 		size_t GetElementSize() const override { return 0; }
 		void *Data() override { return nullptr; }
@@ -17,7 +17,7 @@ namespace
 	};
 } // end namespace
 
-TEST(ITabularizableResource, Construct)
+TEST(IPersistableResource, Construct)
 {
-	EXPECT_NO_THROW(TypeA tabularizable);
+	EXPECT_NO_THROW(TypeA persistable);
 }

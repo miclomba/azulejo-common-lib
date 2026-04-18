@@ -19,13 +19,13 @@ link_directories(
 )
 
 add_executable(${PROJECT_NAME}
-"test_entity_detabularizer.cpp" 
+"test_entity_loader.cpp" 
 "test_entity_hierarchy_blob.cpp" 
-"test_entity_tabularizer.cpp" 
-"test_itabularizable_entity.cpp" 
-"test_itabularizable_resource.cpp" 
-"test_resource_detabularizer.cpp" 
-"test_resource_tabularizer.cpp" 
+"test_entity_persister.cpp" 
+"test_ipersistable_entity.cpp" 
+"test_ipersistable_resource.cpp" 
+"test_resource_loader.cpp" 
+"test_resource_persister.cpp" 
 "test_sqlite.cpp" 
 "test_sqlite_blob.cpp" 
 )

@@ -1,10 +1,10 @@
 /**
- * @file EntityDetabularizer.h
- * @brief Declaration of the EntityDetabularizer class for detabularizing entities from database tables.
+ * @file EntityLoader.h
+ * @brief Declaration of the EntityLoader class for loading entities from database tables.
  */
 
-#ifndef database_adapters_entitydetabularizer_h
-#define database_adapters_entitydetabularizer_h
+#ifndef database_adapters_entityloader_h
+#define database_adapters_entityloader_h
 
 #include <functional>
 #include <map>
@@ -20,43 +20,43 @@
 
 #include "Entities/EntityHierarchy.h"
 #include "Entities/EntityRegistry.h"
-#include "DatabaseAdapters/ITabularizableEntity.h"
+#include "DatabaseAdapters/IPersistableEntity.h"
 #include "DatabaseAdapters/Sqlite.h"
 
 namespace database_adapters
 {
 
     /**
-     * @class EntityDetabularizer
-     * @brief A singleton class responsible for detabularizing entities from SQLite database tables.
+     * @class EntityLoader
+     * @brief A singleton class responsible for loading entities from SQLite database tables.
      */
-    class DATABASE_ADAPTERS_DLL_EXPORT EntityDetabularizer
+    class DATABASE_ADAPTERS_DLL_EXPORT EntityLoader
     {
     public:
         /**
-         * @brief Destructor for the EntityDetabularizer class.
+         * @brief Destructor for the EntityLoader class.
          */
-        virtual ~EntityDetabularizer();
+        virtual ~EntityLoader();
 
         /**
-         * @brief Get the singleton instance of the EntityDetabularizer.
-         * @return Pointer to the EntityDetabularizer instance.
+         * @brief Get the singleton instance of the EntityLoader.
+         * @return Pointer to the EntityLoader instance.
          */
-        static EntityDetabularizer *GetInstance();
+        static EntityLoader *GetInstance();
 
         /**
-         * @brief Reset the singleton instance of the EntityDetabularizer.
+         * @brief Reset the singleton instance of the EntityLoader.
          */
         static void ResetInstance();
 
         /**
-         * @brief Get the registry of tabularizable entities.
-         * @return Reference to the EntityRegistry for ITabularizableEntity.
+         * @brief Get the registry of persistable entities.
+         * @return Reference to the EntityRegistry for IPersistableEntity.
          */
-        entity::EntityRegistry<ITabularizableEntity> &GetRegistry();
+        entity::EntityRegistry<IPersistableEntity> &GetRegistry();
 
         /**
-         * @brief Get the hierarchy of tabularized entities.
+         * @brief Get the hierarchy of persisted entities.
          * @return Reference to the EntityHierarchy.
          */
         entity::EntityHierarchy &GetHierarchy();
@@ -79,55 +79,55 @@ namespace database_adapters
         Sqlite &GetDatabase();
 
         /**
-         * @brief Load and detabularize an entity from the database.
-         * @param entity The tabularizable entity to load data into.
+         * @brief Load an entity from the database.
+         * @param entity The persistable entity to load data into.
          */
-        void LoadEntity(ITabularizableEntity &entity);
+        void LoadEntity(IPersistableEntity &entity);
 
     private:
         /**
-         * @brief Default constructor for the EntityDetabularizer class.
+         * @brief Default constructor for the EntityLoader class.
          *
          * Private to enforce the singleton pattern.
          */
-        EntityDetabularizer();
+        EntityLoader();
 
         /**
          * @brief Deleted copy constructor to prevent copying.
          */
-        EntityDetabularizer(const EntityDetabularizer &) = delete;
+        EntityLoader(const EntityLoader &) = delete;
 
         /**
          * @brief Deleted copy assignment operator to prevent copying.
          * @return Reference to the updated instance (not used).
          */
-        EntityDetabularizer &operator=(const EntityDetabularizer &) = delete;
+        EntityLoader &operator=(const EntityLoader &) = delete;
 
         /**
          * @brief Deleted move constructor to prevent moving.
          */
-        EntityDetabularizer(EntityDetabularizer &&) = delete;
+        EntityLoader(EntityLoader &&) = delete;
 
         /**
          * @brief Deleted move assignment operator to prevent moving.
          * @return Reference to the updated instance (not used).
          */
-        EntityDetabularizer &operator=(EntityDetabularizer &&) = delete;
+        EntityLoader &operator=(EntityLoader &&) = delete;
 
         /**
          * @brief Load an entity with an optional parent key.
          * @param entity The entity to load data into.
          * @param parentKey The key of the parent entity (default is an empty string).
          */
-        void LoadWithParentKey(ITabularizableEntity &entity, const std::string_view parentKey = "");
+        void LoadWithParentKey(IPersistableEntity &entity, const std::string_view parentKey = "");
 
-        /** @brief Pointer to the singleton instance of the EntityDetabularizer. */
-        static EntityDetabularizer *instance_;
+        /** @brief Pointer to the singleton instance of the EntityLoader. */
+        static EntityLoader *instance_;
 
-        /** @brief Registry of tabularizable entities. */
-        entity::EntityRegistry<ITabularizableEntity> registry_;
+        /** @brief Registry of persistable entities. */
+        entity::EntityRegistry<IPersistableEntity> registry_;
 
-        /** @brief Hierarchy of tabularized entities. */
+        /** @brief Hierarchy of persisted entities. */
         entity::EntityHierarchy hierarchy_;
 
         /** @brief SQLite database adapter. */
@@ -136,4 +136,4 @@ namespace database_adapters
 
 } // end namespace database_adapters
 
-#endif // database_adapters_entitydetabularizer_h
+#endif // database_adapters_entityloader_h

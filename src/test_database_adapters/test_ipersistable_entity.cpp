@@ -7,12 +7,12 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "DatabaseAdapters/ITabularizableEntity.h"
+#include "DatabaseAdapters/IPersistableEntity.h"
 #include "DatabaseAdapters/Sqlite.h"
 
 namespace pt = boost::property_tree;
 
-using database_adapters::ITabularizableEntity;
+using database_adapters::IPersistableEntity;
 using database_adapters::Sqlite;
 using entity::Entity;
 
@@ -22,10 +22,10 @@ using SharedEntity = Entity::SharedEntity;
 namespace
 {
 	const std::string ROOT_KEY = "root";
-	const std::string TABULARIZABLE_KEY = "tabularizable";
-	const std::string NON_TABULARIZABLE_KEY = "non-tabularizable";
+	const std::string LOADABLE_KEY = "persistable";
+	const std::string NON_LOADABLE_KEY = "non-persistable";
 
-	struct TypeA : public ITabularizableEntity
+	struct TypeA : public IPersistableEntity
 	{
 		TypeA() = default;
 		TypeA(const Key &key) { SetKey(key); }
@@ -36,31 +36,31 @@ namespace
 	};
 } // end namespace
 
-TEST(ITabularizableEntity, Construct)
+TEST(IPersistableEntity, Construct)
 {
-	EXPECT_NO_THROW(TypeA tabularizable);
+	EXPECT_NO_THROW(TypeA persistable);
 }
 
-TEST(ITabularizableEntity, CopyConstruct)
+TEST(IPersistableEntity, CopyConstruct)
 {
 	TypeA source(ROOT_KEY);
 	EXPECT_NO_THROW(TypeA target(source));
 }
 
-TEST(ITabularizableEntity, CopyAssign)
+TEST(IPersistableEntity, CopyAssign)
 {
 	TypeA source(ROOT_KEY);
 	TypeA target(ROOT_KEY);
 	EXPECT_NO_THROW(target = source);
 }
 
-TEST(ITabularizableEntity, MoveConstruct)
+TEST(IPersistableEntity, MoveConstruct)
 {
 	TypeA source(ROOT_KEY);
 	EXPECT_NO_THROW(TypeA target(std::move(source)));
 }
 
-TEST(ITabularizableEntity, MoveAssign)
+TEST(IPersistableEntity, MoveAssign)
 {
 	TypeA source(ROOT_KEY);
 	TypeA target(ROOT_KEY);

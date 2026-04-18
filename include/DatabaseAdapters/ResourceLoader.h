@@ -1,10 +1,10 @@
 /**
- * @file ResourceDetabularizer.h
- * @brief Declaration of the ResourceDetabularizer class for detabularizing resources from database tables.
+ * @file ResourceLoader.h
+ * @brief Declaration of the ResourceLoader class for loading resources from database tables.
  */
 
-#ifndef database_adapters_resourcedetabularizer_h
-#define database_adapters_resourcedetabularizer_h
+#ifndef database_adapters_resourceloader_h
+#define database_adapters_resourceloader_h
 
 #include <fstream>
 #include <functional>
@@ -18,32 +18,32 @@
 
 #include "DatabaseAdapters/config.h"
 
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 #include "DatabaseAdapters/Sqlite.h"
 
 namespace database_adapters
 {
 
     /**
-     * @class ResourceDetabularizer
-     * @brief A singleton class responsible for detabularizing resources from SQLite database tables.
+     * @class ResourceLoader
+     * @brief A singleton class responsible for loading resources from SQLite database tables.
      */
-    class DATABASE_ADAPTERS_DLL_EXPORT ResourceDetabularizer
+    class DATABASE_ADAPTERS_DLL_EXPORT ResourceLoader
     {
     public:
         /**
-         * @brief Destructor for the ResourceDetabularizer class.
+         * @brief Destructor for the ResourceLoader class.
          */
-        virtual ~ResourceDetabularizer();
+        virtual ~ResourceLoader();
 
         /**
-         * @brief Get the singleton instance of the ResourceDetabularizer.
-         * @return Pointer to the ResourceDetabularizer instance.
+         * @brief Get the singleton instance of the ResourceLoader.
+         * @return Pointer to the ResourceLoader instance.
          */
-        static ResourceDetabularizer *GetInstance();
+        static ResourceLoader *GetInstance();
 
         /**
-         * @brief Reset the singleton instance of the ResourceDetabularizer.
+         * @brief Reset the singleton instance of the ResourceLoader.
          */
         static void ResetInstance();
 
@@ -71,7 +71,7 @@ namespace database_adapters
          * @param constructor The constructor function for creating instances of the resource type.
          */
         template <typename T>
-        void RegisterResource(const std::string_view key, std::function<std::unique_ptr<ITabularizableResource>(void)> constructor);
+        void RegisterResource(const std::string_view key, std::function<std::unique_ptr<IPersistableResource>(void)> constructor);
 
         /**
          * @brief Unregister a resource type by its key.
@@ -89,64 +89,64 @@ namespace database_adapters
          * @param key The key to check for.
          * @return True if the key is registered, false otherwise.
          */
-        bool HasTabularizationKey(const std::string_view key) const;
+        bool HasPersistenceKey(const std::string_view key) const;
 
         /**
-         * @brief Detabularize a resource by its key.
-         * @param key The key of the resource to detabularize.
-         * @return A unique pointer to the detabularized resource.
+         * @brief Load a resource by its key.
+         * @param key The key of the resource to load.
+         * @return A unique pointer to the loaded resource.
          */
-        std::unique_ptr<ITabularizableResource> Detabularize(const std::string_view key);
+        std::unique_ptr<IPersistableResource> Load(const std::string_view key);
 
         /**
          * @brief Generate a resource instance by its key.
          * @param key The key of the resource to generate.
          * @return A unique pointer to the generated resource.
          */
-        std::unique_ptr<ITabularizableResource> GenerateResource(const std::string_view key) const;
+        std::unique_ptr<IPersistableResource> GenerateResource(const std::string_view key) const;
 
     private:
         /**
-         * @brief Default constructor for the ResourceDetabularizer class.
+         * @brief Default constructor for the ResourceLoader class.
          *
          * Private to enforce the singleton pattern.
          */
-        ResourceDetabularizer();
+        ResourceLoader();
 
         /**
          * @brief Deleted copy constructor to prevent copying.
          */
-        ResourceDetabularizer(const ResourceDetabularizer &) = delete;
+        ResourceLoader(const ResourceLoader &) = delete;
 
         /**
          * @brief Deleted copy assignment operator to prevent copying.
          * @return Reference to the updated instance (not used).
          */
-        ResourceDetabularizer &operator=(const ResourceDetabularizer &) = delete;
+        ResourceLoader &operator=(const ResourceLoader &) = delete;
 
         /**
          * @brief Deleted move constructor to prevent moving.
          */
-        ResourceDetabularizer(ResourceDetabularizer &&) = delete;
+        ResourceLoader(ResourceLoader &&) = delete;
 
         /**
          * @brief Deleted move assignment operator to prevent moving.
          * @return Reference to the updated instance (not used).
          */
-        ResourceDetabularizer &operator=(ResourceDetabularizer &&) = delete;
+        ResourceLoader &operator=(ResourceLoader &&) = delete;
 
-        /** @brief Pointer to the singleton instance of the ResourceDetabularizer. */
-        static ResourceDetabularizer *instance_;
+        /** @brief Pointer to the singleton instance of the ResourceLoader. */
+        static ResourceLoader *instance_;
 
         /** @brief Map of keys to resource constructor functions. */
-        mutable std::map<std::string, std::function<std::unique_ptr<ITabularizableResource>(void)>, std::less<>> keyToResourceMap_;
+        mutable std::map<std::string, std::function<std::unique_ptr<IPersistableResource>(void)>, std::less<>> keyToResourceMap_;
 
         /** @brief SQLite database adapter. */
         Sqlite databaseAdapter_;
     };
 
-#include "DatabaseAdapters/ResourceDetabularizer.hpp"
+#include "DatabaseAdapters/ResourceLoader.hpp"
 
 } // end namespace database_adapters
 
-#endif // database_adapters_resourcedetabularizer_h
+#endif // database_adapters_resourceloader_h

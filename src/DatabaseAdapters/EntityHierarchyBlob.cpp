@@ -6,11 +6,11 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 
 namespace pt = boost::property_tree;
 using database_adapters::EntityHierarchyBlob;
-using database_adapters::ITabularizableResource;
+using database_adapters::IPersistableResource;
 
 namespace
 {

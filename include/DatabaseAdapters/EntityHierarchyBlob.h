@@ -10,18 +10,18 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "DatabaseAdapters/config.h"
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 
 namespace database_adapters
 {
 
     /**
      * @class EntityHierarchyBlob
-     * @brief A class for handling serialized entity hierarchy data as a tabularizable resource.
+     * @brief A class for handling serialized entity hierarchy data as a persistable resource.
      *
-     * Inherits from `database_adapters::ITabularizableResource`.
+     * Inherits from `database_adapters::IPersistableResource`.
      */
-    class DATABASE_ADAPTERS_DLL_EXPORT EntityHierarchyBlob : public database_adapters::ITabularizableResource
+    class DATABASE_ADAPTERS_DLL_EXPORT EntityHierarchyBlob : public database_adapters::IPersistableResource
     {
     public:
         /**

@@ -1,16 +1,16 @@
-#include "DatabaseAdapters/ResourceTabularizer.h"
+#include "DatabaseAdapters/ResourcePersister.h"
 
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include "Config/filesystem.hpp"
 
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "DatabaseAdapters/SqliteBlob.h"
 
-using database_adapters::ITabularizableResource;
-using database_adapters::ResourceTabularizer;
+using database_adapters::IPersistableResource;
+using database_adapters::ResourcePersister;
 using database_adapters::Sqlite;
 using database_adapters::SqliteBlob;
 
@@ -25,34 +25,34 @@ namespace
 	const std::string DATA_KEY = "data";
 }
 
-ResourceTabularizer *ResourceTabularizer::instance_ = nullptr;
+ResourcePersister *ResourcePersister::instance_ = nullptr;
 
-ResourceTabularizer::ResourceTabularizer() = default;
+ResourcePersister::ResourcePersister() = default;
 
-ResourceTabularizer::~ResourceTabularizer()
+ResourcePersister::~ResourcePersister()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-ResourceTabularizer *ResourceTabularizer::GetInstance()
+ResourcePersister *ResourcePersister::GetInstance()
 {
 	if (!instance_)
-		instance_ = new ResourceTabularizer();
+		instance_ = new ResourcePersister();
 	return instance_;
 }
 
-void ResourceTabularizer::ResetInstance()
+void ResourcePersister::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-void ResourceTabularizer::OpenDatabase(const Path &dbPath)
+void ResourcePersister::OpenDatabase(const Path &dbPath)
 {
 	if (databaseAdapter_.IsOpen())
-		throw std::runtime_error("ResourceTabularizer already has a database open");
+		throw std::runtime_error("ResourcePersister already has a database open");
 	databaseAdapter_.Open(dbPath);
 
 	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -68,27 +68,27 @@ void ResourceTabularizer::OpenDatabase(const Path &dbPath)
 	databaseAdapter_.Execute(sql);
 }
 
-void ResourceTabularizer::CloseDatabase()
+void ResourcePersister::CloseDatabase()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-Sqlite &ResourceTabularizer::GetDatabase()
+Sqlite &ResourcePersister::GetDatabase()
 {
 	return databaseAdapter_;
 }
 
-void ResourceTabularizer::Tabularize(const ITabularizableResource &resource, const std::string_view key)
+void ResourcePersister::Persist(const IPersistableResource &resource, const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Cannot tabularize resource with empty key");
+		throw std::runtime_error("Cannot persist resource with empty key");
 
 	if (!resource.UpdateChecksum())
 		return;
 
 	if (!databaseAdapter_.IsOpen())
-		throw std::runtime_error("Cannot tabularize resource because the database is not open");
+		throw std::runtime_error("Cannot persist resource because the database is not open");
 
 	const std::string M = std::to_string(resource.GetColumnSize());
 	const std::string N = std::to_string(resource.GetRowSize());
@@ -100,13 +100,13 @@ void ResourceTabularizer::Tabularize(const ITabularizableResource &resource, con
 	SqliteBlob::InsertBlob(databaseAdapter_, sql, resource.Data(), size);
 }
 
-void ResourceTabularizer::Untabularize(const std::string_view key)
+void ResourcePersister::Load(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Cannot untabularize resource with empty key");
+		throw std::runtime_error("Cannot unpersist resource with empty key");
 
 	if (!databaseAdapter_.IsOpen())
-		throw std::runtime_error("Cannot untabularize resource because the database is not open");
+		throw std::runtime_error("Cannot unpersist resource because the database is not open");
 
 	std::string sql = "DELETE FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + std::string(key) + "';";
 	GetDatabase().Execute(sql);

@@ -1,4 +1,4 @@
-#include "DatabaseAdapters/EntityDetabularizer.h"
+#include "DatabaseAdapters/EntityLoader.h"
 
 #include <fstream>
 #include <memory>
@@ -14,18 +14,18 @@
 #include "Entities/EntityHierarchy.h"
 #include "Entities/EntityRegistry.h"
 #include "DatabaseAdapters/EntityHierarchyBlob.h"
-#include "DatabaseAdapters/ITabularizableEntity.h"
-#include "DatabaseAdapters/ITabularizableResource.h"
-#include "DatabaseAdapters/ResourceDetabularizer.h"
+#include "DatabaseAdapters/IPersistableEntity.h"
+#include "DatabaseAdapters/IPersistableResource.h"
+#include "DatabaseAdapters/ResourceLoader.h"
 #include "DatabaseAdapters/Sqlite.h"
 
 namespace pt = boost::property_tree;
 
-using database_adapters::EntityDetabularizer;
+using database_adapters::EntityLoader;
 using database_adapters::EntityHierarchyBlob;
-using database_adapters::ITabularizableEntity;
-using database_adapters::ITabularizableResource;
-using database_adapters::ResourceDetabularizer;
+using database_adapters::IPersistableEntity;
+using database_adapters::IPersistableResource;
+using database_adapters::ResourceLoader;
 using database_adapters::Sqlite;
 using entity::Entity;
 using entity::EntityHierarchy;
@@ -37,7 +37,7 @@ namespace
 {
 	const std::string ENTITY_HIERARCHY_BLOB_KEY = "entity_hierarchy_blob";
 
-	auto ENTITY_HIERARCHY_BLOB_CONSTRUCTOR = []() -> std::unique_ptr<ITabularizableResource>
+	auto ENTITY_HIERARCHY_BLOB_CONSTRUCTOR = []() -> std::unique_ptr<IPersistableResource>
 	{
 		return std::make_unique<EntityHierarchyBlob>();
 	};
@@ -74,92 +74,92 @@ namespace
 
 	pt::ptree GetEntityHierarchyTree(const Sqlite &database)
 	{
-		ResourceDetabularizer *resourceDetabularizer = ResourceDetabularizer::GetInstance();
+		ResourceLoader *resourceLoader = ResourceLoader::GetInstance();
 
-		bool resourceDetabularizerIsOpen = resourceDetabularizer->GetDatabase().IsOpen();
+		bool resourceLoaderIsOpen = resourceLoader->GetDatabase().IsOpen();
 
-		if (!resourceDetabularizerIsOpen)
-			resourceDetabularizer->OpenDatabase(database.GetPath());
-		if (!resourceDetabularizer->HasTabularizationKey(ENTITY_HIERARCHY_BLOB_KEY))
-			resourceDetabularizer->RegisterResource<char>(ENTITY_HIERARCHY_BLOB_KEY, ENTITY_HIERARCHY_BLOB_CONSTRUCTOR);
+		if (!resourceLoaderIsOpen)
+			resourceLoader->OpenDatabase(database.GetPath());
+		if (!resourceLoader->HasPersistenceKey(ENTITY_HIERARCHY_BLOB_KEY))
+			resourceLoader->RegisterResource<char>(ENTITY_HIERARCHY_BLOB_KEY, ENTITY_HIERARCHY_BLOB_CONSTRUCTOR);
 
-		std::unique_ptr<ITabularizableResource> entityHierarchyBlob;
+		std::unique_ptr<IPersistableResource> entityHierarchyBlob;
 		try
 		{
-			entityHierarchyBlob = resourceDetabularizer->Detabularize(ENTITY_HIERARCHY_BLOB_KEY);
+			entityHierarchyBlob = resourceLoader->Load(ENTITY_HIERARCHY_BLOB_KEY);
 		}
 		catch (std::runtime_error &)
 		{
-			if (!resourceDetabularizerIsOpen)
-				resourceDetabularizer->CloseDatabase();
+			if (!resourceLoaderIsOpen)
+				resourceLoader->CloseDatabase();
 			return pt::ptree();
 		}
 
-		if (!resourceDetabularizerIsOpen)
-			resourceDetabularizer->CloseDatabase();
+		if (!resourceLoaderIsOpen)
+			resourceLoader->CloseDatabase();
 
 		auto entityHierarchyBlobPtr = dynamic_cast<EntityHierarchyBlob *>(entityHierarchyBlob.get());
 		return entityHierarchyBlobPtr->GetHierarchyTree();
 	}
 } // end namespace anonymous
 
-EntityDetabularizer *EntityDetabularizer::instance_ = nullptr;
+EntityLoader *EntityLoader::instance_ = nullptr;
 
-EntityDetabularizer::EntityDetabularizer() = default;
-EntityDetabularizer::~EntityDetabularizer()
+EntityLoader::EntityLoader() = default;
+EntityLoader::~EntityLoader()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-EntityDetabularizer *EntityDetabularizer::GetInstance()
+EntityLoader *EntityLoader::GetInstance()
 {
 	if (!instance_)
-		instance_ = new EntityDetabularizer();
+		instance_ = new EntityLoader();
 	return instance_;
 }
 
-void EntityDetabularizer::ResetInstance()
+void EntityLoader::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-EntityRegistry<ITabularizableEntity> &EntityDetabularizer::GetRegistry()
+EntityRegistry<IPersistableEntity> &EntityLoader::GetRegistry()
 {
 	return registry_;
 }
 
-EntityHierarchy &EntityDetabularizer::GetHierarchy()
+EntityHierarchy &EntityLoader::GetHierarchy()
 {
 	return hierarchy_;
 }
 
-void EntityDetabularizer::CloseDatabase()
+void EntityLoader::CloseDatabase()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-void EntityDetabularizer::OpenDatabase(const Path &dbPath)
+void EntityLoader::OpenDatabase(const Path &dbPath)
 {
 	if (databaseAdapter_.IsOpen())
-		throw std::runtime_error("EntityDetabularizer already has a database set");
+		throw std::runtime_error("EntityLoader already has a database set");
 	databaseAdapter_.Open(dbPath);
 
 	hierarchy_.GetSerializationStructure() = GetEntityHierarchyTree(GetDatabase());
 }
 
-Sqlite &EntityDetabularizer::GetDatabase()
+Sqlite &EntityLoader::GetDatabase()
 {
 	return databaseAdapter_;
 }
 
-void EntityDetabularizer::LoadEntity(ITabularizableEntity &entity)
+void EntityLoader::LoadEntity(IPersistableEntity &entity)
 {
 	if (!databaseAdapter_.IsOpen())
-		throw std::runtime_error("Cannot detabularize entity because the database is not open");
+		throw std::runtime_error("Cannot load entity because the database is not open");
 
 	std::string keyPath = GetKeyPath(entity.GetKey(), hierarchy_.GetSerializationStructure());
 	if (keyPath.empty())
@@ -168,13 +168,13 @@ void EntityDetabularizer::LoadEntity(ITabularizableEntity &entity)
 	LoadWithParentKey(entity, GetParentKeyPath(keyPath));
 }
 
-void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity &entity, const std::string_view parentKey)
+void EntityLoader::LoadWithParentKey(IPersistableEntity &entity, const std::string_view parentKey)
 {
 	std::string searchPath = parentKey.empty() ? entity.GetKey() : std::string(parentKey) + "." + entity.GetKey();
 
 	boost::optional<pt::ptree &> tree = hierarchy_.GetSerializationStructure().get_child_optional(searchPath);
 	if (!tree)
-		throw std::runtime_error("Cannot locate entity key in the detabularization json structure");
+		throw std::runtime_error("Cannot locate entity key in the loading json structure");
 
 	entity.Load(*tree, GetDatabase());
 
@@ -184,10 +184,10 @@ void EntityDetabularizer::LoadWithParentKey(ITabularizableEntity &entity, const 
 		if (!registry_.HasRegisteredKey(key))
 			continue;
 
-		std::unique_ptr<ITabularizableEntity> memberEntity = registry_.GenerateEntity(key);
+		std::unique_ptr<IPersistableEntity> memberEntity = registry_.GenerateEntity(key);
 		entity.AggregateMember<Entity>(std::move(memberEntity));
 
-		auto childEntity = std::dynamic_pointer_cast<ITabularizableEntity>(entity.GetAggregatedMember(key));
+		auto childEntity = std::dynamic_pointer_cast<IPersistableEntity>(entity.GetAggregatedMember(key));
 		LoadWithParentKey(*childEntity, searchPath);
 	}
 }

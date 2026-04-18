@@ -16,13 +16,13 @@ link_directories(
 
 # Define the actual TARGET
 add_library(${PROJECT_NAME} SHARED
-"EntityDetabularizer.cpp" 
+"EntityLoader.cpp" 
 "EntityHierarchyBlob.cpp" 
-"EntityTabularizer.cpp" 
-"ITabularizableEntity.cpp" 
-"ITabularizableResource.cpp" 
-"ResourceDetabularizer.cpp" 
-"ResourceTabularizer.cpp" 
+"EntityPersister.cpp" 
+"IPersistableEntity.cpp" 
+"IPersistableResource.cpp" 
+"ResourceLoader.cpp" 
+"ResourcePersister.cpp" 
 "Sqlite.cpp" 
 "SqliteBlob.cpp" 
 )

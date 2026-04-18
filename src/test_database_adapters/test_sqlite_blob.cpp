@@ -11,12 +11,12 @@
 #include <boost/system/error_code.hpp>
 
 #include "test_database_adapters/ContainerResource.h"
-#include "DatabaseAdapters/ResourceTabularizer.h"
+#include "DatabaseAdapters/ResourcePersister.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "DatabaseAdapters/SqliteBlob.h"
 
 using boost::system::error_code;
-using database_adapters::ResourceTabularizer;
+using database_adapters::ResourcePersister;
 using database_adapters::Sqlite;
 using database_adapters::SqliteBlob;
 
@@ -67,13 +67,13 @@ namespace
 	{
 		SqliteBlobF()
 		{
-			ResourceTabularizer *tabularizer = ResourceTabularizer::GetInstance();
-			tabularizer->OpenDatabase(DB_PATH);
+			ResourcePersister *persister = ResourcePersister::GetInstance();
+			persister->OpenDatabase(DB_PATH);
 
 			Resource resource_(ARRAY_1);
-			tabularizer->Tabularize(resource_, RESOURCE_KEY);
+			persister->Persist(resource_, RESOURCE_KEY);
 
-			tabularizer->CloseDatabase();
+			persister->CloseDatabase();
 
 			db_.Open(DB_PATH);
 		}
@@ -81,7 +81,7 @@ namespace
 		~SqliteBlobF()
 		{
 			db_.Close();
-			ResourceTabularizer::ResetInstance();
+			ResourcePersister::ResetInstance();
 		}
 
 		Sqlite &GetDatabase()
@@ -98,9 +98,9 @@ namespace
 	{
 		SqliteBlobG()
 		{
-			ResourceTabularizer *tabularizer = ResourceTabularizer::GetInstance();
-			tabularizer->OpenDatabase(DB_PATH);
-			tabularizer->CloseDatabase();
+			ResourcePersister *persister = ResourcePersister::GetInstance();
+			persister->OpenDatabase(DB_PATH);
+			persister->CloseDatabase();
 
 			db_.Open(DB_PATH);
 		}
@@ -108,7 +108,7 @@ namespace
 		~SqliteBlobG()
 		{
 			db_.Close();
-			ResourceTabularizer::ResetInstance();
+			ResourcePersister::ResetInstance();
 		}
 
 		Sqlite &GetDatabase()

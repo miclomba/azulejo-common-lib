@@ -1,4 +1,4 @@
-#include "DatabaseAdapters/ResourceDetabularizer.h"
+#include "DatabaseAdapters/ResourceLoader.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -6,12 +6,12 @@
 #include <string_view>
 #include "Config/filesystem.hpp"
 
-#include "DatabaseAdapters/ITabularizableResource.h"
+#include "DatabaseAdapters/IPersistableResource.h"
 #include "DatabaseAdapters/Sqlite.h"
 #include "DatabaseAdapters/SqliteBlob.h"
 
-using database_adapters::ITabularizableResource;
-using database_adapters::ResourceDetabularizer;
+using database_adapters::IPersistableResource;
+using database_adapters::ResourceLoader;
 using database_adapters::Sqlite;
 using database_adapters::SqliteBlob;
 
@@ -26,39 +26,39 @@ namespace
 	const std::string DATA_KEY = "data";
 }
 
-ResourceDetabularizer *ResourceDetabularizer::instance_ = nullptr;
+ResourceLoader *ResourceLoader::instance_ = nullptr;
 
-ResourceDetabularizer::ResourceDetabularizer() = default;
-ResourceDetabularizer::~ResourceDetabularizer()
+ResourceLoader::ResourceLoader() = default;
+ResourceLoader::~ResourceLoader()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-ResourceDetabularizer *ResourceDetabularizer::GetInstance()
+ResourceLoader *ResourceLoader::GetInstance()
 {
 	if (!instance_)
-		instance_ = new ResourceDetabularizer();
+		instance_ = new ResourceLoader();
 	return instance_;
 }
 
-void ResourceDetabularizer::ResetInstance()
+void ResourceLoader::ResetInstance()
 {
 	if (instance_)
 		delete instance_;
 	instance_ = nullptr;
 }
 
-void ResourceDetabularizer::CloseDatabase()
+void ResourceLoader::CloseDatabase()
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();
 }
 
-void ResourceDetabularizer::OpenDatabase(const Path &dbPath)
+void ResourceLoader::OpenDatabase(const Path &dbPath)
 {
 	if (databaseAdapter_.IsOpen())
-		throw std::runtime_error("ResourceDetabularizer already has a database set");
+		throw std::runtime_error("ResourceLoader already has a database set");
 	databaseAdapter_.Open(dbPath);
 
 	std::string sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -74,38 +74,38 @@ void ResourceDetabularizer::OpenDatabase(const Path &dbPath)
 	databaseAdapter_.Execute(sql);
 }
 
-Sqlite &ResourceDetabularizer::GetDatabase()
+Sqlite &ResourceLoader::GetDatabase()
 {
 	return databaseAdapter_;
 }
 
-void ResourceDetabularizer::UnregisterResource(const std::string_view key)
+void ResourceLoader::UnregisterResource(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Key is empty when unregistering resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when unregistering resource with ResourceLoader");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key not already registered with the ResourceDetabularizer");
+		throw std::runtime_error("Key not already registered with the ResourceLoader");
 
 	keyToResourceMap_.erase(std::string(key));
 }
 
-bool ResourceDetabularizer::HasTabularizationKey(const std::string_view key) const
+bool ResourceLoader::HasPersistenceKey(const std::string_view key) const
 {
 	return keyToResourceMap_.find(key) != keyToResourceMap_.cend();
 }
 
-void ResourceDetabularizer::UnregisterAll()
+void ResourceLoader::UnregisterAll()
 {
 	keyToResourceMap_.clear();
 }
 
-std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(const std::string_view key)
+std::unique_ptr<IPersistableResource> ResourceLoader::Load(const std::string_view key)
 {
 	if (key.empty())
-		throw std::runtime_error("Key is empty when detabularizing resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when loading resource with ResourceLoader");
 
 	if (!databaseAdapter_.IsOpen())
-		throw std::runtime_error("Cannot detabularize resource because the database is not open");
+		throw std::runtime_error("Cannot load resource because the database is not open");
 
 	const std::string sql = "SELECT " + P_KEY + ", " + ROW_KEY + ", " + M_KEY + ", " + N_KEY + ", " + SIZE_OF_KEY + " FROM " + TABLE_NAME + " WHERE " + P_KEY + " = '" + std::string(key) + "';";
 
@@ -130,7 +130,7 @@ std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(cons
 	size_t size = m * n * sizeOf;
 	std::vector<char> blob = sqliteBlob.Read(size, 0);
 
-	std::unique_ptr<ITabularizableResource> resource = GenerateResource(key);
+	std::unique_ptr<IPersistableResource> resource = GenerateResource(key);
 	resource->SetRowSize(m);
 	resource->SetColumnSize(n);
 	resource->Assign(blob.data(), size);
@@ -138,14 +138,14 @@ std::unique_ptr<ITabularizableResource> ResourceDetabularizer::Detabularize(cons
 	return resource;
 }
 
-std::unique_ptr<ITabularizableResource> ResourceDetabularizer::GenerateResource(const std::string_view key) const
+std::unique_ptr<IPersistableResource> ResourceLoader::GenerateResource(const std::string_view key) const
 {
 	if (key.empty())
-		throw std::runtime_error("Key is empty when generating resource with ResourceDetabularizer");
+		throw std::runtime_error("Key is empty when generating resource with ResourceLoader");
 	if (keyToResourceMap_.find(key) == keyToResourceMap_.cend())
-		throw std::runtime_error("Key is not registered with the ResourceDetabularizer");
+		throw std::runtime_error("Key is not registered with the ResourceLoader");
 
-	std::unique_ptr<ITabularizableResource> resource = keyToResourceMap_[std::string(key)]();
+	std::unique_ptr<IPersistableResource> resource = keyToResourceMap_[std::string(key)]();
 
 	return resource;
 }
