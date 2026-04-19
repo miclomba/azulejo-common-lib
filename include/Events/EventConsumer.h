@@ -38,7 +38,7 @@ namespace events
         /**
          * @brief Destructor for the EventConsumer class.
          */
-        virtual ~EventConsumer();
+        virtual ~EventConsumer() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -57,14 +57,14 @@ namespace events
          * @brief Move constructor.
          * @param other The EventConsumer instance to move from.
          */
-        EventConsumer(EventConsumer &&other);
+        EventConsumer(EventConsumer &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The EventConsumer instance to move from.
          * @return Reference to the updated EventConsumer instance.
          */
-        EventConsumer &operator=(EventConsumer &&other);
+        EventConsumer &operator=(EventConsumer &&other) noexcept;
 
         /**
          * @brief Get the subscriber function for handling events.

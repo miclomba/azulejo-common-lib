@@ -38,7 +38,7 @@ namespace filesystem_adapters
         /**
          * @brief Destructor for the EntityDeserializer class.
          */
-        virtual ~EntityDeserializer();
+        virtual ~EntityDeserializer() noexcept;
 
         /**
          * @brief Get the singleton instance of the EntityDeserializer.

@@ -34,7 +34,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the ResourceLoader class.
          */
-        virtual ~ResourceLoader();
+        virtual ~ResourceLoader() noexcept;
 
         /**
          * @brief Get the singleton instance of the ResourceLoader.

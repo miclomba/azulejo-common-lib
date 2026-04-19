@@ -50,7 +50,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the EntityHierarchyBlob class.
          */
-        virtual ~EntityHierarchyBlob();
+        virtual ~EntityHierarchyBlob() noexcept;
 
         /**
          * @brief Get the property tree representing the entity hierarchy.

@@ -39,7 +39,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the IPersistableResource class.
          */
-        virtual ~IPersistableResource();
+        virtual ~IPersistableResource() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -58,14 +58,14 @@ namespace database_adapters
          * @brief Move constructor.
          * @param other The IPersistableResource instance to move from.
          */
-        IPersistableResource(IPersistableResource &&other);
+        IPersistableResource(IPersistableResource &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IPersistableResource instance to move from.
          * @return Reference to the updated IPersistableResource instance.
          */
-        IPersistableResource &operator=(IPersistableResource &&other);
+        IPersistableResource &operator=(IPersistableResource &&other) noexcept;
     };
 
 } // end namespace database_adapters

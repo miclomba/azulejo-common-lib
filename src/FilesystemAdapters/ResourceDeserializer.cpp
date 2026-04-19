@@ -22,7 +22,7 @@ using filesystem_adapters::ResourceDeserializer;
 using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
 
 ResourceDeserializer::ResourceDeserializer() = default;
-ResourceDeserializer::~ResourceDeserializer() = default;
+ResourceDeserializer::~ResourceDeserializer() noexcept = default;
 
 ResourceDeserializer *ResourceDeserializer::GetInstance()
 {

@@ -61,7 +61,7 @@ namespace
 EntityDeserializer *EntityDeserializer::instance_ = nullptr;
 
 EntityDeserializer::EntityDeserializer() = default;
-EntityDeserializer::~EntityDeserializer() = default;
+EntityDeserializer::~EntityDeserializer() noexcept = default;
 
 EntityDeserializer *EntityDeserializer::GetInstance()
 {

@@ -28,7 +28,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the ResourcePersister class.
          */
-        virtual ~ResourcePersister();
+        virtual ~ResourcePersister() noexcept;
 
         /**
          * @brief Get the singleton instance of the ResourcePersister.

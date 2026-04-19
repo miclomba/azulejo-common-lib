@@ -106,7 +106,7 @@ namespace
 EntityLoader *EntityLoader::instance_ = nullptr;
 
 EntityLoader::EntityLoader() = default;
-EntityLoader::~EntityLoader()
+EntityLoader::~EntityLoader() noexcept
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();

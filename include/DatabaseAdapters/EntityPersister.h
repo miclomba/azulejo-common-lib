@@ -31,7 +31,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the EntityPersister class.
          */
-        virtual ~EntityPersister();
+        virtual ~EntityPersister() noexcept;
 
         /**
          * @brief Get the singleton instance of the EntityPersister.

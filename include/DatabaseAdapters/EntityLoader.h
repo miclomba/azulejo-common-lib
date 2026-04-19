@@ -36,7 +36,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the EntityLoader class.
          */
-        virtual ~EntityLoader();
+        virtual ~EntityLoader() noexcept;
 
         /**
          * @brief Get the singleton instance of the EntityLoader.

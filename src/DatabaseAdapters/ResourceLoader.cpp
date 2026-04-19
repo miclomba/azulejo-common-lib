@@ -29,7 +29,7 @@ namespace
 ResourceLoader *ResourceLoader::instance_ = nullptr;
 
 ResourceLoader::ResourceLoader() = default;
-ResourceLoader::~ResourceLoader()
+ResourceLoader::~ResourceLoader() noexcept
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();

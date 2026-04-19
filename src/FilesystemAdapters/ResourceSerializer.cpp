@@ -25,7 +25,7 @@ namespace
 }
 
 ResourceSerializer::ResourceSerializer() = default;
-ResourceSerializer::~ResourceSerializer() = default;
+ResourceSerializer::~ResourceSerializer() noexcept = default;
 
 ResourceSerializer *ResourceSerializer::GetInstance()
 {

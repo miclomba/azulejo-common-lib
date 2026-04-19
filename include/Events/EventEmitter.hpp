@@ -5,9 +5,9 @@ EventEmitter<T>::EventEmitter()
 {
 }
 
-TEMPLATE_T EventEmitter<T>::~EventEmitter() = default;
-TEMPLATE_T EventEmitter<T>::EventEmitter(EventEmitter<T>&&) = default;
-TEMPLATE_T EventEmitter<T>& EventEmitter<T>::operator=(EventEmitter<T>&&) = default;
+TEMPLATE_T EventEmitter<T>::~EventEmitter() noexcept = default;
+TEMPLATE_T EventEmitter<T>::EventEmitter(EventEmitter<T>&&) noexcept = default;
+TEMPLATE_T EventEmitter<T>& EventEmitter<T>::operator=(EventEmitter<T>&&) noexcept = default;
 
 TEMPLATE_T
 boost::signals2::connection EventEmitter<T>::Connect(const std::shared_ptr<IEventConsumer> subscriber)

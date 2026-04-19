@@ -35,7 +35,7 @@ namespace events
         /**
          * @brief Virtual destructor for the IEventEmitter interface.
          */
-        virtual ~IEventEmitter();
+        virtual ~IEventEmitter() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -54,14 +54,14 @@ namespace events
          * @brief Move constructor.
          * @param other The IEventEmitter instance to move from.
          */
-        IEventEmitter(IEventEmitter &&other);
+        IEventEmitter(IEventEmitter &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IEventEmitter instance to move from.
          * @return Reference to the updated IEventEmitter instance.
          */
-        IEventEmitter &operator=(IEventEmitter &&other);
+        IEventEmitter &operator=(IEventEmitter &&other) noexcept;
 
         /**
          * @brief Connect a subscriber to the event emitter.

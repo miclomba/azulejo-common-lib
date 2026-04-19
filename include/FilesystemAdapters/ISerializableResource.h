@@ -78,7 +78,7 @@ namespace filesystem_adapters
         /**
          * @brief Destructor for the ISerializableResource class.
          */
-        virtual ~ISerializableResource();
+        virtual ~ISerializableResource() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -97,14 +97,14 @@ namespace filesystem_adapters
          * @brief Move constructor.
          * @param other The ISerializableResource instance to move from.
          */
-        ISerializableResource(ISerializableResource &&other);
+        ISerializableResource(ISerializableResource &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The ISerializableResource instance to move from.
          * @return Reference to the updated ISerializableResource instance.
          */
-        ISerializableResource &operator=(ISerializableResource &&other);
+        ISerializableResource &operator=(ISerializableResource &&other) noexcept;
 
         /** @brief IO lock */
         std::shared_ptr<std::mutex> mtx_;

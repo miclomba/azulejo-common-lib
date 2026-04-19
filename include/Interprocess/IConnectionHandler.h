@@ -50,7 +50,7 @@ namespace interprocess
         /**
          * @brief Virtual destructor for the IConnectionHandler class.
          */
-        virtual ~IConnectionHandler();
+        virtual ~IConnectionHandler() noexcept;
 
         /**
          * @brief Deleted copy constructor to prevent copying.

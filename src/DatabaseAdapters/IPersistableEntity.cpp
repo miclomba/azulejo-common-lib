@@ -16,12 +16,12 @@ using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
 
 IPersistableEntity::IPersistableEntity() = default;
-IPersistableEntity::~IPersistableEntity() = default;
+IPersistableEntity::~IPersistableEntity() noexcept = default;
 
 IPersistableEntity::IPersistableEntity(const IPersistableEntity &) = default;
 IPersistableEntity &IPersistableEntity::operator=(const IPersistableEntity &) = default;
-IPersistableEntity::IPersistableEntity(IPersistableEntity &&) = default;
-IPersistableEntity &IPersistableEntity::operator=(IPersistableEntity &&) = default;
+IPersistableEntity::IPersistableEntity(IPersistableEntity &&) noexcept = default;
+IPersistableEntity &IPersistableEntity::operator=(IPersistableEntity &&) noexcept = default;
 
 SharedEntity &IPersistableEntity::GetAggregatedMember(const Key &key) const
 {

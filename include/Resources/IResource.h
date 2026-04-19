@@ -28,7 +28,7 @@ namespace resource
         /**
          * @brief Destructor for the IResource class.
          */
-        virtual ~IResource();
+        virtual ~IResource() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -47,14 +47,14 @@ namespace resource
          * @brief Move constructor.
          * @param other The IResource instance to move from.
          */
-        IResource(IResource &&other);
+        IResource(IResource &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IResource instance to move from.
          * @return Reference to the updated IResource instance.
          */
-        IResource &operator=(IResource &&other);
+        IResource &operator=(IResource &&other) noexcept;
 
         /**
          * @brief Get the number of columns in the resource data.

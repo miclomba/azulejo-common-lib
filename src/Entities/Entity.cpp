@@ -17,7 +17,7 @@ namespace entity
 
 	Entity::Entity() = default;
 
-	Entity::Entity(Entity &&) = default;
+	Entity::Entity(Entity &&) noexcept = default;
 	Entity::Entity(const Entity &other) : key_(other.key_)
 	{
 		for (const std::pair<Key, SharedEntity> &e : other.membersMap_) {
@@ -26,7 +26,7 @@ namespace entity
 		}
 	}
 
-	Entity &Entity::operator=(Entity &&) = default;
+	Entity &Entity::operator=(Entity &&) noexcept = default;
 	Entity &Entity::operator=(const Entity &other)
 	{
 		if (this == &other)
@@ -43,7 +43,7 @@ namespace entity
 		return *this;
 	}
 
-	Entity::~Entity() = default;
+	Entity::~Entity() noexcept = default;
 
 	Key Entity::GetKey() const
 	{

@@ -43,7 +43,7 @@ namespace interprocess
         /**
          * @brief Destructor for the TCPServer class.
          */
-        virtual ~TCPServer();
+        virtual ~TCPServer() noexcept;
 
         /**
          * @brief Deleted copy constructor to prevent copying.

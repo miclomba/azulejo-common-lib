@@ -57,7 +57,7 @@ public:
     /**
      * @brief Destructor for the SqliteBlob class.
      */
-    virtual ~SqliteBlob();
+    virtual ~SqliteBlob() noexcept;
 
     /**
      * @brief Open a BLOB in the database for operations.

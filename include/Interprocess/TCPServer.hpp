@@ -13,7 +13,7 @@ TCPServer_t::TCPServer(boost::asio::io_context& context, const size_t numThreads
 }
 
 TEMPLATE_T
-TCPServer_t::~TCPServer()
+TCPServer_t::~TCPServer() noexcept
 {
 	Join();
 }

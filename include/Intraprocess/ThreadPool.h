@@ -59,7 +59,7 @@ namespace intraprocess
         /**
          * @brief Destructor for the ThreadPool class.
          */
-        virtual ~ThreadPool();
+        virtual ~ThreadPool() noexcept;
 
         /**
          * @brief Get the number of threads in the thread pool.

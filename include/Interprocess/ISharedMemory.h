@@ -34,7 +34,7 @@ namespace interprocess
         /**
          * @brief Virtual destructor for the ISharedMemory class.
          */
-        virtual ~ISharedMemory();
+        virtual ~ISharedMemory() noexcept;
 
         /**
          * @brief Deleted copy constructor to prevent copying.

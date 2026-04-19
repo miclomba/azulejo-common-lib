@@ -15,9 +15,9 @@ using entity::EntityHierarchy;
 EntityHierarchy::EntityHierarchy() = default;
 EntityHierarchy::EntityHierarchy(const EntityHierarchy &) = default;
 EntityHierarchy &EntityHierarchy::operator=(const EntityHierarchy &) = default;
-EntityHierarchy::EntityHierarchy(EntityHierarchy &&) = default;
-EntityHierarchy &EntityHierarchy::operator=(EntityHierarchy &&) = default;
-EntityHierarchy::~EntityHierarchy() = default;
+EntityHierarchy::EntityHierarchy(EntityHierarchy &&) noexcept = default;
+EntityHierarchy &EntityHierarchy::operator=(EntityHierarchy &&) noexcept = default;
+EntityHierarchy::~EntityHierarchy() noexcept = default;
 
 void EntityHierarchy::LoadSerializationStructure(const Path &pathToJSON)
 {

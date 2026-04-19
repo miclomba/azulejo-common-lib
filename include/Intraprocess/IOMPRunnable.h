@@ -30,7 +30,7 @@ public:
     /**
      * @brief Virtual destructor for the IOMPRunnable class.
      */
-    virtual ~IOMPRunnable();
+    virtual ~IOMPRunnable() noexcept;
 
     /**
      * @brief Copy constructor.
@@ -49,14 +49,14 @@ public:
      * @brief Move constructor.
      * @param other The IOMPRunnable instance to move from.
      */
-    IOMPRunnable(IOMPRunnable&& other);
+    IOMPRunnable(IOMPRunnable&& other) noexcept;
 
     /**
      * @brief Move assignment operator.
      * @param other The IOMPRunnable instance to move from.
      * @return Reference to the updated IOMPRunnable instance.
      */
-    IOMPRunnable& operator=(IOMPRunnable&& other);
+    IOMPRunnable& operator=(IOMPRunnable&& other) noexcept;
 
     /**
      * @brief Start the OpenMP task by invoking the Run method.

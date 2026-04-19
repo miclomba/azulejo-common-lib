@@ -12,13 +12,13 @@ TEMPLATE_T
 EntityRegistry_t& EntityRegistry_t::operator=(const EntityRegistry_t&) = default;
 
 TEMPLATE_T
-EntityRegistry_t::EntityRegistry(EntityRegistry_t&&) = default;
+EntityRegistry_t::EntityRegistry(EntityRegistry_t&&) noexcept = default;
 
 TEMPLATE_T
-EntityRegistry_t& EntityRegistry_t::operator=(EntityRegistry_t&&) = default;
+EntityRegistry_t& EntityRegistry_t::operator=(EntityRegistry_t&&) noexcept = default;
 
 TEMPLATE_T
-EntityRegistry_t::~EntityRegistry() = default;
+EntityRegistry_t::~EntityRegistry() noexcept = default;
 
 TEMPLATE_T
 bool EntityRegistry_t::HasRegisteredKey(const Entity::Key& key) const

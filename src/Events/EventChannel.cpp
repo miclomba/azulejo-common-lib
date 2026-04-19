@@ -16,11 +16,11 @@ using events::IEventConsumer;
 using events::IEventEmitter;
 
 EventChannel::EventChannel() = default;
-EventChannel::~EventChannel() = default;
+EventChannel::~EventChannel() noexcept = default;
 EventChannel::EventChannel(const EventChannel &) = default;
 EventChannel &EventChannel::operator=(const EventChannel &) = default;
-EventChannel::EventChannel(EventChannel &&) = default;
-EventChannel &EventChannel::operator=(EventChannel &&) = default;
+EventChannel::EventChannel(EventChannel &&) noexcept = default;
+EventChannel &EventChannel::operator=(EventChannel &&) noexcept = default;
 
 void EventChannel::RegisterEmitter(const std::string_view emitterKey, const std::shared_ptr<IEventEmitter> emitter)
 {

@@ -49,19 +49,19 @@ namespace entity
          * @brief Move constructor.
          * @param other The EntityRegistry instance to move from.
          */
-        EntityRegistry(EntityRegistry &&other);
+        EntityRegistry(EntityRegistry &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The EntityRegistry instance to move from.
          * @return Reference to the updated EntityRegistry instance.
          */
-        EntityRegistry &operator=(EntityRegistry &&other);
+        EntityRegistry &operator=(EntityRegistry &&other) noexcept;
 
         /**
          * @brief Destructor for the EntityRegistry class.
          */
-        virtual ~EntityRegistry();
+        virtual ~EntityRegistry() noexcept;
 
         /**
          * @brief Register a new entity type with the registry.

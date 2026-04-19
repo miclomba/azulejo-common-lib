@@ -43,7 +43,7 @@ namespace events
         /**
          * @brief Virtual destructor for the EventEmitter class.
          */
-        virtual ~EventEmitter();
+        virtual ~EventEmitter() noexcept;
 
         /**
          * @brief Deleted copy constructor to prevent copying.
@@ -60,14 +60,14 @@ namespace events
          * @brief Move constructor.
          * @param other The EventEmitter instance to move from.
          */
-        EventEmitter(EventEmitter &&other);
+        EventEmitter(EventEmitter &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The EventEmitter instance to move from.
          * @return Reference to the updated instance.
          */
-        EventEmitter &operator=(EventEmitter &&other);
+        EventEmitter &operator=(EventEmitter &&other) noexcept;
 
         /**
          * @brief Connect a subscriber to the event emitter.

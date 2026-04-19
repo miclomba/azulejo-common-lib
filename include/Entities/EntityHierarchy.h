@@ -45,19 +45,19 @@ namespace entity
          * @brief Move constructor.
          * @param other The EntityHierarchy instance to move from.
          */
-        EntityHierarchy(EntityHierarchy &&other);
+        EntityHierarchy(EntityHierarchy &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The EntityHierarchy instance to move from.
          * @return Reference to the updated EntityHierarchy instance.
          */
-        EntityHierarchy &operator=(EntityHierarchy &&other);
+        EntityHierarchy &operator=(EntityHierarchy &&other) noexcept;
 
         /**
          * @brief Destructor for the EntityHierarchy class.
          */
-        virtual ~EntityHierarchy();
+        virtual ~EntityHierarchy() noexcept;
 
         /**
          * @brief Load the serialization structure from a JSON file.

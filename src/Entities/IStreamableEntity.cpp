@@ -24,12 +24,12 @@ namespace entity
 
 	IStreamableEntity::IStreamableEntity() = default;
 
-	IStreamableEntity::~IStreamableEntity() = default;
+	IStreamableEntity::~IStreamableEntity() noexcept = default;
 
 	IStreamableEntity::IStreamableEntity(const IStreamableEntity &) = default;
 	IStreamableEntity &IStreamableEntity::operator=(const IStreamableEntity &) = default;
-	IStreamableEntity::IStreamableEntity(IStreamableEntity &&) = default;
-	IStreamableEntity &IStreamableEntity::operator=(IStreamableEntity &&) = default;
+	IStreamableEntity::IStreamableEntity(IStreamableEntity &&) noexcept = default;
+	IStreamableEntity &IStreamableEntity::operator=(IStreamableEntity &&) noexcept = default;
 
 	std::string IStreamableEntity::GetDelimeter()
 	{

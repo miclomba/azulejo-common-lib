@@ -37,7 +37,7 @@ namespace events
         /**
          * @brief Destructor for the EventChannel class.
          */
-        virtual ~EventChannel();
+        virtual ~EventChannel() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -56,14 +56,14 @@ namespace events
          * @brief Move constructor.
          * @param other The EventChannel instance to move from.
          */
-        EventChannel(EventChannel &&other);
+        EventChannel(EventChannel &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The EventChannel instance to move from.
          * @return Reference to the updated EventChannel instance.
          */
-        EventChannel &operator=(EventChannel &&other);
+        EventChannel &operator=(EventChannel &&other) noexcept;
 
         /**
          * @brief Register an event emitter with a unique key.

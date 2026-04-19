@@ -45,7 +45,7 @@ namespace database_adapters
         /**
          * @brief Destructor for the IPersistableEntity class.
          */
-        virtual ~IPersistableEntity();
+        virtual ~IPersistableEntity() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -64,14 +64,14 @@ namespace database_adapters
          * @brief Move constructor.
          * @param other The IPersistableEntity instance to move from.
          */
-        IPersistableEntity(IPersistableEntity &&other);
+        IPersistableEntity(IPersistableEntity &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IPersistableEntity instance to move from.
          * @return Reference to the updated IPersistableEntity instance.
          */
-        IPersistableEntity &operator=(IPersistableEntity &&other);
+        IPersistableEntity &operator=(IPersistableEntity &&other) noexcept;
 
         /**
          * @brief Save the entity data to a database.

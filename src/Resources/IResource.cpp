@@ -5,11 +5,11 @@
 using resource::IResource;
 
 IResource::IResource() = default;
-IResource::~IResource() = default;
+IResource::~IResource() noexcept = default;
 IResource::IResource(const IResource &) = default;
 IResource &IResource::operator=(const IResource &) = default;
-IResource::IResource(IResource &&) = default;
-IResource &IResource::operator=(IResource &&) = default;
+IResource::IResource(IResource &&) noexcept = default;
+IResource &IResource::operator=(IResource &&) noexcept = default;
 
 void IResource::SetColumnSize(const size_t size)
 {

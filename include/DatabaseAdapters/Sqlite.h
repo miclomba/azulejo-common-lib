@@ -53,19 +53,19 @@ namespace database_adapters
          * @brief Move constructor.
          * @param other The Sqlite instance to move from.
          */
-        Sqlite(Sqlite &&other);
+        Sqlite(Sqlite &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The Sqlite instance to move from.
          * @return Reference to the updated Sqlite instance.
          */
-        Sqlite &operator=(Sqlite &&other);
+        Sqlite &operator=(Sqlite &&other) noexcept;
 
         /**
          * @brief Destructor for the Sqlite class.
          */
-        virtual ~Sqlite();
+        virtual ~Sqlite() noexcept;
 
         /**
          * @brief Execute an SQL command.

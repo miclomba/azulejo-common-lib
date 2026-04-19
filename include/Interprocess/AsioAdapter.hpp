@@ -5,7 +5,7 @@ TEMPLATE_T
 AsioAdapter_t::AsioAdapter() = default;
 
 TEMPLATE_T
-AsioAdapter_t::~AsioAdapter() = default;
+AsioAdapter_t::~AsioAdapter() noexcept = default;
 
 TEMPLATE_T
 void AsioAdapter_t::AsyncRead(

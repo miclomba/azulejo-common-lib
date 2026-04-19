@@ -16,12 +16,12 @@ using Key = Entity::Key;
 using SharedEntity = Entity::SharedEntity;
 
 ISerializableEntity::ISerializableEntity() = default;
-ISerializableEntity::~ISerializableEntity() = default;
+ISerializableEntity::~ISerializableEntity() noexcept = default;
 
 ISerializableEntity::ISerializableEntity(const ISerializableEntity &) = default;
 ISerializableEntity &ISerializableEntity::operator=(const ISerializableEntity &) = default;
-ISerializableEntity::ISerializableEntity(ISerializableEntity &&) = default;
-ISerializableEntity &ISerializableEntity::operator=(ISerializableEntity &&) = default;
+ISerializableEntity::ISerializableEntity(ISerializableEntity &&) noexcept = default;
+ISerializableEntity &ISerializableEntity::operator=(ISerializableEntity &&) noexcept = default;
 
 SharedEntity &ISerializableEntity::GetAggregatedMember(const Key &key) const
 {

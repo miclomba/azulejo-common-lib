@@ -44,7 +44,7 @@ namespace filesystem_adapters
         /**
          * @brief Destructor for the ISerializableEntity class.
          */
-        virtual ~ISerializableEntity();
+        virtual ~ISerializableEntity() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -63,14 +63,14 @@ namespace filesystem_adapters
          * @brief Move constructor.
          * @param other The ISerializableEntity instance to move from.
          */
-        ISerializableEntity(ISerializableEntity &&other);
+        ISerializableEntity(ISerializableEntity &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The ISerializableEntity instance to move from.
          * @return Reference to the updated ISerializableEntity instance.
          */
-        ISerializableEntity &operator=(ISerializableEntity &&other);
+        ISerializableEntity &operator=(ISerializableEntity &&other) noexcept;
 
         /**
          * @brief Save the entity data to a property tree.

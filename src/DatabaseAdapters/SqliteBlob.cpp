@@ -20,7 +20,7 @@ SqliteBlob::SqliteBlob(Sqlite &db) : db_(db)
 {
 }
 
-SqliteBlob::~SqliteBlob()
+SqliteBlob::~SqliteBlob() noexcept
 {
 	if (blob_)
 		sqlite3_blob_close(blob_);

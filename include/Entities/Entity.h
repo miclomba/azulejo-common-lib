@@ -47,7 +47,7 @@ namespace entity
         /**
          * @brief Destructor for the Entity class.
          */
-        virtual ~Entity();
+        virtual ~Entity() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -66,14 +66,14 @@ namespace entity
          * @brief Move constructor.
          * @param other The Entity instance to move from.
          */
-        Entity(Entity &&other);
+        Entity(Entity &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The Entity instance to move from.
          * @return Reference to the updated Entity instance.
          */
-        Entity &operator=(Entity &&other);
+        Entity &operator=(Entity &&other) noexcept;
 
         /**
          * @brief Get the key associated with this Entity.

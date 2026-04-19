@@ -22,10 +22,10 @@ namespace
 Sqlite::Sqlite() = default;
 Sqlite::Sqlite(const Sqlite &) = default;
 Sqlite &Sqlite::operator=(const Sqlite &) = default;
-Sqlite::Sqlite(Sqlite &&) = default;
-Sqlite &Sqlite::operator=(Sqlite &&) = default;
+Sqlite::Sqlite(Sqlite &&) noexcept = default;
+Sqlite &Sqlite::operator=(Sqlite &&) noexcept = default;
 
-Sqlite::~Sqlite()
+Sqlite::~Sqlite() noexcept
 {
 	if (db_)
 		delete db_;

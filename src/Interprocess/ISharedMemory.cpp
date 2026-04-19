@@ -12,7 +12,7 @@ using interprocess::ISharedMemory;
 
 ISharedMemory::ISharedMemory() = default;
 
-ISharedMemory::~ISharedMemory()
+ISharedMemory::~ISharedMemory() noexcept
 {
 	if (!shmem_ || !isShmemOwner_)
 		return;

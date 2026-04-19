@@ -13,12 +13,12 @@ IOMPRunnable::IOMPRunnable(const size_t numThreads, const bool setDynamic, const
 		throw std::runtime_error("Cannot start IOMPRunnable with invalid number of threads: " + std::to_string(numThreads_));
 }
 
-IOMPRunnable::~IOMPRunnable() = default;
+IOMPRunnable::~IOMPRunnable() noexcept = default;
 
 IOMPRunnable::IOMPRunnable(const IOMPRunnable &) = default;
 IOMPRunnable &IOMPRunnable::operator=(const IOMPRunnable &) = default;
-IOMPRunnable::IOMPRunnable(IOMPRunnable &&) = default;
-IOMPRunnable &IOMPRunnable::operator=(IOMPRunnable &&) = default;
+IOMPRunnable::IOMPRunnable(IOMPRunnable &&) noexcept = default;
+IOMPRunnable &IOMPRunnable::operator=(IOMPRunnable &&) noexcept = default;
 
 void IOMPRunnable::Start()
 {

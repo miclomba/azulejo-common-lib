@@ -4,11 +4,11 @@ using filesystem_adapters::ISerializableResource;
 using LockedResource = filesystem_adapters::ISerializableResource::LockedResource;
 
 ISerializableResource::ISerializableResource() : mtx_{std::make_shared<std::mutex>()} {};
-ISerializableResource::~ISerializableResource() = default;
+ISerializableResource::~ISerializableResource() noexcept = default;
 ISerializableResource::ISerializableResource(const ISerializableResource &) = default;
 ISerializableResource &ISerializableResource::operator=(const ISerializableResource &) = default;
-ISerializableResource::ISerializableResource(ISerializableResource &&) = default;
-ISerializableResource &ISerializableResource::operator=(ISerializableResource &&) = default;
+ISerializableResource::ISerializableResource(ISerializableResource &&) noexcept = default;
+ISerializableResource &ISerializableResource::operator=(ISerializableResource &&) noexcept = default;
 
 LockedResource ISerializableResource::Lock()
 {

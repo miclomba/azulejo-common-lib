@@ -6,11 +6,11 @@ EventConsumer<T>::EventConsumer(const std::function<T>& subscriber) :
 {
 }
 
-TEMPLATE_T EventConsumer<T>::~EventConsumer() = default;
+TEMPLATE_T EventConsumer<T>::~EventConsumer() noexcept = default;
 TEMPLATE_T EventConsumer<T>::EventConsumer(const EventConsumer<T>&) = default;
 TEMPLATE_T EventConsumer<T>& EventConsumer<T>::operator=(const EventConsumer<T>&) = default;
-TEMPLATE_T EventConsumer<T>::EventConsumer(EventConsumer<T>&&) = default;
-TEMPLATE_T EventConsumer<T>& EventConsumer<T>::operator=(EventConsumer<T>&&) = default;
+TEMPLATE_T EventConsumer<T>::EventConsumer(EventConsumer<T>&&) noexcept = default;
+TEMPLATE_T EventConsumer<T>& EventConsumer<T>::operator=(EventConsumer<T>&&) noexcept = default;
 
 TEMPLATE_T 
 std::function<T> EventConsumer<T>::GetSubscriber() const

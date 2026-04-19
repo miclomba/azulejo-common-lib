@@ -25,7 +25,7 @@ using Key = Entity::Key;
 EntitySerializer *EntitySerializer::instance_ = nullptr;
 
 EntitySerializer::EntitySerializer() = default;
-EntitySerializer::~EntitySerializer() = default;
+EntitySerializer::~EntitySerializer() noexcept = default;
 
 EntitySerializer *EntitySerializer::GetInstance()
 {

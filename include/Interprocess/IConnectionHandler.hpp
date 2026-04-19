@@ -14,7 +14,7 @@ IConnectionHandler_t::IConnectionHandler(boost::asio::io_context& ioService) :
 }
 
 TEMPLATE_T
-IConnectionHandler_t::~IConnectionHandler() = default;
+IConnectionHandler_t::~IConnectionHandler() noexcept = default;
 
 TEMPLATE_T
 boost::asio::ip::tcp::socket& IConnectionHandler_t::Socket()

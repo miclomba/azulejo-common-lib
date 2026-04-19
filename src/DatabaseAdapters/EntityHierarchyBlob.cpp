@@ -73,7 +73,7 @@ EntityHierarchyBlob::EntityHierarchyBlob(std::string &&buff)
 	hierarchyTree_ = MakeHierarchyTree(reinterpret_cast<const char *>(Data()));
 }
 
-EntityHierarchyBlob::~EntityHierarchyBlob() = default;
+EntityHierarchyBlob::~EntityHierarchyBlob() noexcept = default;
 
 const pt::ptree &EntityHierarchyBlob::GetHierarchyTree()
 {

@@ -54,7 +54,7 @@ EntityPersister *EntityPersister::instance_ = nullptr;
 
 EntityPersister::EntityPersister() = default;
 
-EntityPersister::~EntityPersister()
+EntityPersister::~EntityPersister() noexcept
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();

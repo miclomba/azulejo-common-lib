@@ -37,7 +37,7 @@ ThreadPool::ThreadPool(const size_t numThreads)
 	std::this_thread::sleep_for(HUNDRED_MSEC);
 }
 
-ThreadPool::~ThreadPool()
+ThreadPool::~ThreadPool() noexcept
 {
 	Join();
 }

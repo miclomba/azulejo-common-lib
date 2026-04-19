@@ -28,7 +28,7 @@ namespace filesystem_adapters
         /**
          * @brief Destructor for the ResourceSerializer class.
          */
-        virtual ~ResourceSerializer();
+        virtual ~ResourceSerializer() noexcept;
 
         /**
          * @brief Get the singleton instance of the ResourceSerializer.

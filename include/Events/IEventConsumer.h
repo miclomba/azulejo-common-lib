@@ -30,7 +30,7 @@ namespace events
         /**
          * @brief Virtual destructor for the IEventConsumer interface.
          */
-        virtual ~IEventConsumer();
+        virtual ~IEventConsumer() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -49,14 +49,14 @@ namespace events
          * @brief Move constructor.
          * @param other The IEventConsumer instance to move from.
          */
-        IEventConsumer(IEventConsumer &&other);
+        IEventConsumer(IEventConsumer &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IEventConsumer instance to move from.
          * @return Reference to the updated IEventConsumer instance.
          */
-        IEventConsumer &operator=(IEventConsumer &&other);
+        IEventConsumer &operator=(IEventConsumer &&other) noexcept;
 
         /**
          * @brief Get the type of subscriber the event consumer represents.

@@ -29,7 +29,7 @@ ResourcePersister *ResourcePersister::instance_ = nullptr;
 
 ResourcePersister::ResourcePersister() = default;
 
-ResourcePersister::~ResourcePersister()
+ResourcePersister::~ResourcePersister() noexcept
 {
 	if (databaseAdapter_.IsOpen())
 		databaseAdapter_.Close();

@@ -40,7 +40,7 @@ namespace interprocess
         /**
          * @brief Virtual destructor for the AsioAdapter class.
          */
-        virtual ~AsioAdapter();
+        virtual ~AsioAdapter() noexcept;
 
         /**
          * @brief Deleted copy constructor to prevent copying.

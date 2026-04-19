@@ -32,7 +32,7 @@ namespace entity
         /**
          * @brief Destructor for the IStreamableEntity class.
          */
-        virtual ~IStreamableEntity();
+        virtual ~IStreamableEntity() noexcept;
 
         /**
          * @brief Copy constructor.
@@ -51,14 +51,14 @@ namespace entity
          * @brief Move constructor.
          * @param other The IStreamableEntity instance to move from.
          */
-        IStreamableEntity(IStreamableEntity &&other);
+        IStreamableEntity(IStreamableEntity &&other) noexcept;
 
         /**
          * @brief Move assignment operator.
          * @param other The IStreamableEntity instance to move from.
          * @return Reference to the updated IStreamableEntity instance.
          */
-        IStreamableEntity &operator=(IStreamableEntity &&other);
+        IStreamableEntity &operator=(IStreamableEntity &&other) noexcept;
 
         /**
          * @brief Serialize the entity to a string representation.

@@ -31,7 +31,7 @@ namespace filesystem_adapters
         /**
          * @brief Destructor for the EntitySerializer class.
          */
-        virtual ~EntitySerializer();
+        virtual ~EntitySerializer() noexcept;
 
         /**
          * @brief Get the singleton instance of the EntitySerializer.
